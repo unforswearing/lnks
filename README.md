@@ -1,5 +1,5 @@
 # lnks
-List / Save / Instapaper your Google Chrome links from the terminal
+List / Save / Instapaper your Google Chrome links from the terminal (on OS X)  
 
 ## Installation 
 
@@ -15,7 +15,7 @@ List / Save / Instapaper your Google Chrome links from the terminal
 `-c`: Copy links matching `search-term` to the clipboard  
 `-p`: Print links matching `search-term` to stdout  
 `-q`: Quietly print links matching `search-term` to stdout  
-`-i`: Save links matching `search-term` to Instapaper. On the first run, `lnks` will ask for your Instapaper credentials. 
+`-i`: Save links matching `search-term` to Instapaper. On the first run, `lnks` will ask for your Instapaper credentials.   
 `-h`: Print this help message  
 
 ## License  
