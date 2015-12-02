@@ -1,15 +1,9 @@
 #!/bin/sh
 
-# To Do: 
-# 	- [x] Remove the dependency on chrome-cli (replacing with applescript)
-#	- [x] Add a "Save to Instapaper" feature, with the credentials read from a file (lnks.conf)
-#	- [x] Reverse the option and argument to read `lnks -c 'search term` and NOT `lnks 'search term' -c`
-
 srch="$2"
 today=$(date +"%m-%d")
 
 help () {
-	clear 
 	echo "Lnks Help:"
 	printf '\n'
 	echo "Lnks - quickly search your chrome tabs and print, copy, or save the links."
@@ -26,7 +20,7 @@ help () {
 	printf '\n'
 	echo "Note:"
 	echo "using option -s will allow you to specify an output file, such as:"
-	echo "	lnks SearchTerm -s ~/MyLinks.txt"
+	echo "	lnks -s SearchTerm ~/MyLinks.txt"
 
 }
 
@@ -46,13 +40,13 @@ _instapaper() {
 	else
 		echo "lnks needs to store your Instapaper credentials"
 		sleep .2
-		echo "enter your username (email address)"
+		echo "enter your username (email address):"
 		read username
 		sleep .2
-		echo "enter your password"
+		echo "enter your password:"
 		read password
 		sleep .2 
-		echo "done"
+		echo "done!"
 		echo "username=\"$username\"" > ~/.lnks.conf
 		echo "password=\"$password\"" >> ~/.lnks.conf
 	fi
