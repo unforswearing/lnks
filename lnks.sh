@@ -39,14 +39,15 @@ _instapaper() {
 		password=$(cat ~/.lnks.conf | grep 'password' | awk -F= '{print $2}' | sed 's|\"||g')
 	else
 		echo "lnks needs to store your Instapaper credentials"
-		sleep .2
+		echo "your credentials are stored at $HOME/.lnks.conf"
+		sleep 1
 		echo "enter your username (email address):"
 		read username
 		sleep .2
 		echo "enter your password:"
 		read password
 		sleep .2 
-		echo "done!"
+		echo "done! now saving your links"
 		echo "username=\"$username\"" > ~/.lnks.conf
 		echo "password=\"$password\"" >> ~/.lnks.conf
 	fi
