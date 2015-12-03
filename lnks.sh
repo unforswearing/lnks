@@ -62,24 +62,24 @@ case "$1" in
 	;;
 	# option to save the list as a file
 	-s) echo $links | tr ', ' '\n' | grep -i "$srch" > "$3"
-		echo "Links matching "$2" saved to "$3""
+	echo "Links matching "$2" saved to "$3""
 	;;
 	# copy to clipboard
 	-c) echo $links | tr ', ' '\n' | grep -i "$srch" | pbcopy
-		echo "Links matching "$2" copied to clipboard"
+	echo "Links matching "$2" copied to clipboard"
 	;;
 	# print to stdout
 	-p) echo "Links matching "$2":"
-		echo $links | tr ', ' '\n' | grep -i "$srch" 
+	echo $links | tr ', ' '\n' | grep -i "$srch" 
 	;;
 	-q) echo $links | tr ', ' '\n' | grep -i "$srch"
 	;;
 	# when null
 	-i) _instapaper
-		urls=$(echo $links | tr ', ' '\n' | grep -i "$srch")
-		echo $urls | tr ' ' '\n' | while read url; do 
-			curl -d "username=$username&password=$password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
+	urls=$(echo $links | tr ', ' '\n' | grep -i "$srch")
+	echo $urls | tr ' ' '\n' | while read url; do 
+		curl -d "username=$username&password=$password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
 			echo "$url Saved!"
-		done
+	done
 	;;
 esac	
