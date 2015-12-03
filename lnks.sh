@@ -79,7 +79,7 @@ case "$1" in
 	urls=$(echo $links | tr ', ' '\n' | grep -i "$srch")
 	echo $urls | tr ' ' '\n' | while read url; do 
 		curl -d "username=$username&password=$password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
-			echo "$url Saved!"
+		echo "$url Saved!"
 	done
 	;;
 esac	
