@@ -1,7 +1,5 @@
-#!/bin/sh
-
+#!/bin/bash
 srch="$2"
-today=$(date +"%m-%d")
 
 help () {
 	echo "Lnks Help:"
@@ -20,17 +18,49 @@ help () {
 	printf '\n'
 	echo "Note:"
 	echo "using option -s will allow you to specify an output file, such as:"
-	echo "	lnks -s SearchTerm ~/MyLinks.txt"
-
+	echo "	lnks -s searchterm matchinglinks.txt"
 }
 
 links() {
-	osascript <<EOT
-		tell application "Google Chrome"
-			set links to get URL of tabs of first window
-			return links
-		end tell
+	_pull() {
+		osascript <<EOT
+			tell application "Google Chrome"
+				set links to get URL of tabs of first window
+				return links
+			end tell
 EOT
+	}
+	count=$(_pull | grep "$srch" | sed "s|^ ||g" | wc -l)
+    links=$(_pull | tr ',' '\n' | grep "$srch" | sed "s|^ ||g")
+
+	if [[ $count -eq 0 ]]; then
+		echo "Error: No matching links"
+		exit 1
+	else
+		echo "$links"
+	fi
+}
+
+_s() {
+	if [[ $3 == "" ]]; then
+		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
+		exit 1;
+	fi
+	links > "$3" && echo "Links matching "$srch" saved to "$3""
+}
+
+_c() {
+	copylinks() {
+		links | pbcopy
+		echo "Links matching "$srch" copied to clipboard"
+	}
+	local lnx=$(links)
+	if [[ $lnx == "Error: No matching links" ]]; then
+		links;
+		exit 1;
+	else
+		copylinks;
+	fi
 }
 
 _instapaper() {
@@ -46,41 +76,52 @@ _instapaper() {
 		sleep .2
 		echo "enter your password:"
 		read password
-		sleep .2 
+		sleep .2
 		echo "done! now saving your links"
 		echo "username=\"$username\"" > ~/.lnks.conf
 		echo "password=\"$password\"" >> ~/.lnks.conf
 	fi
 }
 
-links=$(links)
+_instapaper_curl() {
+	local lnx=$(links)
+	if [[ $lnx == "Error: No matching links" ]]; then
+		links;
+		exit 1;
+	else
+		links | while read url; do
+			curl -d "username=$username&password=$password&url=$url" 	https://www.instapaper.com/api/add > /dev/null 2>&1
+			echo "$url Saved!"
+			sleep .5
+		done
+	fi
+
+}
+
+if [[ $srch == "" ]]; then
+	echo "Error: No search term entered";
+	exit 1;
+fi
 
 case "$1" in
 	# help
-	-h) help 
+	-h) help
 	;;
 	"") help
 	;;
 	# option to save the list as a file
-	-s) echo $links | tr ', ' '\n' | grep -i "$srch" > "$3"
-	echo "Links matching "$2" saved to "$3""
+	-s) _s
 	;;
-	# copy to clipboard
-	-c) echo $links | tr ', ' '\n' | grep -i "$srch" | pbcopy
-	echo "Links matching "$2" copied to clipboard"
+	# copy to clipboa
+	-c) _c
 	;;
 	# print to stdout
-	-p) echo "Links matching "$2":"
-	echo $links | tr ', ' '\n' | grep -i "$srch" 
+	-p) echo "Links matching $srch:"; links
 	;;
-	-q) echo $links | tr ', ' '\n' | grep -i "$srch"
+	# print quietly
+	-q) links
 	;;
-	# when null
-	-i) _instapaper
-	urls=$(echo $links | tr ', ' '\n' | grep -i "$srch")
-	echo $urls | tr ' ' '\n' | while read url; do 
-		curl -d "username=$username&password=$password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
-		echo "$url Saved!"
-	done
+	# add to instapaper
+	-i) _instapaper && _instapaper_curl
 	;;
-esac	
+esac
