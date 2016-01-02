@@ -9,7 +9,7 @@ help () {
 	echo "lnks [option] [search term]"
 	printf '\n'
 	echo "Options:"
-	echo "	-s to save the links to a file on the desktop"
+#	echo "	-s to save the links to a file on the desktop"
 	echo "	-c to copy the links to your clipboard"
 	echo "	-p to print the links to stdout"
 	echo "	-q to quietly print the links to stdout"
@@ -41,13 +41,13 @@ EOT
 	fi
 }
 
-_s() {
-	if [[ $3 == "" ]]; then
-		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
-		exit 1;
-	fi
-	links > "$3" && echo "Links matching "$srch" saved to "$3""
-}
+# _s() {
+# 	if [[ $3 == "" ]]; then
+# 		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
+# 		exit 1;
+# 	fi
+# 	links > "$3" && echo "Links matching "$srch" saved to "$3""
+# }
 
 _c() {
 	copylinks() {
@@ -109,9 +109,9 @@ case "$1" in
 	;;
 	"") help
 	;;
-	# option to save the list as a file
-	-s) _s
-	;;
+# 	option to save the list as a file
+#	-s) _s
+#	;;
 	# copy to clipboa
 	-c) _c
 	;;
