@@ -15,10 +15,10 @@ help () {
 	echo "	-q to quietly print the links to stdout"
 	echo "	-i to save the link(s) to instapaper"
 	echo "	-h prints this help message"
-	printf '\n'
-	echo "Note:"
-	echo "using option -s will allow you to specify an output file, such as:"
-	echo "	lnks -s searchterm matchinglinks.txt"
+#	printf '\n'
+#	echo "Note:"
+#	echo "using option -s will allow you to specify an output file, such as:"
+#	echo "	lnks -s searchterm matchinglinks.txt"
 }
 
 links() {
@@ -92,7 +92,7 @@ _instapaper_curl() {
 		links | while read url; do
 			curl -d "username=$username&password=$password&url=$url" 	https://www.instapaper.com/api/add > /dev/null 2>&1
 			echo "$url Saved!"
-			sleep .5
+			sleep .2
 		done
 	fi
 
