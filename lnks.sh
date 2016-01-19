@@ -6,7 +6,7 @@ help () {
 	printf '\n'
 	echo "Lnks - quickly search your chrome tabs and print, copy, or save the links."
 	printf '\n'
-	echo "lnks [option] [search term]"
+	echo "lnks <option> <search term]>"
 	printf '\n'
 	echo "Options:"
 #	echo "	-s to save the links to a file on the desktop"
