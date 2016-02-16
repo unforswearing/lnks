@@ -30,8 +30,8 @@ links() {
 			end tell
 EOT
 	}
-	count=$(_pull | grep "$srch" | sed "s|^ ||g" | wc -l)
-    links=$(_pull | tr ',' '\n' | grep "$srch" | sed "s|^ ||g")
+	count=$(_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l)
+    links=$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")
 
 	if [[ $count -eq 0 ]]; then
 		echo "Error: No matching links"
@@ -65,8 +65,8 @@ _c() {
 
 _instapaper() {
 	if [[ -f ~/.lnks.conf ]]; then
-		username=$(cat ~/.lnks.conf | grep 'username' | awk -F= '{print $2}' | sed 's|\"||g')
-		password=$(cat ~/.lnks.conf | grep 'password' | awk -F= '{print $2}' | sed 's|\"||g')
+		username=$(cat ~/.lnks.conf | grep -i 'username' | awk -F= '{print $2}' | sed 's|\"||g')
+		password=$(cat ~/.lnks.conf | grep -i 'password' | awk -F= '{print $2}' | sed 's|\"||g')
 	else
 		echo "lnks needs to store your Instapaper credentials"
 		echo "your credentials are stored at $HOME/.lnks.conf"
