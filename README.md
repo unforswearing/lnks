@@ -30,7 +30,7 @@ Or download the zip and move to your desired location.
 
 ## To Do
 
-- [ ] Allow `lnks` to use regex to find matching urls
+- [ ] Allow regex to find matching urls
 - [ ] Add support for other read later/bookmarking services
 - [ ] Stop using Applescript to find urls
 
