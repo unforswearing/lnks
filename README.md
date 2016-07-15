@@ -14,12 +14,17 @@ Or download the zip and move to your desired location.
 
 **Options**
 
-`-s`: Save links matching `search-term` to a file. Ex. `lnks -s github ~/github.txt`
-`-c`: Copy links matching `search-term` to the clipboard
-`-p`: Print links matching `search-term` to stdout
-`-q`: Quietly print links matching `search-term` to stdout
-`-i`: Save links matching `search-term` to Instapaper. On the first run, `lnks` will ask for your Instapaper credentials.
-`-h`: Print this help message
+	-s to save the links to a file on the desktop
+	-c to copy the links to your clipboard
+	-p to print the links to stdout
+	-q to quietly print the links to stdout
+	-i to save the link(s) to instapaper
+	-h prints this help message
+
+	Note:
+	- one (and only one) option is permitted. lnks will fail if multiple options are specified.
+	- using option -s will allow you to specify an output file, such as:
+			lnks -s searchterm matchinglinks.txt
 <br><br>
 
 ## To Do
