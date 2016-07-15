@@ -11,6 +11,7 @@ Or download the zip and move to your desired location.
 ## Usage
 
 `lnks <option> search-term`
+<br><br>
 
 **Options**
 
