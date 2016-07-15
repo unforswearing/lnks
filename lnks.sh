@@ -1,24 +1,28 @@
 #!/bin/bash
+IFS=$'\n\t'
+
 srch="$2"
+lfile="$3"
 
 help () {
 	echo "Lnks Help:"
 	printf '\n'
 	echo "Lnks - quickly search your chrome tabs and print, copy, or save the links."
 	printf '\n'
-	echo "lnks <option> <search term]>"
+	echo "lnks <option> <search term>"
 	printf '\n'
 	echo "Options:"
-#	echo "	-s to save the links to a file on the desktop"
+	echo "	-s to save the links to a file on the desktop"
 	echo "	-c to copy the links to your clipboard"
 	echo "	-p to print the links to stdout"
 	echo "	-q to quietly print the links to stdout"
 	echo "	-i to save the link(s) to instapaper"
 	echo "	-h prints this help message"
-#	printf '\n'
-#	echo "Note:"
-#	echo "using option -s will allow you to specify an output file, such as:"
-#	echo "	lnks -s searchterm matchinglinks.txt"
+	printf '\n'
+	echo "Note:"
+	echo "- one (and only one) option is permitted. lnks will fail if multiple options are specified."
+	echo "- using option -s will allow you to specify an output file, such as:"
+	echo "		lnks -s searchterm matchinglinks.txt"
 }
 
 links() {
@@ -41,13 +45,13 @@ EOT
 	fi
 }
 
-# _s() {
-# 	if [[ $3 == "" ]]; then
-# 		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
-# 		exit 1;
-# 	fi
-# 	links > "$3" && echo "Links matching "$srch" saved to "$3""
-# }
+_s() {
+	if [[ "$lfile" == "" ]]; then
+		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
+		exit 1;
+	fi
+	links > "$lfile" && echo "Links matching "$srch" saved to "$lfile""
+}
 
 _c() {
 	copylinks() {
@@ -69,17 +73,17 @@ _instapaper() {
 		password=$(cat ~/.lnks.conf | grep -i 'password' | awk -F= '{print $2}' | sed 's|\"||g')
 	else
 		echo "lnks needs to store your Instapaper credentials"
-		echo "your credentials are stored at $HOME/.lnks.conf"
 		sleep 1
-		echo "enter your username (email address):"
-		read username
+		tput cnorm
+		read -r -p "	enter your username (email address): " username
 		sleep .2
-		echo "enter your password:"
-		read password
+		read -rs -p "	enter your password: " password
 		sleep .2
-		echo "done! now saving your links"
-		echo "username=\"$username\"" > ~/.lnks.conf
-		echo "password=\"$password\"" >> ~/.lnks.conf
+		echo "done! your credentials are stored at $HOME/.lnks.conf"
+		echo "delete this file at any time to revoke Instapaper access."
+		sleep .2
+		echo "now saving your links"
+		echo -en "username=\"$username\"\npassword=\"$password\"" > ~/.lnks.conf
 	fi
 }
 
@@ -90,7 +94,7 @@ _instapaper_curl() {
 		exit 1;
 	else
 		links | while read url; do
-			curl -d "username=$username&password=$password&url=$url" 	https://www.instapaper.com/api/add > /dev/null 2>&1
+			curl -d "username=$username&password=$password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
 			echo "$url Saved!"
 			sleep .2
 		done
@@ -109,10 +113,10 @@ case "$1" in
 	;;
 	"") help
 	;;
-# 	option to save the list as a file
-#	-s) _s
-#	;;
-	# copy to clipboa
+	# option to save the list as a file
+	-s) _s
+	;;
+	# copy to clipboard
 	-c) _c
 	;;
 	# print to stdout
