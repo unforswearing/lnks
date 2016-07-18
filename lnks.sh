@@ -35,7 +35,7 @@ links() {
 EOT
 	}
 	count=$(_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l)
-    links=$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")
+        links=$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")
 
 	if [[ $count -eq 0 ]]; then
 		echo "Error: No matching links"
@@ -50,6 +50,7 @@ _s() {
 		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
 		exit 1;
 	fi
+
 	links > "$lfile" && echo "Links matching "$srch" saved to "$lfile""
 }
 
@@ -58,6 +59,7 @@ _c() {
 		links | pbcopy
 		echo "Links matching "$srch" copied to clipboard"
 	}
+
 	local lnx=$(links)
 	if [[ $lnx == "Error: No matching links" ]]; then
 		links;
@@ -89,6 +91,7 @@ _instapaper() {
 
 _instapaper_curl() {
 	local lnx=$(links)
+	
 	if [[ $lnx == "Error: No matching links" ]]; then
 		links;
 		exit 1;
