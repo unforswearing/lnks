@@ -40,7 +40,3 @@ Or download the zip and move to your desired location.
 - [ ] Stop using Applescript to find urls
 
 <br><br>
-
-## License
-
-Unlicense
