@@ -7,6 +7,7 @@ List / Save / Instapaper your Google Chrome links from the terminal (on OS X)
 ```
 > mkdir lnks && cd lnks
 > git clone https://github.com/unforswearing/lnks.git .
+> chmod +x lnks.sh	# if needed
 ```
 
 Or download the zip and move to your desired location.
