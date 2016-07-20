@@ -43,7 +43,7 @@ help () {
 	echo "	-i to save the link(s) to instapaper"
 
 	# default: pdf
-    echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
+	echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
 
 	echo "	-h prints this help message"
 	printf '\n'
