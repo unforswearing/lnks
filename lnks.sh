@@ -1,6 +1,14 @@
 #!/bin/bash
 IFS=$'\n\t'
 
+# To Do
+#
+# - Allow regex to find matching urls
+# - Add support for other read later/bookmarking services
+# 	- Will need to change .lnks.conf structure to accomodate multiple services.
+#	- Maybe a '.lnks.conf' folder with each service config as a separate file.
+# - Stop using Applescript to find urls
+
 srch="$2"
 lfile="$3"
 
