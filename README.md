@@ -30,7 +30,7 @@ Or download the zip and move to your desired location.
 <br><br>
 
 ## Dependencies
-`wkhtmltopdf` for saving a the url/webpage as a pdf. Visit http://wkhtmltopdf.org/downloads.html.
+- `wkhtmltopdf` for saving a the url/webpage as a pdf. Visit http://wkhtmltopdf.org/downloads.html.
 <br><br>
 
 ## To Do
