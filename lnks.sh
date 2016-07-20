@@ -17,12 +17,42 @@ help () {
 	echo "	-p to print the links to stdout"
 	echo "	-q to quietly print the links to stdout"
 	echo "	-i to save the link(s) to instapaper"
+    echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
 	echo "	-h prints this help message"
 	printf '\n'
 	echo "Note:"
 	echo "- one (and only one) option is permitted. lnks will fail if multiple options are specified."
 	echo "- using option -s will allow you to specify an output file, such as:"
 	echo "		lnks -s searchterm matchinglinks.txt"
+}
+
+_prog() {
+	# script sources:
+	#   - http://stackoverflow.com/questions/12498304/using-bash-to-display-a-progress-working-indicator
+	#   - http://www.unix.com/shell-programming-and-scripting/176837-bash-hide-terminal-cursor.html
+	#   - http://superuser.com/questions/305933/preventing-bash-from-displaying-done-when-a-background-command-finishes-execut
+
+	[[ "$1" == "" ]] && exit 0
+
+	set +m
+	tput civis
+
+	eval "$1" > /dev/null 2>&1 &
+
+	pid=$! # Process Id of the previous running command
+	spin="-\|/" #-\|/
+	i=0
+
+	while kill -0 $pid 2>/dev/null
+	do
+	  i=$(( (i+1) %4 ))
+	  printf "\r${spin:$i:1}"
+	  sleep .07
+	done
+	printf "\r"
+
+	tput cnorm
+	set -m
 }
 
 links() {
@@ -34,8 +64,9 @@ links() {
 			end tell
 EOT
 	}
+
 	count=$(_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l)
-        links=$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")
+    links=$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")
 
 	if [[ $count -eq 0 ]]; then
 		echo "Error: No matching links"
@@ -91,7 +122,7 @@ _instapaper() {
 
 _instapaper_curl() {
 	local lnx=$(links)
-	
+
 	if [[ $lnx == "Error: No matching links" ]]; then
 		links;
 		exit 1;
@@ -103,6 +134,33 @@ _instapaper_curl() {
 		done
 	fi
 
+}
+
+_w() {
+	_to_pdf() {
+		$(which wkhtmltopdf) --quiet --title "$url" "$url" "$filename".pdf
+		sleep .2
+	}
+
+	_filename() {
+		curl -L --silent "$url" | \
+			grep '<title>' | \
+			awk '{gsub("<[^>]*>", "")}1' | \
+			sed 's/ - //g;s/\://g;s/\///g;s/\·//g;s/^ *//g;s/ /_/g;s/__*/_/g'
+	}
+
+	# test for the existense of wkhtmltopdf
+	if [[ ! $(which wkhtmltopdf) ]]; then
+		echo "Error: wkhtmltopdf is not installed."
+		echo "Please visit http://wkhtmltopdf.org/downloads.html for installation instructions"
+	else
+		while read url; do
+			filename=$(_filename)
+			echo "Converting \""$url"\" to PDF..."
+			_prog _to_pdf
+			echo "Done - $(pwd)/"$filename""
+		done < <(links)
+	fi
 }
 
 if [[ $srch == "" ]]; then
@@ -130,5 +188,8 @@ case "$1" in
 	;;
 	# add to instapaper
 	-i) _instapaper && _instapaper_curl
+	;;
+	# save url (as webpage) to pdf
+	-w) _w
 	;;
 esac

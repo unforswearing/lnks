@@ -20,12 +20,17 @@ Or download the zip and move to your desired location.
 	-p to print the links to stdout
 	-q to quietly print the links to stdout
 	-i to save the link(s) to instapaper
+	-w to save each url as a pdf (saves the page via 'wkhtmltopdf')
 	-h prints this help message
 
 	Note:
 	- one (and only one) option is permitted. lnks will fail if multiple options are specified.
 	- using option -s will allow you to specify an output file, such as:
 			lnks -s searchterm matchinglinks.txt
+<br><br>
+
+## Dependencies
+`wkhtmltopdf` for saving a the url/webpage as a pdf. Visit http://wkhtmltopdf.org/downloads.html.
 <br><br>
 
 ## To Do
