@@ -1,13 +1,19 @@
 #!/bin/bash
 IFS=$'\n\t'
 
-# To Do
+# TO DO:
 #
 # - Allow regex to find matching urls
 # - Add support for other read later/bookmarking services
-# 	- Will need to change .lnks.conf structure to accomodate multiple services.
+# 	- Will need to change .lnks.conf structure to accomodate multiple services
 #	- Maybe a '.lnks.conf' folder with each service config as a separate file.
+#	- See _pinboard and _pocket for methods
 # - Stop using Applescript to find urls
+# - Allow user to set defaults in the .links.conf file
+#	- e.g. if 'quiet' is preffered over '-p', add to conf:
+#			default=quiet
+#	  and read from conf on startup. Otherwise
+#			default=print
 
 srch="$2"
 lfile="$3"
@@ -20,12 +26,25 @@ help () {
 	echo "lnks <option> <search term>"
 	printf '\n'
 	echo "Options:"
+
+	# default: save
 	echo "	-s to save the links to a file on the desktop"
+
+	# default: copy
 	echo "	-c to copy the links to your clipboard"
+
+	# default: print
 	echo "	-p to print the links to stdout"
+
+	# default: quiet
 	echo "	-q to quietly print the links to stdout"
+
+	# default: instapaper
 	echo "	-i to save the link(s) to instapaper"
+
+	# default: pdf
     echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
+
 	echo "	-h prints this help message"
 	printf '\n'
 	echo "Note:"
@@ -143,6 +162,16 @@ _instapaper_curl() {
 	fi
 
 }
+
+# Not Implemented:
+# _pinboard() {
+#	 curl -k --get "https://USER:PASS@api.pinboard.in/v1/posts/add/" --data-urlencode "url=URL" -d "description=DESC" -d "tags=TAGS"
+# }
+
+# Not Implemented:
+# _pocket() {
+#	TBD
+# }
 
 _w() {
 	_to_pdf() {
