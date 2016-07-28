@@ -44,7 +44,7 @@ Or download the zip and move to your desired location.
 - [ ] Add support for sending links to pastebin.com
 - [ ] Add support for other read later/bookmarking services
 - [ ] Add more robust `lnks.conf` usage  
-- [ ] Default to `lnks -q`/Deprecate `lnks -p` (because having the leading text is annoying)
+- [ ] Default to `lnks -q` / Deprecate `lnks -p` (because having the leading text is annoying)
 - [ ] Stop using Applescript to find urls (maybe impossible)
 
 <br><br>
