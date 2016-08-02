@@ -45,6 +45,6 @@ Or download the zip and move to your desired location.
 - [ ] Add support for other read later/bookmarking services
 - [ ] Add more robust `lnks.conf` usage  
 - [ ] Default to `lnks -q` / Deprecate `lnks -p` (because having the leading text is annoying)
-- [ ] Stop using Applescript to find urls (maybe impossible)
+- [ ] Stop using Applescript to find urls (difficult, but see [chrome cli](https://github.com/prasmussen/chrome-cli))
 
 <br><br>
