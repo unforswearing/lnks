@@ -22,8 +22,8 @@ Or download the zip and move to your desired location.
 
 	-s to save the links to a file on the desktop
 	-c to copy the links to your clipboard
+	-v to print the links to stdout with leading text
 	-p to print the links to stdout
-	-q to quietly print the links to stdout
 	-i to save the link(s) to instapaper
 	-b to save the link(s) to pastebin.com
 	-w to save each url as a pdf (saves the page via 'wkhtmltopdf')
@@ -42,10 +42,10 @@ Or download the zip and move to your desired location.
 ## To Do
 
 - [ ] Allow regex to find matching urls
-- [ ] Add support for sending links to pastebin.com
+- [x] Add support for sending links to pastebin.com
 - [ ] Add support for other read later/bookmarking services
 - [ ] Add more robust `lnks.conf` usage  
-- [ ] Default to `lnks -q` / Deprecate `lnks -p` (because having the leading text is annoying)
+- [x] Default to `lnks -q` / Deprecate `lnks -p` (because having the leading text is annoying)
 - [ ] Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 
 <br><br>

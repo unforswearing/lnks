@@ -33,11 +33,11 @@ help () {
 	# default: copy
 	echo "	-c to copy the links to your clipboard"
 
-	# default: print
-	echo "	-p to print the links to stdout"
+	# default: verbose
+	echo "	-v to print the links to stdout with leading text"
 
-	# default: quiet
-	echo "	-q to quietly print the links to stdout"
+	# default: print
+	echo "	-p print the links to stdout"
 
 	# default: instapaper
 	echo "	-i to save the link(s) to instapaper"
@@ -279,11 +279,11 @@ case "$1" in
 	# copy to clipboard
 	-c) _c
 	;;
-	# print to stdout
-	-p) echo "Links matching $srch:"; links
+	# print to stdout with leading text
+	-v) echo "Links matching $srch:"; links
 	;;
-	# print quietly
-	-q) links
+	# print
+	-p) links
 	;;
 	# add to instapaper
 	-i) _instapaper && _instapaper_curl
