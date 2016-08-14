@@ -33,6 +33,10 @@ Or download the zip and move to your desired location.
 	- one (and only one) option is permitted. lnks will fail if multiple options are specified.
 	- using option -s will allow you to specify an output file, such as:
 			lnks -s searchterm matchinglinks.txt
+
+<br>
+You may view a [sample `.lnks.conf` file here](https://github.com/unforswearing/lnks/blob/master/.lnks.conf)  
+
 <br><br>
 
 ## Dependencies
