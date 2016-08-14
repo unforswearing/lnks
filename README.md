@@ -49,7 +49,7 @@ Your Instapaper and Pastebin credentials are stored in a file named `lnks.conf`,
 
 - [ ] Allow regex to find matching urls
 - [x] Add support for sending links to pastebin.com
-- [ ] Add support for other read later/bookmarking services
+- [ ] Add support for pinboard.in  
 - [ ] Add more robust `lnks.conf` usage  
 - [x] Default to `lnks -q` / Deprecate `lnks -p` (because having the leading text is annoying)
 - [ ] Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
