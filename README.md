@@ -35,6 +35,8 @@ Or download the zip and move to your desired location.
 			lnks -s searchterm matchinglinks.txt
 
 <br>
+
+Your Instapaper and Pastebin credentials are stored in a file named `lnks.conf`. 
 You may view a [sample `.lnks.conf` file here](https://github.com/unforswearing/lnks/blob/master/.lnks.conf)  
 
 <br><br>
