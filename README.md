@@ -36,7 +36,7 @@ Or download the zip and move to your desired location.
 
 <br>
 Your Instapaper and Pastebin credentials are stored in a file named `lnks.conf`, and any credentials stored in this file may be revoked by deleting the line(s) containing your information (or deleting the entire file).  
-<br><br>y
+<br><br>
 You may view a [sample `.lnks.conf` file here](https://github.com/unforswearing/lnks/blob/master/.lnks.conf)  
 
 <br><br>
