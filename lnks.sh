@@ -230,11 +230,6 @@ _pastebin_curl() {
 #	 curl -k --get "https://USER:PASS@api.pinboard.in/v1/posts/add/" --data-urlencode "url=URL" -d "description=DESC" -d "tags=TAGS"
 # }
 
-# Not Implemented:
-# _pocket() {
-#	TBD
-# }
-
 _w() {
 	_to_pdf() {
 		$(which wkhtmltopdf) --quiet --title "$url" "$url" "$filename".pdf
