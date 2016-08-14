@@ -42,6 +42,9 @@ help () {
 	# default: instapaper
 	echo "	-i to save the link(s) to instapaper"
 
+	# default: pastebin
+	echo " -b to save the link(s) to pastebin.com"
+
 	# default: pdf
 	echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
 
@@ -127,23 +130,32 @@ _c() {
 	fi
 }
 
+
 _instapaper() {
-	if [[ -f ~/.lnks.conf ]]; then
-		username=$(cat ~/.lnks.conf | grep -i 'username' | awk -F= '{print $2}' | sed 's|\"||g')
-		password=$(cat ~/.lnks.conf | grep -i 'password' | awk -F= '{print $2}' | sed 's|\"||g')
-	else
+	_instapaper_get_credentials() {
+		instapaper_username=$(grep -i 'username' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
+		instapaper_password=$(grep -i 'password' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
+	}
+
+	_instapaper_store_credentials() {
 		echo "lnks needs to store your Instapaper credentials"
 		sleep 1
 		tput cnorm
-		read -r -p "	enter your username (email address): " username
+		read -r -p "	enter your username (email address): " instapaper_username
 		sleep .2
-		read -rs -p "	enter your password: " password
+		read -rs -p "	enter your password: " instapaper_password
 		sleep .2
 		echo "done! your credentials are stored at $HOME/.lnks.conf"
 		echo "delete this file at any time to revoke Instapaper access."
 		sleep .2
 		echo "now saving your links"
-		echo -en "username=\"$username\"\npassword=\"$password\"" > ~/.lnks.conf
+		echo -en "instapaper_username=\"$instapaper_username\"\ninstapaper_password=\"$instapaper_password\"" >> ~/.lnks.conf
+	}
+
+	if [[ "$(grep 'instapaper' ~/.lnks.conf)" ]]; then
+		_instapaper_get_credentials
+	else
+		_instapaper_store_credentials
 	fi
 }
 
@@ -154,13 +166,63 @@ _instapaper_curl() {
 		links;
 		exit 1;
 	else
-		links | while read url; do
-			curl -d "username=$username&password=$password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
+		links | while read -r url; do
+			curl -d "username=$instapaper_username&password=$instapaper_password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
 			echo "$url Saved!"
 			sleep .2
 		done
 	fi
 
+}
+
+_pastebin() {
+	_pastebin_store_credentials() {
+		echo "lnks needs to store your Pastebin API Key."
+		echo "You can generate an API key by creating an account at pastebin.com"
+		echo "and visiting the API documentation - http://pastebin.com/api"
+		sleep 1
+		tput cnorm
+		read -r -p "	enter your API Key: " pastebin_api
+		sleep .2
+		echo "done! your credentials are stored at $HOME/.lnks.conf"
+		echo "delete this file at any time to revoke Instapaper access."
+		sleep .2
+		echo "now saving your links"
+		echo -en "pastebin_api=\"$pastebin_api\"" >> ~/.lnks.conf
+	}
+
+	_pastebin_get_credentials() {
+		grep -i 'pastebin_api' ~/.lnks.conf | \
+		awk -F= '{print $2}' | \
+		sed 's|\"||g'
+	}
+
+	if [[ "$(grep 'pastebin_api' ~/.lnks.conf)" ]]; then
+		pastebin_api=$(_pastebin_get_credentials)
+	else
+		_pastebin_store_credentials
+	fi
+}
+
+_pastebin_curl() {
+	_do_curl() {
+		curl -s \
+	   	-F "api_dev_key=$pastebin_api" \
+	   	-F "api_option=paste" \
+	   	-F "api_paste_code=$lnx" \
+	   	http://pastebin.com/api/api_post.php
+	}
+
+	local lnx=$(links)
+
+	if [[ $lnx == "Error: No matching links" ]]; then
+		links;
+		exit 1;
+	else
+		echo 'your links are available at:'
+		_do_curl
+		printf '\n'
+	fi
 }
 
 # Not Implemented:
@@ -225,6 +287,9 @@ case "$1" in
 	;;
 	# add to instapaper
 	-i) _instapaper && _instapaper_curl
+	;;
+	# save to pastebin
+	-b) _pastebin && _pastebin_curl
 	;;
 	# save url (as webpage) to pdf
 	-w) _w

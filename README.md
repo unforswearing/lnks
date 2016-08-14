@@ -25,6 +25,7 @@ Or download the zip and move to your desired location.
 	-p to print the links to stdout
 	-q to quietly print the links to stdout
 	-i to save the link(s) to instapaper
+	-b to save the link(s) to pastebin.com
 	-w to save each url as a pdf (saves the page via 'wkhtmltopdf')
 	-h prints this help message
 
