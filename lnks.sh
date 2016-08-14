@@ -185,7 +185,7 @@ _pastebin() {
 		read -r -p "	enter your API Key: " pastebin_api
 		sleep .2
 		echo "done! your credentials are stored at $HOME/.lnks.conf"
-		echo "delete this file at any time to revoke Instapaper access."
+		echo "delete this file at any time to revoke Pastebin access."
 		sleep .2
 		echo "now saving your links"
 		echo -en "pastebin_api=\"$pastebin_api\"" >> ~/.lnks.conf
