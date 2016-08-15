@@ -17,6 +17,7 @@ set -eo pipefail
 #				default=verbose
 #		- this will also apply when multiple browser support is added:
 #				broswer=chrome
+#		- will need to set "" (in the case statement) to the default option
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 # - Allow regex to find matching urls
 # - Stop using Applescript to find urls
