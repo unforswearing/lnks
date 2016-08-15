@@ -1,29 +1,28 @@
 #!/bin/bash
 IFS=$'\n\t'
 
-# To-Do/Roadmap:
-# ==============
+# TO DO:
+#
 # - Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
 #	- Add a "browser" line to lnks.conf
 # 	- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
 # - Add support for pinboard.in
-#	- Planned. See function _pinboard
-#	- What other services would be useful?
-#		- Perhaps wait til I'm not the only one using this...
-# - Add more robust `lnks.conf` usage (read the conf by default, if it exists)
-# 	- Allow user to set defaults in the .links.conf file
-#		- e.g. if '-v' is preffered over '-p', add to conf:
-#				default=verbose
-#		- this will also apply when multiple browser support is added:
-#				broswer=chrome
-#		- will need to set "" (in the case statement) to the default option
+# - Add more robust `lnks.conf` usage
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 # - Allow regex to find matching urls
+# - Add support for other read later/bookmarking services
+# 	- Will need to change .lnks.conf structure to accomodate multiple services
+#	- Maybe a '.lnks.conf' folder with each service config as a separate file.
+#	- See _pinboard and _pocket for methods
 # - Stop using Applescript to find urls
+# - Allow user to set defaults in the .links.conf file
+#	- e.g. if 'quiet' is preffered over '-p', add to conf:
+#			default=quiet
+#	  and read from conf on startup. Otherwise
+#			default=print
 
 srch="$2"
 lfile="$3"
-# browser=$(grep -i 'browser' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
 
 help () {
 	echo "Lnks Help:"
@@ -87,15 +86,47 @@ _prog() {
 	set -m
 }
 
+_initialize() {
+	# USE INITIALIZE TO SOURCE ALL VARIABLES IN lnks.conf INSTEAD OF PARSING THEM MANUALLY
+	# 	source ~/.lnks.conf
+	
+	_browser_get_default() {
+		grep -i 'default_browser' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
+	}
+
+	_browser_store_default() {
+		echo "lnks needs to store your default browser"
+		sleep 1
+		tput cnorm
+		read -r -p "enter a default browser (chrome|canary|chromium|safari|webkit): " default_browser
+
+		case "$default_browser" in
+			"chrome") default_browser="Google Chrome" ;;
+			"canary") default_browser="Google Chrome Canary" ;;
+			"chromium") default_browser="Chromium" ;;
+			"safari") default_browser="Safari" ;;
+			"webkit") default_browser="Webkit" ;;
+		esac
+
+		sleep .2
+		echo "done! your credentials are stored at $HOME/.lnks.conf"
+		sleep .2
+		echo "now saving your links"
+		echo -en "default_browser=\"$default_browser\"" >> ~/.lnks.conf
+	}
+
+	if [[ "$(grep 'default_browser' ~/.lnks.conf)" ]]; then
+		default_browser=$(_browser_get_default)
+	else
+		_browser_store_default
+	fi
+}
+
 links() {
-	# Add checking for "browser" variable, then use _pull
+	_initialize
+
 	_pull() {
-		osascript <<EOT
-			tell application "Google Chrome"
-				set links to get URL of tabs of first window
-				return links
-			end tell
-EOT
+ 		osascript -e "tell application \""$default_browser"\" to return URL of tabs of every window"
 	}
 
 	count=$(_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l)
@@ -246,7 +277,7 @@ _w() {
 			sed 's/ - //g;s/\://g;s/\///g;s/\·//g;s/^ *//g;s/ /_/g;s/__*/_/g'
 	}
 
-	# test for the existense of wkhtmltopdf
+	# test for the existence of wkhtmltopdf
 	if [[ ! $(which wkhtmltopdf) ]]; then
 		echo "Error: wkhtmltopdf is not installed."
 		echo "Please visit http://wkhtmltopdf.org/downloads.html for installation instructions"
