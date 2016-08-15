@@ -1,25 +1,25 @@
 #!/bin/bash
 IFS=$'\n\t'
+set -eo pipefail
 
-# TO DO:
-#
+# To-Do/Roadmap:
+# ==============
 # - Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
 #	- Add a "browser" line to lnks.conf
 # 	- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
 # - Add support for pinboard.in
-# - Add more robust `lnks.conf` usage
+#	- Planned. See function _pinboard
+#	- What other services would be useful?
+#		- Perhaps wait til I'm not the only one using this...
+# - Add more robust `lnks.conf` usage (read the conf by default, if it exists)
+# 	- Allow user to set defaults in the .links.conf file
+#		- e.g. if '-v' is preffered over '-p', add to conf:
+#				default=verbose
+#		- this will also apply when multiple browser support is added:
+#				broswer=chrome
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 # - Allow regex to find matching urls
-# - Add support for other read later/bookmarking services
-# 	- Will need to change .lnks.conf structure to accomodate multiple services
-#	- Maybe a '.lnks.conf' folder with each service config as a separate file.
-#	- See _pinboard and _pocket for methods
 # - Stop using Applescript to find urls
-# - Allow user to set defaults in the .links.conf file
-#	- e.g. if 'quiet' is preffered over '-p', add to conf:
-#			default=quiet
-#	  and read from conf on startup. Otherwise
-#			default=print
 
 srch="$2"
 lfile="$3"
