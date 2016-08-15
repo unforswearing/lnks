@@ -3,6 +3,12 @@ IFS=$'\n\t'
 
 # TO DO:
 #
+# - Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
+#	- Add a "browser" line to lnks.conf
+# 	- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
+# - Add support for pinboard.in
+# - Add more robust `lnks.conf` usage
+# - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 # - Allow regex to find matching urls
 # - Add support for other read later/bookmarking services
 # 	- Will need to change .lnks.conf structure to accomodate multiple services
@@ -17,6 +23,7 @@ IFS=$'\n\t'
 
 srch="$2"
 lfile="$3"
+# browser=$(grep -i 'browser' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
 
 help () {
 	echo "Lnks Help:"
@@ -57,11 +64,6 @@ help () {
 }
 
 _prog() {
-	# script sources:
-	#   - http://stackoverflow.com/questions/12498304/using-bash-to-display-a-progress-working-indicator
-	#   - http://www.unix.com/shell-programming-and-scripting/176837-bash-hide-terminal-cursor.html
-	#   - http://superuser.com/questions/305933/preventing-bash-from-displaying-done-when-a-background-command-finishes-execut
-
 	[[ "$1" == "" ]] && exit 0
 
 	set +m
@@ -69,8 +71,8 @@ _prog() {
 
 	eval "$1" > /dev/null 2>&1 &
 
-	pid=$! # Process Id of the previous running command
-	spin="-\|/" #-\|/
+	pid=$!
+	spin="-\|/"
 	i=0
 
 	while kill -0 $pid 2>/dev/null
@@ -86,6 +88,7 @@ _prog() {
 }
 
 links() {
+	# Add checking for "browser" variable, then use _pull
 	_pull() {
 		osascript <<EOT
 			tell application "Google Chrome"
@@ -133,8 +136,8 @@ _c() {
 
 _instapaper() {
 	_instapaper_get_credentials() {
-		instapaper_username=$(grep -i 'username' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
-		instapaper_password=$(grep -i 'password' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
+		instapaper_username=$(grep -i 'instapaper_username' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
+		instapaper_password=$(grep -i 'instapaper_password' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
 	}
 
 	_instapaper_store_credentials() {
