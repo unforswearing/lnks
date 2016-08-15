@@ -4,8 +4,8 @@ IFS=$'\n\t'
 # TO DO:
 #
 # - Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
-#	- Add a "browser" line to lnks.conf
-# 	- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
+#	- [x] Add a "browser" line to lnks.conf
+# 		- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
 # - Add support for pinboard.in
 # - Add more robust `lnks.conf` usage
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
@@ -23,6 +23,8 @@ IFS=$'\n\t'
 
 srch="$2"
 lfile="$3"
+
+date +%s > ~/.lnks_exec # start
 
 help () {
 	echo "Lnks Help:"
@@ -126,7 +128,7 @@ links() {
 	_initialize
 
 	_pull() {
-		# This may need to change based on the browser. Will have to test. 
+		# This may need to change based on the browser. Will have to test.
  		osascript -e "tell application \""$default_browser"\" to return URL of tabs of every window"
 	}
 
@@ -139,6 +141,12 @@ links() {
 	else
 		echo "$links"
 	fi
+}
+
+_v() {
+	echo "Links matching $srch:"
+	links
+	echo "[retrieved in $tt]"
 }
 
 _s() {
@@ -266,6 +274,8 @@ _pastebin_curl() {
 # }
 
 _w() {
+	tt=$(/bin/date -j -f '%s' "$(echo "scale=4; $e - $(cat ~/.lnks_exec)" | bc)" +'%Mm %Ss')
+
 	_to_pdf() {
 		$(which wkhtmltopdf) --quiet --title "$url" "$url" "$filename".pdf
 		sleep .2
@@ -290,12 +300,16 @@ _w() {
 			echo "Done - $(pwd)/"$filename""
 		done < <(links)
 	fi
+
+	echo "[retrieved in $tt]"
 }
 
 if [[ $srch == "" ]]; then
 	echo "Error: No search term entered";
 	exit 1;
 fi
+
+e=$(date +%s) # end
 
 case "$1" in
 	# help
@@ -310,7 +324,7 @@ case "$1" in
 	-c) _c
 	;;
 	# print to stdout with leading text
-	-v) echo "Links matching $srch:"; links
+	-v) _v
 	;;
 	# print
 	-p) links
