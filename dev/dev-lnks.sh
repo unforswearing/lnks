@@ -89,7 +89,7 @@ _prog() {
 _initialize() {
 	# USE INITIALIZE TO SOURCE ALL VARIABLES IN lnks.conf INSTEAD OF PARSING THEM MANUALLY
 	# 	source ~/.lnks.conf
-	
+
 	_browser_get_default() {
 		grep -i 'default_browser' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
 	}
@@ -126,6 +126,7 @@ links() {
 	_initialize
 
 	_pull() {
+		# This may need to change based on the browser. Will have to test. 
  		osascript -e "tell application \""$default_browser"\" to return URL of tabs of every window"
 	}
 
