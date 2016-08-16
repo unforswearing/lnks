@@ -1,19 +1,24 @@
 #!/bin/bash
 IFS=$'\n\t'
 
-# TO DO:
+# TO-DO/ROADMAP
+# =============
 #
+# Soon
 # - Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
 #	- [x] Add a "browser" line to lnks.conf
+#   - Figure out how applescript works with Canary, Chromium, Safari, and Webkit
+#		- Opera and Firefox do not have applescript support.
 # 		- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
 # - Add support for pinboard.in
 # - Add more robust `lnks.conf` usage
+# - Use initialize to source all variables in lnks.conf instead of parsing them manually
+# 		- source ~/.lnks.conf
+#
+# Later
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 # - Allow regex to find matching urls
-# - Add support for other read later/bookmarking services
-# 	- Will need to change .lnks.conf structure to accomodate multiple services
-#	- Maybe a '.lnks.conf' folder with each service config as a separate file.
-#	- See _pinboard and _pocket for methods
+# - Figure out execution time processing (for pdf conversion and option -v)
 # - Stop using Applescript to find urls
 # - Allow user to set defaults in the .links.conf file
 #	- e.g. if 'quiet' is preffered over '-p', add to conf:
@@ -23,8 +28,6 @@ IFS=$'\n\t'
 
 srch="$2"
 lfile="$3"
-
-date +%s > ~/.lnks_exec # start
 
 help () {
 	echo "Lnks Help:"
@@ -89,9 +92,6 @@ _prog() {
 }
 
 _initialize() {
-	# USE INITIALIZE TO SOURCE ALL VARIABLES IN lnks.conf INSTEAD OF PARSING THEM MANUALLY
-	# 	source ~/.lnks.conf
-
 	_browser_get_default() {
 		grep -i 'default_browser' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
 	}
@@ -100,7 +100,7 @@ _initialize() {
 		echo "lnks needs to store your default browser"
 		sleep 1
 		tput cnorm
-		read -r -p "enter a default browser (chrome|canary|chromium|safari|webkit): " default_browser
+		read -r -p "enter a default browser (chrome|chromium|canary|safari|webkit): " default_browser
 
 		case "$default_browser" in
 			"chrome") default_browser="Google Chrome" ;;
@@ -143,13 +143,13 @@ links() {
 	fi
 }
 
-_v() {
-	echo "Links matching $srch:"
+_verbose() {
+	echo "$(links | wc -l | sed 's/^       //g') link(s) found matching $srch:"
 	links
-	echo "[retrieved in $tt]"
+	echo "[retrieved on $(date)]"
 }
 
-_s() {
+_save() {
 	if [[ "$lfile" == "" ]]; then
 		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
 		exit 1;
@@ -158,7 +158,7 @@ _s() {
 	links > "$lfile" && echo "Links matching "$srch" saved to "$lfile""
 }
 
-_c() {
+_copy() {
 	copylinks() {
 		links | pbcopy
 		echo "Links matching "$srch" copied to clipboard"
@@ -219,6 +219,12 @@ _instapaper_curl() {
 }
 
 _pastebin() {
+	_pastebin_get_credentials() {
+		grep -i 'pastebin_api' ~/.lnks.conf | \
+		awk -F= '{print $2}' | \
+		sed 's|\"||g'
+	}
+
 	_pastebin_store_credentials() {
 		echo "lnks needs to store your Pastebin API Key."
 		echo "You can generate an API key by creating an account at pastebin.com"
@@ -232,12 +238,6 @@ _pastebin() {
 		sleep .2
 		echo "now saving your links"
 		echo -en "pastebin_api=\"$pastebin_api\"" >> ~/.lnks.conf
-	}
-
-	_pastebin_get_credentials() {
-		grep -i 'pastebin_api' ~/.lnks.conf | \
-		awk -F= '{print $2}' | \
-		sed 's|\"||g'
 	}
 
 	if [[ "$(grep 'pastebin_api' ~/.lnks.conf)" ]]; then
@@ -273,9 +273,8 @@ _pastebin_curl() {
 #	 curl -k --get "https://USER:PASS@api.pinboard.in/v1/posts/add/" --data-urlencode "url=URL" -d "description=DESC" -d "tags=TAGS"
 # }
 
-_w() {
-	tt=$(/bin/date -j -f '%s' "$(echo "scale=4; $e - $(cat ~/.lnks_exec)" | bc)" +'%Mm %Ss')
-
+_convert_to_pdf() {
+	# Needs Error checking if there are no matching links
 	_to_pdf() {
 		$(which wkhtmltopdf) --quiet --title "$url" "$url" "$filename".pdf
 		sleep .2
@@ -300,42 +299,38 @@ _w() {
 			echo "Done - $(pwd)/"$filename""
 		done < <(links)
 	fi
-
-	echo "[retrieved in $tt]"
 }
 
 if [[ $srch == "" ]]; then
-	echo "Error: No search term entered";
-	exit 1;
+	echo "Error: No search term entered"
+	exit 1
 fi
-
-e=$(date +%s) # end
 
 case "$1" in
 	# help
-	-h) help
+	-h|--help) help
 	;;
 	"") help
 	;;
 	# option to save the list as a file
-	-s) _s
+	-s|--save) _save
 	;;
 	# copy to clipboard
-	-c) _c
+	-c|--copy) _copy
 	;;
 	# print to stdout with leading text
-	-v) _v
+	-v|--verbose) _verbose
 	;;
 	# print
-	-p) links
+	-p|--print) links
 	;;
 	# add to instapaper
-	-i) _instapaper && _instapaper_curl
+	-i|--instapaper) _instapaper && _instapaper_curl
 	;;
 	# save to pastebin
-	-b) _pastebin && _pastebin_curl
+	-b|--pastebin) _pastebin && _pastebin_curl
 	;;
 	# save url (as webpage) to pdf
-	-w) _w
+	-w|--pdf) _convert_to_pdf
 	;;
 esac

@@ -1,29 +1,10 @@
 #!/bin/bash
 IFS=$'\n\t'
 
-# To-Do/Roadmap:
-# ==============
-# - Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
-#	- Add a "browser" line to lnks.conf
-# 	- See https://gist.github.com/vitorgalvao/5392178 for other browser functionality
-# - Add support for pinboard.in
-#	- Planned. See function _pinboard
-#	- What other services would be useful?
-#		- Perhaps wait til I'm not the only one using this...
-# - Add more robust `lnks.conf` usage (read the conf by default, if it exists)
-# 	- Allow user to set defaults in the .links.conf file
-#		- e.g. if '-v' is preffered over '-p', add to conf:
-#				default=verbose
-#		- this will also apply when multiple browser support is added:
-#				broswer=chrome
-#		- will need to set "" (in the case statement) to the default option
-# - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
-# - Allow regex to find matching urls
-# - Stop using Applescript to find urls
+# Roadmap can be found in https://github.com/unforswearing/lnks/blob/master/dev/dev-lnks.sh
 
 srch="$2"
 lfile="$3"
-# browser=$(grep -i 'browser' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')
 
 help () {
 	echo "Lnks Help:"
@@ -88,7 +69,6 @@ _prog() {
 }
 
 links() {
-	# Add checking for "browser" variable, then use _pull
 	_pull() {
 		osascript <<EOT
 			tell application "Google Chrome"
