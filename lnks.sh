@@ -14,30 +14,15 @@ help () {
 	echo "lnks <option> <search term>"
 	printf '\n'
 	echo "Options:"
-
-	# default: save
 	echo "	-s to save the links to a file on the desktop"
-
-	# default: copy
 	echo "	-c to copy the links to your clipboard"
-
-	# default: verbose
 	echo "	-v to print the links to stdout with leading text"
-
-	# default: print
 	echo "	-p print the links to stdout"
-
-	# default: instapaper
 	echo "	-i to save the link(s) to instapaper"
-
-	# default: pastebin
-	echo " -b to save the link(s) to pastebin.com"
-
-	# default: pdf
+	echo "  -b to save the link(s) to pastebin.com"
 	echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
-
 	echo "	-h prints this help message"
-	printf '\n'
+	echo
 	echo "Note:"
 	echo "- one (and only one) option is permitted. lnks will fail if multiple options are specified."
 	echo "- using option -s will allow you to specify an output file, such as:"
@@ -240,7 +225,11 @@ _w() {
 	fi
 }
 
-if [[ $srch == "" ]]; then
+if [[ "$1" == "-h" ]]; then
+	:
+elif [[ ! "$1" ]]; then
+	:
+elif [[ $srch == "" ]]; then
 	echo "Error: No search term entered";
 	exit 1;
 fi

@@ -303,9 +303,13 @@ _convert_to_pdf() {
 	fi
 }
 
-if [[ $srch == "" ]]; then
-	echo "Error: No search term entered"
-	exit 1
+if [[ "$1" == "-h" ]]; then
+	:
+elif [[ ! "$1" ]]; then
+	:
+elif [[ $srch == "" ]]; then
+	echo "Error: No search term entered";
+	exit 1;
 fi
 
 case "$1" in

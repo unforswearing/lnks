@@ -30,14 +30,14 @@ Or download the zip and move to your desired location.
 	-h prints this help message
 
 	Note:
-	- one (and only one) option is permitted. lnks will fail if multiple options are specified.
+	- lnks accepts one option. the program will fail if run with more than one option.
 	- using option -s will allow you to specify an output file, such as:
 			lnks -s searchterm matchinglinks.txt
 
 <br>
-Your Instapaper and Pastebin credentials are stored in a file named `lnks.conf`, and any credentials stored in this file may be revoked by deleting the line(s) containing your information (or deleting the entire file).  
+`lnks` stores credentials in the `.lnks.conf` file located in your home directory. Revoke credentials at any time by deleting specific line(s) or the entire lnks.conf file.
 <br>
-[You may view a sample `.lnks.conf` file here](https://github.com/unforswearing/lnks/blob/master/.lnks.conf)  
+[You may view a sample `.lnks.conf` file here](https://github.com/unforswearing/lnks/blob/master/.lnks.conf)
 
 <br><br>
 
@@ -48,10 +48,10 @@ Your Instapaper and Pastebin credentials are stored in a file named `lnks.conf`,
 ## To Do
 
 - [ ] Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
-- [ ] Add support for pinboard.in  
-- [ ] Add more robust `lnks.conf` usage  
+- [ ] Add support for pinboard.in
+- [ ] Add more robust `lnks.conf` usage
 (because having the leading text is annoying)
 - [ ] Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 - [ ] Allow regex to find matching urls
-- [x] Default to `lnks -q` / Deprecate `lnks -p` 
+- [x] Default to `lnks -q` / Deprecate `lnks -p`
 - [x] Add support for sending links to pastebin.com
