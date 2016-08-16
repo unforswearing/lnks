@@ -13,18 +13,20 @@ IFS=$'\n\t'
 # - Add support for pinboard.in
 # - Add more robust `lnks.conf` usage
 # - Use initialize to source all variables in lnks.conf instead of parsing them manually
-# 		- source ~/.lnks.conf
+# 	- source ~/.lnks.conf
 #
 # Later
-# - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
-# - Allow regex to find matching urls
-# - Figure out execution time processing (for pdf conversion and option -v)
-# - Stop using Applescript to find urls
 # - Allow user to set defaults in the .links.conf file
 #	- e.g. if 'quiet' is preffered over '-p', add to conf:
 #			default=quiet
 #	  and read from conf on startup. Otherwise
 #			default=print
+# - Figure out execution time processing (for pdf conversion and option -v)
+# - Add ability to toggle verobosity to all options
+# - Add ability to toggle color output for all options
+# - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
+# - Allow regex to find matching urls
+
 
 srch="$2"
 lfile="$3"
