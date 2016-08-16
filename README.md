@@ -52,6 +52,6 @@ Or download the zip and move to your desired location.
 - [ ] Add more robust `lnks.conf` usage
 (because having the leading text is annoying)
 - [ ] Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
-- [ ] Allow regex to find matching urls
+- [x] Allow regex to find matching urls (possible via grep)
 - [x] Default to `lnks -q` / Deprecate `lnks -p`
 - [x] Add support for sending links to pastebin.com

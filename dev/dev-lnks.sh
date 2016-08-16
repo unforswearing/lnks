@@ -25,7 +25,8 @@ IFS=$'\n\t'
 # - Add ability to toggle verobosity to all options
 # - Add ability to toggle color output for all options
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
-# - Allow regex to find matching urls
+# - [x] Allow regex to find matching urls (already possible via grep)
+#	- Add example
 
 srch="$2"
 lfile="$3"
