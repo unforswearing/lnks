@@ -38,7 +38,7 @@ SYNOPSIS
 	lnks <OPTION> <SEARCH TERM> [FILE]
 
 DESCRIPTION
-	Lnks - quickly search your chrome tabs and print, copy, or save the links
+	lnks - quickly search your chrome tabs and print, copy, or save the links
 
 OPTIONS
 	-s, --save [FILE]	save the links to a file on the desktop
@@ -130,7 +130,7 @@ links() {
     links=$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")
 
 	if [[ $count -eq 0 ]]; then
-		echo "Error: No matching links"
+		echo "Error: No matching links" &> /dev/null
 		exit 1
 	else
 		echo "$links"
@@ -138,15 +138,15 @@ links() {
 }
 
 _verbose() {
-	echo "$(links | wc -l | sed 's/^       //g') link(s) found matching $srch:"
+	echo "$(links | wc -l | sed 's/^ *//g') link(s) found matching $srch:"
 	links
 	echo "[retrieved on $(date)]"
 }
 
 _save() {
 	if [[ "$lfile" == "" ]]; then
-		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'";
-		exit 1;
+		echo "No filename entered. Usage: 'lnks -s <search term> <file name>'" &> /dev/null
+		exit 1
 	fi
 
 	links > "$lfile" && echo "Links matching "$srch" saved to "$lfile""
@@ -159,11 +159,12 @@ _copy() {
 	}
 
 	local lnx=$(links)
+
 	if [[ $lnx == "Error: No matching links" ]]; then
-		links;
-		exit 1;
+		links &> /dev/null
+		exit 1
 	else
-		copylinks;
+		copylinks
 	fi
 }
 
@@ -200,8 +201,8 @@ _instapaper_curl() {
 	local lnx=$(links)
 
 	if [[ $lnx == "Error: No matching links" ]]; then
-		links;
-		exit 1;
+		links &> /dev/null
+		exit 1
 	else
 		links | while read -r url; do
 			curl -d "username=$instapaper_username&password=$instapaper_password&url=$url" https://www.instapaper.com/api/add > /dev/null 2>&1
@@ -253,8 +254,8 @@ _pastebin_curl() {
 	local lnx=$(links)
 
 	if [[ $lnx == "Error: No matching links" ]]; then
-		links;
-		exit 1;
+		links &> /dev/null
+		exit 1
 	else
 		echo 'your links are available at:'
 		_do_curl
@@ -300,8 +301,8 @@ if [[ "$1" == "-h" ]]; then
 elif [[ ! "$1" ]]; then
 	:
 elif [[ $srch == "" ]]; then
-	echo "Error: No search term entered";
-	exit 1;
+	echo "Error: No search term entered" &> /dev/null
+	exit 1
 fi
 
 case "$1" in
