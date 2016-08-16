@@ -27,46 +27,38 @@ IFS=$'\n\t'
 # - Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
 # - Allow regex to find matching urls
 
-
 srch="$2"
 lfile="$3"
 
 help () {
-	echo "Lnks Help:"
-	printf '\n'
-	echo "Lnks - quickly search your chrome tabs and print, copy, or save the links."
-	printf '\n'
-	echo "lnks <option> <search term>"
-	printf '\n'
-	echo "Options:"
+	echo "NAME
+	lnks
 
-	# default: save
-	echo "	-s to save the links to a file on the desktop"
+SYNOPSIS
+	lnks <OPTION> <SEARCH TERM> [FILE]
 
-	# default: copy
-	echo "	-c to copy the links to your clipboard"
+DESCRIPTION
+	Lnks - quickly search your chrome tabs and print, copy, or save the links
 
-	# default: verbose
-	echo "	-v to print the links to stdout with leading text"
+OPTIONS
+	-s, --save [FILE]	save the links to a file on the desktop
+	-c, --copy		copy the links to your clipboard
+	-v, --verbose		print the links to stdout with leading text
+	-p, --print		print the links to stdout
+	-i, --instapaper	save the links to instapaper
+	-b, --pastebin		to save the links to pastebin.com
+ 	-w, --pdf		save each url as a pdf
+	-h, --help		prints this help message
 
-	# default: print
-	echo "	-p print the links to stdout"
+EXAMPLES
+	lnks			print help message
+	lnks -h			print help message
+	lnks -w			save to pdf via wkhtmltopdf
+	lnks -s 		save to specified file
+	lnks --print		print links matching 'search term'
 
-	# default: instapaper
-	echo "	-i to save the link(s) to instapaper"
-
-	# default: pastebin
-	echo " -b to save the link(s) to pastebin.com"
-
-	# default: pdf
-	echo "  -w to save each url as a pdf (saves the page via 'wkhtmltopdf')"
-
-	echo "	-h prints this help message"
-	printf '\n'
-	echo "Note:"
-	echo "- one (and only one) option is permitted. lnks will fail if multiple options are specified."
-	echo "- using option -s will allow you to specify an output file, such as:"
-	echo "		lnks -s searchterm matchinglinks.txt"
+AUTHOR
+	Alvin C <support@unforswearing.com>"
 }
 
 _prog() {
@@ -314,7 +306,7 @@ fi
 
 case "$1" in
 	# help
-	-h|--help) help
+	-h|--help|--version) help
 	;;
 	"") help
 	;;
