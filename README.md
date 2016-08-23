@@ -49,6 +49,7 @@ Or download the zip and move to your desired location.
 
 - [ ] Add Safari Functionality (merge [`surls`](https://github.com/unforswearing/surls) into `lnks`)
 - [ ] Add support for pinboard.in
+- [ ] Possibly discontinue Instapaper support (in anticipation of service disruptions/cancellation from [their acquisition by Pinterest](http://blog.instapaper.com/post/149374303661))
 - [ ] Add more robust `lnks.conf` usage
 (because having the leading text is annoying)
 - [ ] Stop using Applescript to find urls (see [chrome cli](https://github.com/prasmussen/chrome-cli))
