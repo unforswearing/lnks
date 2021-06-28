@@ -33,6 +33,5 @@
     "type" : "individual",
     "url" : "https://www.unforswearing.com/#/"
   },
-  "os": [ "darwin", "linux"],
-  }
+  "os": [ "darwin", "linux"]
 }
