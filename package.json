@@ -1,0 +1,38 @@
+{
+  "name": "lnks",
+  "version": "1.0.0",
+  "description": "List / Save / Instapaper your Google Chrome links from the terminal - on MacOS",
+  "main": "lnks",
+  "scripts": {
+    "test": "lnks --help"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unforswearing/lnks.git"
+  },
+  "keywords": [
+    "google",
+    "chrome",
+    "links",
+    "pinboard",
+    "instapaper",
+    "wkhtmltopdf",
+    "markdown",
+    "bookmarking",
+    "cli",
+    "links",
+    "url"
+  ],
+  "author": "unforswearing",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unforswearing/lnks/issues"
+  },
+  "homepage": "https://github.com/unforswearing/lnks#readme",
+  "funding": {
+    "type" : "individual",
+    "url" : "https://www.unforswearing.com/#/"
+  },
+  "os": [ "darwin", "linux"],
+  }
+}
