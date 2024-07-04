@@ -9,6 +9,41 @@
 # - remove all commented code
 #
 
+
+__util.color() {
+  local red="\033[31m"
+  local green="\033[32m"
+  local blue="\033[34m"
+  local reset="\033[39m"
+  local opt="$1"
+  shift
+  case "$opt" in
+    red) print "${red}$@${reset}" ;;
+    green) print "${green}$@${reset}" ;;
+    blue) print "${blue}$@${reset}" ;;
+  esac
+}
+__util.require() {
+    local comm="$(command -v $1)"
+    if [[ $comm ]]; then
+      echo $comm
+    else
+      __util.color red "Command '$comm' is not installed, or it is not in your \$PATH"
+	  case $comm in
+		"hxclean"|"hxselect")
+			echo "Please visit https://www.w3.org/Tools/HTML-XML-utils/README for installation instructions"
+			echo "Or install the 'html-xml-utils' package via homebrew (https://brew.sh)"
+		;;
+		"osascript") 
+			echo "Are you using an Apple device?"
+		;;
+		"wkhtmltopdf")
+			echo "Please visit http://wkhtmltopdf.org/downloads.html for installation instructions"
+		;;
+	  esac
+	fi
+}
+
 lnks() {
 	OIFS="$IFS"
 	IFS=$'\n\t'
@@ -18,8 +53,8 @@ lnks() {
 	local lfile; lfile="$3"
 
 	# https://www.w3.org/Tools/HTML-XML-utils/README
-	local hxclean; hxclean="$(command -v hxclean)"
-	local hxselect; hxselect="$(command -v hxselect)"
+	local hxclean; hxclean="$(__util.require hxclean)"
+	local hxselect; hxselect="$(__util.require hxselect)"
 
 	_lnx_help() {
 		echo "lnks <option> <search term>"
@@ -37,12 +72,6 @@ lnks() {
 		echo "Note"
 		echo "  - one (and only one) option is permitted. lnks will fail if multiple options are specified."
 		echo "    - lnks will allow multiple options in a future version"
-	}
-
-	_htmlxmlutil_warning() {
-		echo "Error: hxclean or hxselect is not installed, or they are not in your \$PATH"
-		echo "Please visit https://www.w3.org/Tools/HTML-XML-utils/README for installation information"
-		echo "or install the 'html-xml-utils' package via homebrew (https://brew.sh)"
 	}
 
 	_prog() {
@@ -69,8 +98,9 @@ lnks() {
 	}
 
 	links() {
+		applescript=$(__util.require osascript)
 		_pull() {
-			osascript <<EOT
+			$applecript <<EOT
 				tell application "Google Chrome"
 					set links to get URL of tabs of first window
 					return links
@@ -86,9 +116,6 @@ EOT
 		else
 			echo "$links"
 		fi
-
-		unset count
-		unset links
 	}
 
 	_save() {
@@ -98,7 +125,6 @@ EOT
 		fi
 
 		links > "$lfile" && echo "Links matching $srch saved to $lfile"
-		unset -f _save
 	}
 
 	_copy() {
@@ -115,21 +141,13 @@ EOT
 		else
 			copylinks
 		fi
-
-		unset -f _copy
 	}
 
 	_markdown() {
-		if [[ -z "$hxclean" ]] || [[ -z "$hxselect" ]]; then
-			_htmlxmlutil_warning
-		else
-			links | while read -r lnk; do
-				local title; title="$(curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title')"
-				echo -en "[${title}](${lnk})\n"
-			done
-		fi
-
-		unset -f _markdown
+		links | while read -r lnk; do
+			local title; title="$(curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title')"
+			echo -en "[${title}](${lnk})\n"
+		done
 	}
 
 	_instapaper() {
@@ -189,11 +207,6 @@ EOT
 				sleep .2
 			done
 		fi
-
-		unset instapaper_username
-		unset instapaper_password
-		unset -f _instapaper
-		unset -f _instapaper_add
 	}
 
 	_pinboard() {
@@ -274,41 +287,28 @@ EOT
 				sleep .2
 			done < <(echo "$lnx")
 		fi
-
-		unset pinboard_api
-		unset -f _pinboard
-		unset -f _pinboard_add
 	}
 
 	_wkhtmltopdf() {
+		htmltopdf=$(__util.require wkhtmltopdf)
 		_to_pdf() {
-			"$(command -v wkhtmltopdf)" --quiet --title "$url" "$url" "$title".pdf
+			$htmltopdf --quiet --title "$url" "$url" "$title".pdf
 			sleep .2
 		}
 
-		# test for the existense of wkhtmltopdf
-		if [[ ! "$(command -v wkhtmltopdf)" ]]; then
-			echo "Error: wkhtmltopdf is not installed, or it is not in your \$PATH"
-			echo "Please visit http://wkhtmltopdf.org/downloads.html for installation instructions"
-		else
-			local lnx; lnx="$(links | tr ' ' '\n')"
+		local lnx; lnx="$(links | tr ' ' '\n')"
 
-			while read -r url; do
-				echo "Converting \"${url}\" to PDF..."
-				_prog _to_pdf
+		while read -r url; do
+			echo "Converting \"${url}\" to PDF..."
+			_prog _to_pdf
 
-				local title
-				title="$(
-					readonly hxclean="$(command -v hxclean)";
-					readonly hxselect="$(command -v hxselect)";
-					curl -so - "$url" | $hxclean | "$hxselect" -s '\n' -c 'title'
-				)"
+			local title
+			title="$(
+				curl -so - "$url" | $hxclean | "$hxselect" -s '\n' -c 'title'
+			)"
 
-				echo "Done - $(pwd)/${title}.pdf"
-			done < <(echo "$lnx")
-		fi
-
-		unset -f _wkhtmltopdf
+			echo "Done - $(pwd)/${title}.pdf"
+		done < <(echo "$lnx")
 	}
 
 	if [[ "$option" == "-h" ]]; then
@@ -340,16 +340,4 @@ EOT
 		--pdf | -w) _wkhtmltopdf ;;
 		*) _lnx_help ;;
 	esac
-
-	# take only memories, leave no footprints
-	{
-		unset url
-		unset -f links; unset -f _lnx_help; unset -f _s
-		unset -f _c; unset -f _instapaper; unset -f _instapaper_add
-		unset -f _pinboard; unset -f _pinboard_add; unset -f _w
-
-		IFS="$OIFS"
-
-		unset -f erase
-	} >/dev/null 2>&1
 }
