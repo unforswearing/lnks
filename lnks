@@ -9,7 +9,6 @@
 # - remove all commented code
 #
 
-
 __util.color() {
   local red="\033[31m"
   local green="\033[32m"
@@ -108,8 +107,15 @@ lnks() {
 EOT
 		}
 
-		local count; count="$(_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l)"
-		local links; links="$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")"
+		local count; 
+		count="$(
+			_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l
+		)"
+
+		local links; 
+		links="$(
+			_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g"
+		)"
 
 		if [[ "$count" -eq 0 ]]; then
 			echo "Error: No matching links"
@@ -145,7 +151,11 @@ EOT
 
 	_markdown() {
 		links | while read -r lnk; do
-			local title; title="$(curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title')"
+			local title; 
+			title="$(
+				curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title'
+			)"
+
 			echo -en "[${title}](${lnk})\n"
 		done
 	}
@@ -153,11 +163,15 @@ EOT
 	_instapaper() {
 		_instapaper_get_credentials() {
 			instapaper_username="$(
-				grep -i 'instapaper_username' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
+				grep -i 'instapaper_username' ~/.lnks.conf | \
+					awk -F= '{print $2}' | \
+					sed 's|\"||g'
 			)"
 
 			instapaper_password="$(
-				grep -i 'instapaper_password' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
+				grep -i 'instapaper_password' ~/.lnks.conf | \
+					awk -F= '{print $2}' | \
+					sed 's|\"||g'
 			)"
 		}
 
@@ -211,7 +225,11 @@ EOT
 
 	_pinboard() {
 		_pinboard_get_credentials() {
-			pinboard_api="$(grep -i 'pinboard_api' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')"
+			pinboard_api="$(
+				grep -i 'pinboard_api' ~/.lnks.conf | \
+					awk -F= '{print $2}' | \
+					sed 's|\"||g'
+				)"
 		}
 
 		_pinboard_store_credentials() {
@@ -249,7 +267,13 @@ EOT
 				_htmlxmlutil_warning
 			else
 				local title
-				title="$(curl -so - "$url" | "$hxclean" | "$hxselect" -s '\n' -c 'title')"
+				title="$(
+					curl -so - "$url" | \
+						"$hxclean" | \
+						"$hxselect" -s '\n' -c 'title'
+				)"
+
+				# if $title doesn't exist, use $url as title
 				title="${title:-$url}"
 
 				echo
