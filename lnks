@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# To Do
-# - add option to read urls from a file and run a single command for all
-#   - eg. lnks -r urls.txt --instapaper
-# - improve code quality and style consistency
-#   - to inlcude renaming functions and changing the case statment to use 'getopts'
-# - extract pastebin functions into a standalone file as a 'plugin'
-# - remove all commented code
-#
-
 __util.color() {
   local red="\033[31m"
   local green="\033[32m"
@@ -70,7 +61,7 @@ lnks() {
 		echo
 		echo "Note"
 		echo "  - one (and only one) option is permitted. lnks will fail if multiple options are specified."
-		echo "    - lnks will allow multiple options in a future version"
+		echo "  - lnks will allow multiple options in a future version"
 	}
 
 	_prog() {

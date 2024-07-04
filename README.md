@@ -3,14 +3,15 @@ List / Save / Instapaper your Google Chrome links from the terminal (on OS X/Mac
 <br><br>
 
 ## Installation
-Clone
+
+Clone this repository to use the latest version of `lnks`:
 
 ```
 $ git clone https://github.com/unforswearing/lnks.git .
 $ cd lnks && bash lnks -h
 ```
 
-Or with `npm`
+Or install using `npm`
 
 ```
 $ npm install -g lnks
@@ -52,10 +53,14 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 <br><br>
 
 ## Dependencies
+
 **Required**
+
+- Applescript (`osascript`)
 - Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
 **Optional**
+
 - HTML-XML-utils: [https://www.w3.org/Tools/HTML-XML-utils/README](https://www.w3.org/Tools/HTML-XML-utils/README)
   - to get page titles from processed urls, used with `--markdown` and `--pinboard` options.
 - PDF creation (`lnks --pdf`)
@@ -63,3 +68,11 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
   - Visit [http://wkhtmltopdf.org/downloads.html](http://wkhtmltopdf.org/downloads.html).
 <br><br>
 
+## To Do / Roadmap
+
+- Clean up code, add comments, make everything more readable
+- Feature: Read a list of links from a file and execute a single `lnks` option for each
+  -  eg. `lnks --read urls.txt --pdf`
+- Feature: Add support for [raindrop.io](https://raindrop.io) (if possible)
+- Feature: Create a plugin system and extract Instapaper and Pinboard as "plugins"
+  - eg. `lnks --plugin path/to/lnks_instapaper.bash "search-term"`
