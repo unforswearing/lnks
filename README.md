@@ -61,6 +61,8 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 
 **Optional**
 
+> `lnks` is basically functional without these tools, however they must be installed to use specific `lnks` options. 
+
 - HTML-XML-utils: [https://www.w3.org/Tools/HTML-XML-utils/README](https://www.w3.org/Tools/HTML-XML-utils/README)
   - to get page titles from processed urls, used with `--markdown` and `--pinboard` options.
 - PDF creation (`lnks --pdf`)
