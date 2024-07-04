@@ -98,9 +98,9 @@ lnks() {
 	}
 
 	links() {
-		applescript=$(__util.require osascript)
+		__util.require osascript >/dev/null 2>&1
 		_pull() {
-			$applecript <<EOT
+			osascript <<EOT
 				tell application "Google Chrome"
 					set links to get URL of tabs of first window
 					return links
