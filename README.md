@@ -6,9 +6,11 @@ List / Save / Instapaper your Google Chrome links from the terminal (on OS X/Mac
 
 Clone this repository to use the latest version of `lnks`:
 
-```
+```console
 $ git clone https://github.com/unforswearing/lnks.git .
-$ cd lnks && bash lnks -h
+$ cd lnks 
+$ source lnks
+$ lnks -h
 ```
 
 Or install using `npm`
