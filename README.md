@@ -1,5 +1,6 @@
 # lnks
 List / Save / Instapaper your Google Chrome links from the terminal (on OS X/MacOS)
+
 <br><br>
 
 ## Installation
@@ -15,7 +16,7 @@ $ lnks -h
 
 Or install using `npm`
 
-```
+```console
 $ npm install -g lnks
 ```
 
@@ -23,7 +24,7 @@ $ npm install -g lnks
 
 ## Usage
 
-```
+```console
  lnks <option> <search term>
 
  Options:
