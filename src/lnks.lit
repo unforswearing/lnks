@@ -1,0 +1,529 @@
+@code_type bash .bash
+@comment_type # %s
+@colorscheme src/tomorrow_night.css
+@title lnks
+
+@s About
+
+List / Save / Convert your Google Chrome or Safari links from the terminal on MacOS. To assist with note taking, research, writing, or to help you browse the internet. 
+
+<br />
+
+See [changelog.md](changelog.md) for updates.
+
+--- changelog.md
+
+This version of `lnks` was re-written to experiment with [literate programming](https://en.wikipedia.org/wiki/Literate_programming). The code and docs in this repository were generated using the [Literate](https://github.com/zyedidia/Literate) tool. See [the implementation file](src/lnks.lit) for details.
+
+contains the following changes:
+
+## Pending
+
+- Add option to convert matched_urls to other markup formats (TBD: html, rst, orgmode, wiki)
+- Add option to add urls to [nb](https://xwmx.github.io/nb/)
+  - save link:       `nb <url>`
+  - save contents:   `nb import <url>`
+- Add option to add urls to [archivebox](https://github.com/ArchiveBox/ArchiveBox)
+  - add url:               `archivebox add <url>`
+  - add urls from file:    `archivebox add < urls.txt`
+
+### Later
+
+- Add `plugin` flag option
+- Add pinboard to plugins
+
+## Added
+
+- Run multiple flags on one invocation: `lnks --markdown --copy`
+- Add option `--urls` to run a `lnks` command on urls from a file 
+- Created a skeleton for plugins that can be run via `.lnks.conf` settings
+
+## Removed
+
+- Removed short flags. All flags must use the long format: `--print` instead of `-p`
+- Dropped option `--save`. Use `lnks --print "query" > urls.txt`
+- Dropped option `--pinboard`. I no longer use the service
+- Moved Pastebin and Instapaper to `plugins/`; Pinboard will also be added
+---
+
+--- lnks.bash
+if [[ $(uname) != "Darwin" ]]; then
+  echo "sorry, 'lnks' uses Applescript and only runs on MacOS."
+  exit 1
+fi
+---
+
+@s Usage
+
+--- examples.bash
+# lnks [option [option]] <search term>
+---
+
+Internally, these options are saved as the following variables.
+
+* `query` is the search term passed to the script as the last argument.
+* `options` is the list of flags and optional file names.
+
+--- lnks.bash +=
+# capture command line agruments
+readonly all_args="$@"
+readonly query="${@: -1}"
+readonly options=$(unset 'all_args[${#all_args[@]}-1]')
+---
+
+The list of arguments contained in the `options` variable will be processed later in this script. 
+
+@s Options
+
+`lnks` has multiple options available for processing the urls after they are retrieved from your browser. Arguments are flags passed to the `lnks` script and perform the following actions described in the `help` function below. Flags are always "long" formatted -- use `lnks --copy` instead of `lnks -c`. 
+
+--- lnks.bash +=
+lnx:lib:help() {
+  echo -en "
+lnks <option> <search term>
+
+Options:
+  --print                   print the link(s) to the console
+  --copy                    copy the link(s) to your clipboard
+  --markdown                print link(s) in mardown format: [title](url)
+  TBD --asciidoc            print link(s) in ascidoc format: url[title] 
+  TBD --mediawiki           print links(s) in mediawiki format: [url title]
+  TBD --orgmode             print links(s) in orgmode format: [[url][title]]
+  TBD --rst                 print links(s) in restructuredtext format: \`title <url>\`_
+  --pdf file.pdf            save each url as a pdf (requires 'wkhtmltopdf')
+  --urls urls.txt           run a lnks action against urls in a file
+  TBD --download            save page locally using wget 
+  TBD --nb                  store urls with the nb tool <https://xwmx.github.io/nb/>
+  TBD --archivebox          store urls with archivebox <https://github.com/ArchiveBox/ArchiveBox>
+  TBD --plugin              use a plugin from 'plugins/' to process matched urls 
+  --help                    print this help message
+"
+}
+---
+
+To view `lnks` help pn the command line, run the following command:
+
+--- examples.bash +=
+# view help
+lnks --help
+---
+
+@s Configuration
+
+`lnks` has a few configuration options available for customizing your installation:
+
+* `no_tracking={bool}`
+> * strip tracking params from url
+> * default `true`
+* `default_option={flag}`
+> * option to use when lnks is run with no flag 
+> * default `--print`
+* `default_browser={Google Chrome|Safari}`
+> * use safari or chrome as default
+> * default `chrome`
+* `pdf_writer={name|path}`
+> * choose another pdf converter
+> * default `wkhtmltopdf`
+
+You can find the default `.lnks.conf` in the code below. This file is located at <where?>. Edit this file to change any of the available options. 
+
+--- .lnks.conf
+conf_path="$HOME"
+no_tracking=true
+default_option="--print"
+default_browser="Google Chrome"
+pdf_writer=wkhtmltopdf
+---
+
+By default, the `.lnks.conf` configuration file is located in your `$HOME` directory. Change the value of `conf_path` in the `.lnks.conf` file to store this file in a different location. This path is also exported to your environment in the variable `LNKS_CONF`
+
+--- lnks.bash +=
+# if the $HOME/.lnks.conf file doesn't exist, create it
+file "$HOME/.lnks.conf" || mv ".lnks.conf" "$HOME";
+# check if there is a different location for the .lnks.conf file
+stored_config_path=$(grep 'conf_path' "$HOME/.lnks.conf")
+export LNKS_CONF="${stored_config_path}";
+---
+
+Let's parse the `.lnks.conf` file into a few global variables. Since this configuration file is a list of key/value pairs that use `=` as a delimeter it can be sourced into the `lnks.bash` script like any other `bash` file. 
+
+--- lnks.bash +=
+# source the conf file into any environment
+# all values in .lnks.conf are available as variables
+# eg. `no_tracking=true` can be used in this script directly
+source "$LNKS_CONF"
+---
+
+@s Library Functions
+
+`lnks` has a few functions available internally that help navigate the `bash` environment on MacOS: `color`, `require`, and `file`. These functions are all named `lnx:lib:<name>` to indicate they are to be used in the `lnks` script. 
+
+The `lnx:lib:color` function allows `lnks` output to be colorized. Currently this only works internally so you must modify the `lnks` script to adjust where output may be colorized. 
+
+--- lnks.bash +=
+lnx:lib:color() {
+	local red="\033[31m" 
+	local green="\033[32m" 
+	local yellow="\033[33m" 
+	local blue="\033[34m" 
+	local reset="\033[39m" 
+	local black="\033[30m" 
+	local white="\033[37m" 
+	local magenta="\033[35m" 
+	local cyan="\033[36m" 
+	local opt="$1" 
+	shift
+  # shellcheck disable=SC2145
+	case "$opt" in
+		(red) echo -en "${red}$@${reset}" ;;
+		(green) echo -en "${green}$@${reset}" ;;
+		(yellow) echo -en "${yellow}$@${reset}" ;;
+		(blue) echo -en "${blue}$@${reset}" ;;
+		(black) echo -en "${black}$@${reset}" ;;
+		(white) echo -en "${white}$@${reset}" ;;
+		(magenta) echo -en "${magenta}$@${reset}" ;;
+		(cyan) echo -en "${cyan}$@${reset}" ;;
+		(help) echo -en "colors <red|green|yellow|blue|black|magenta|cyan> string" ;;
+	esac
+}
+---
+
+`lnx:lib:require` is a function that searches the environment for the existence of specified tools and optionally returns the path to the tool, when found. If the tool can't be found in the $PATH an error message is printed before the script exits. 
+
+--- lnks.bash +=
+lnx:lib:require() {
+	local comm; comm="$(command -v "$1")" 
+	if [[ -n $comm ]]
+	then
+    # `as` is a throwaway var added for clarity:
+    # `require tool_name as var_name` instead of
+    # `require tool_name var_name`
+    as="$2";echo "$as">/dev/null 2>&1
+    # `var` is the name of the function that will 
+    # pass $comm path to another command
+    var="$3"
+    if [[ -n $var ]]; 
+    then
+      # create a function to return comm path named $var
+      eval "function $var() { echo $comm; }"
+		  true
+    else 
+      # if we aren't creating a variable, just return true
+      true
+    fi
+	else
+    # if the required command isn't found then print an error message
+	  color red "$0: '$1' not found" #>/dev/null 2>&1
+    false
+	fi
+}
+---
+
+Next, the `lnx:lib:file` function searches for the existence of a file, printing an error if it is not found. This is used for the `--urls` option and internally when the `lnks` script loads the `.links.conf` file. 
+
+--- lnks.bash +=
+# file "$HOME/.lnks.conf" && <read conf>
+lnx:lib:file() {
+	local name="$1" 
+	if [[ -s "$name" ]]
+	then
+		true
+	else
+		# if the required file isn't found then print an error message
+	  color red "$0: file '$1' not found" #>/dev/null 2>&1
+    false
+	fi
+}
+---
+
+Now the helpers have been established, lets move on to actually getting the urls from your browser. 
+
+@s Find matching urls
+
+The `lnks` script was written specifically for MacOS to take advantage of the built-in `Applescript` automation language. Using `Applescript` lets `lnks` pull urls from any browser that has `Applescript` integration, which includes Google Chrome in addition to Safari. The choice of browser must be set in the `.lnks.conf` file described above.
+
+Here is how `lnks` uses `Applescript` to find urls in either browser.
+
+--- lnks.bash +=
+# using `require osascript` to throw a better formatted 
+# error on non-MacOS systems
+pull_urls() {
+  require osascript
+  local browser="${default_browser:-Google Chrome}"
+  osascript <<EOT
+    tell application "${browser}"
+      set links to get URL of tabs of every window
+      return links
+    end tell
+EOT
+}
+---
+
+The script will need to get some information about the urls it finds in the browser. Most importantly, do any of these urls match the `query` that was passed the script? 
+
+`lnks` will use a small function to determine if any urls matched the `query`. 
+
+--- lnks.bash +=
+readonly matched_urls="$(
+  pull_urls \
+  | tr ',' '\n' \
+  | grep -i "${query}" \
+  | sed "s|^ ||g"
+)"
+---
+
+Next, `lnks` needs to count the number of matching urls that matched the `query`. 
+
+--- lnks.bash +=
+readonly count="$(
+  pull_urls \
+  | grep -i "${query}" \
+  | sed "s|^ ||g" \
+  | wc -l
+)"
+---
+
+If `count` is `0`, there are no matching urls. The script can stop here because there is nothing to do. 
+
+--- lnks.bash +=
+if [[ "$count" -eq 0 ]]; then
+  lnx:lib:color red "Error: No matching links"
+  exit 1
+fi
+---
+
+@s Processor functions
+
+Getting to this point means that `lnks` has found some urls that match your `query`. Now a few more functions are needed to actually process the urls according to the flags that were passed to the script. 
+
+There are two types of processor functions: Formatting and Saving.
+
+## Formatting functions
+
+Functions that format the matching urls. <more>
+
+### Print *(--print)*
+
+The `--print` option prints the links that match your query to the console as plain text urls. Multiple matched links are separated with the newline character. 
+
+--- examples.bash +=
+lnks --print "github.com"
+# output: 
+# links matching 'github.com'
+# https://github.com/unfoswearing/lnks
+# https://github.com/unfoswearing
+---
+
+--- lnks.bash +=
+print_urls() {
+  printf "%s\n" "${matched_urls}"
+}
+---
+
+### Copy *(--copy)*
+
+The `--copy` option will copy matching links to the clipboard using the `pbcopy` tool. 
+
+--- examples.bash +=
+# copy matching links to your clipboard
+# output: Links matching 'github.com' are copied to the clipboard.
+lnks --copy"github.com"
+---
+
+#### Using Copy with other flags
+
+- When `--copy` is used with `--print` the links will be copied to the clipboard and printed. 
+`--print`, `--copy`, and `--markdown` options are standalone and do not require any arguments. Lets first see if any of these arguments are present in the `options` variable. 
+
+#### Implementation
+
+--- lnks.bash +=
+copy_urls() {
+  local urls="${1}"
+  <<<$urls | pbcopy
+}
+---
+
+### Markdown *(--markdown)*
+
+The `--markdown` option will format each of the matching urls to markdown. For example `https://github.com` will become `[github](https://github.com)`. The title for the resulting url is generated by using the `curl` tool to pull the `<title>` tag from the html. 
+
+--- examples.bash +=
+# print maching urls as formatted markdown links
+# output: [lnks](https://github.com/unfoswearing/lnks)
+lnks --markdown "github.com"
+---
+
+#### Using Markdown with other flagas
+
+- `--markdown` will print markdown formatted links. The `--print` flag is ignored when used with `--markdown`
+- When `--copy` is used with `--markdown` the markdown formatted links will be copied to the clipboard, not printed. 
+- When `--copy`, `--print`,  and `--markdown` are used the links markdown formatted links will be copied to the clipboard and printed. 
+`--print`, `--copy`, and `--markdown` options are standalone and do not require any arguments. Lets first see if any of these arguments are present in the `options` variable. 
+
+#### Implementation
+
+--- lnks.bash +=
+markdown_urls() {
+  require curl
+}
+---
+
+### Asciidoc *(--asciidoc)*
+#### Using Asciidoc with other flags
+#### Implementation
+
+### Mediawiki *(--mediawiki)*
+#### Using Mediawiki with other flags
+#### Implementation
+
+### Orgmode *(--orgmode)*
+#### Using Orgmode with other flags
+#### Implementation
+
+### RestructuredText *(--restructuredtext)*
+#### Using RestructuredText with other flags
+#### Implementation
+
+## Saving functions 
+
+Functions that save the urls or their contents. <more>
+
+### PDF *(--pdf)*
+
+The `--pdf` option will save the content of each matching url as a pdf file. The title of the resulting pdf will be either the name passed to the `--pdf` flag as an argument, or the name of the site as generated using curl to retrieve the `<title>` tag from the site HTML.
+
+Converting urls to pdf relies on [wkhtmltopdf](http://wkhtmltopdf.org/downloads.html). 
+
+The `--pdf` option requires a single filename as an argument.
+
+--- examples.bash +=
+# save the content of matching urls to pdf
+# output: The content matching 'github.com' is saved to 'myurl.pdf'.
+lnks --pdf myurl.pdf "github.com" 
+---
+
+#### Using PDF with other flags
+
+- All other options will be ignored when using the `--pdf` option with `lnks`. 
+
+#### Implementation
+
+--- lnks.bash +=
+pdf_urls() {
+  # pdf_writer is from the .lnks.conf file sourced
+  # earlier in this script.
+  require $pdf_writer
+  get_page_title() {
+		curl -L --silent "$1" \
+		|	grep '<title>' \
+		|	awk '{gsub("<[^>]*>", "")}1' \
+		|	sed 's/ - //g;s/\://g;s/\///g;s/\·//g;s/^ *//g;s/ /_/g;s/__*/_/g'
+	}
+  # pagetitle is prepended to filename to create the full name
+  # of the resulting pdf file 
+  local filename="${1}"
+  for pdfurl in ${matching_urls}; do
+    local pagetitle="$(get_page_title "${pdfurl})"
+    wkhtmltopdf "$pdfurl" "${pagetitle}_${filename}"
+    # sleep to prevent overloading the command
+    sleep 0.5
+  done
+}
+---
+
+### Urls *(--urls)*
+
+The `--urls` option reads a list of urls from a file and runs a `lnks` option for each. The urls in the file must be plain text urls with no formatting. You can create a url file from matching links by using the command `lnks --print "github.com" > inputurls.txt`.
+
+The `--urls` option requires two arguments: a file to read urls from and the `lnks` action to perform on each url from the file.  
+
+--- examples.bash +=
+# lnks --urls inputurls.txt --<option>
+# read urls from a file and run a lnks option for each
+# output: Content from urls in 'inputurls.txt' is saved to pdf.
+lnks --urls inputurls.txt --pdf
+---
+
+You can also use this option by substituting the filename with the `lnks --print` command:
+
+--- examples.bash +=
+lnks --urls <(lnks --print "github.com") --pdf
+---
+
+#### Using Urls with other flags
+
+- Except for the two options passed to `--urls`, all other options will be ignored when using the `--urls` option with `lnks`.
+
+#### Implementation
+
+--- lnks.bash +=
+read_urls() {
+}
+---
+
+### Download *(--download)*
+#### Using Download with other flags
+#### Implementation
+
+### Nb *(--nb)*
+#### Using Nb with other flags
+#### Implementation
+
+### Archivebox *(--archivebox)*
+#### Using Archivebox with other flags
+#### Implementation
+
+### Plugin *(--plugin)*
+#### Using Plugin with other flags
+#### Implementation
+
+@s Parse options and process urls
+
+Now that the processing functions have been set up, `lnks` finally needs to parse the options passed to the script via the `options` variable. `lnks` will run the matching processor function for each flag found in `options`.
+
+Next, lets find out if any urls need to be printed, formatted, and/or copied and then perform those actions if they exist as flags in `options`. 
+
+--- lnks.bash +=
+# if there are no options, print the urls and exit
+if [[ -z ${options[@]} ]]; then 
+  print_urls
+  exit
+fi
+# this section uses the first item in the options array
+# the markdown/print/copy section uses the entire options array
+case ${options[1]} in
+  "--pdf") 
+    pdfname=${options[2]}
+    pdf_urls "${pdfname}"
+  ;;
+  "--urls")
+    urlfile=${options[2]}
+    lnksflag=${options[3]}
+    file "$urlfile" && read_urls
+  ;;
+  "--download") : ;;
+  "--nb") : ;;
+  "--archivebox") : ;;
+  "--plugin") : ;;
+esac
+# markdown and print are mutually exclusive -- markdown implies print
+fmt_urls=$(
+  case ${options[@]} in
+    "--print") print_urls ;;
+    "--markdown") markdown_urls ;;
+    "--asciidoc") asciidoc_urls ;;
+    "--mediawiki") mediawiki_urls ;;
+    "--orgmode") orgmode_urls ;;
+    "--restructuredtext") restructuredtext_urls ;;
+  esac
+)
+# check to see if the print or markdown args include a copy flag
+case ${options[@]} in
+  "--copy") 
+    # if the print or markdown flags were included, use the $fmt_urls variable
+    # otherwise, use $matched_urls set earlier in this script
+    copy_urls "${fmt_urls:-$matched_urls}
+  ;;
+esac
+---

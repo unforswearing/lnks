@@ -1,355 +1,159 @@
-#!/bin/bash
-
-# To Do
-# - add option to read urls from a file and run a single command for all
-#   - eg. lnks -r urls.txt --instapaper
-# - improve code quality and style consistency
-#   - to inlcude renaming functions and changing the case statment to use 'getopts'
-# - extract pastebin functions into a standalone file as a 'plugin'
-# - remove all commented code
+#!/bin/env -i bash --noprofile --norc
+# =================
+# Updated 7/2/2023, 9/2/2021
+# =================
 #
+# @todo Update lnks with better code and more options
+# ---
+# (see also: dev/dev-lnks.sh)
+# (see also: dev/surls)
+# ---
+# Stage 1. improve code quality/style/consistency
+#   - rename functions, improve option handling (multiple options), separate code into 
+#     smaller units, more isolation from the user environment, etc
+#    - accept multiple options by looping over the `$@` options array and parsing each item
+# Stage 2. update project documentation
+#   - including new `lib/` files
+# Stage 3. add option (and docs) for creating and using plugins
+#   - @note this will require planning to properly incorporate into the script
+#   - plugin setting for lnks.conf
+#     - `plugins={true|false}`
+#   - using plugins
+#     - plugins should accept a title and url.
+#     - plugins should perform some external action.
+#     - plugins can store their credentials with the plugin or in `lnks.conf`
+#     - more TBD
+# ---
+# @todo update lnks behavior, re: options
+# general: allow for multiple / chained options
+# ---
+# @todo new lnks option: settings
+#   - `lnks --settings plugins=true`"
+#   - or multiple opts enclosed in quotes. eg:
+#    `lnks --settings "no_tracking=false default_browser=chrome"`
+#   - available settings for lnks.conf
+    # - no_tracking={bool} :: strip tracking params from url -> default `true`
+    # - default_option={flag} :: option to use when lnks is run with no flag -> default `-p`
+    # - default_browser={chrome|safari} :: use safari or chrome as default -> default `chrome`
+    # - pdf_writer={name|path} :: choose another pdf converter -> default `wkhtmltopdf`
+#     - TBD way to store username/password/api key for plugins
+# ---
+# @todo new lnks option: urls
+# eg. `lnks --urls hrefs.txt --pdf`
 
-lnks() {
-	OIFS="$IFS"
-	IFS=$'\n\t'
-
-	local option; option="$1"
-	local srch; srch="$2"
-	local lfile; lfile="$3"
-
-	# https://www.w3.org/Tools/HTML-XML-utils/README
-	local hxclean; hxclean="$(command -v hxclean)"
-	local hxselect; hxselect="$(command -v hxselect)"
-
-	_lnx_help() {
-		echo "lnks <option> <search term>"
-		echo
-		echo "Options:"
-		echo "  -s|--save       save the links to a file on the desktop"
-		echo "  -c|--copy       copy the links to your clipboard"
-		echo "  -p|--print      print the links to stdout"
-		echo "  -m|--markdown		print links in mardown format: [title](url)"
-		echo "  -i|--instapaper save the link(s) to instapaper"
-		echo "  -b|--pinboard   save the link(s) to pinboard.in (requires 'html-xml-utils')"
-		echo "  -w|--pdf        save each url as a pdf (requires 'wkhtmltopdf')"
-		echo "  -h|--help       print this help message"
-		echo
-		echo "Note"
-		echo "  - one (and only one) option is permitted. lnks will fail if multiple options are specified."
-		echo "    - lnks will allow multiple options in a future version"
-	}
-
-	_htmlxmlutil_warning() {
-		echo "Error: hxclean or hxselect is not installed, or they are not in your \$PATH"
-		echo "Please visit https://www.w3.org/Tools/HTML-XML-utils/README for installation information"
-		echo "or install the 'html-xml-utils' package via homebrew (https://brew.sh)"
-	}
-
-	_prog() {
-		[[ -z "$1" ]] && exit 0
-
-		set +m
-		tput civis
-
-		eval "$1" >/dev/null 2>&1 &
-
-		local pid; pid=$!
-		local spin; spin="-\|/"
-		local i; i=0
-
-		while kill -0 "$pid" 2>/dev/null; do
-			i=$(((i + 1) % 4))
-			printf "\r%s" ${spin:$i:1}
-			sleep .07
-		done
-		printf "\r"
-
-		tput cnorm
-		set -m
-	}
-
-	links() {
-		_pull() {
-			osascript <<EOT
-				tell application "Google Chrome"
-					set links to get URL of tabs of first window
-					return links
-				end tell
-EOT
-		}
-
-		local count; count="$(_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l)"
-		local links; links="$(_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g")"
-
-		if [[ "$count" -eq 0 ]]; then
-			echo "Error: No matching links"
-		else
-			echo "$links"
-		fi
-
-		unset count
-		unset links
-	}
-
-	_save() {
-		if [[ -z "$lfile" ]]; then
-			echo "No filename entered."
-			_lnx_help
-		fi
-
-		links > "$lfile" && echo "Links matching $srch saved to $lfile"
-		unset -f _save
-	}
-
-	_copy() {
-		copylinks() {
-			links | pbcopy
-			echo "Links matching $srch copied to clipboard"
-		}
-
-		local lnx
-		lnx="$(links)"
-
-		if [[ "$lnx" == "Error: No matching links" ]]; then
-			links
-		else
-			copylinks
-		fi
-
-		unset -f _copy
-	}
-
-	_markdown() {
-		if [[ -z "$hxclean" ]] || [[ -z "$hxselect" ]]; then
-			_htmlxmlutil_warning
-		else
-			links | while read -r lnk; do
-				local title; title="$(curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title')"
-				echo -en "[${title}](${lnk})\n"
-			done
-		fi
-
-		unset -f _markdown
-	}
-
-	_instapaper() {
-		_instapaper_get_credentials() {
-			instapaper_username="$(
-				grep -i 'instapaper_username' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
-			)"
-
-			instapaper_password="$(
-				grep -i 'instapaper_password' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g'
-			)"
-		}
-
-		_instapaper_store_credentials() {
-			echo "lnks needs to store your Instapaper credentials"
-			sleep 1
-
-			tput cnorm
-			read -r -p "enter your username (email address): " instapaper_username
-			read -rs -p "	enter your password: " instapaper_password
-			sleep .2
-
-			{
-				echo "instapaper_username=\"$instapaper_username\"";
-				echo "instapaper_password=\"$instapaper_password\"";
-				echo;
-			} >> ~/.lnks.conf
-
-			echo "done! your credentials are stored at $HOME/.lnks.conf"
-			echo "delete this file at any time to revoke Instapaper access."
-		}
-
-		if grep -q 'instapaper' ~/.lnks.conf; then
-			_instapaper_get_credentials
-		else
-			_instapaper_store_credentials
-		fi
-	}
-
-	_instapaper_add() {
-		local lnx
-		lnx="$(links)"
-
-		if [[ "$lnx" == "Error: No matching links" ]]; then
-			links
-		else
-			links | while read -r url; do
-				local base="https://www.instapaper.com/api/add"
-
-				curl -d --silent \
-					--data-urlencode "username=${instapaper_username}" \
-					--data-urlencode "password=${instapaper_password}" \
-					--data-urlencode "url=${url}" \
-					"${base}" >/dev/null 2>&1
-
-				echo "$url Saved!"
-				sleep .2
-			done
-		fi
-
-		unset instapaper_username
-		unset instapaper_password
-		unset -f _instapaper
-		unset -f _instapaper_add
-	}
-
-	_pinboard() {
-		_pinboard_get_credentials() {
-			pinboard_api="$(grep -i 'pinboard_api' ~/.lnks.conf | awk -F= '{print $2}' | sed 's|\"||g')"
-		}
-
-		_pinboard_store_credentials() {
-			echo "lnks needs to store your Pinboard API Token."
-			echo -en "You can find your API Token by visiting your pinboard settings:\n"
-			echo -en "https://pinboard.in/settings/password. \nYour Token will appear as"
-			echo "'userName:tokenString.' For example 'lnksuser:1F4E2SD32418AF103FDD'"
-
-			echo
-			sleep 1
-
-			tput cnorm
-			read -r -p "	enter your API Key: " pinboard_api
-			echo
-
-			echo "done! your credentials are stored at $HOME/.lnks.conf"
-			echo "delete this file at any time to revoke Pinboard access."
-			sleep .2
-
-			echo -en "pinboard_api=\"$pinboard_api\"" >> ~/.lnks.conf
-		}
-
-		if grep -q 'pinboard_api' ~/.lnks.conf; then
-			_pinboard_get_credentials
-		else
-			_pinboard_store_credentials
-		fi
-	}
-
-	_pinboard_add() {
-		_get_info_and_post() {
-			local url; url="$1"
-
-			if [[ -z "$hxclean" ]] || [[ -z "$hxselect" ]]; then
-				_htmlxmlutil_warning
-			else
-				local title
-				title="$(curl -so - "$url" | "$hxclean" | "$hxselect" -s '\n' -c 'title')"
-				title="${title:-$url}"
-
-				echo
-				echo "TITLE: $title"
-				echo "URL: $url"
-				echo -en "========\n"
-				echo
-				echo "Enter tags for this bookmark: "
-
-				tput cnorm
-				read -r tags
-
-				sleep 1
-
-				local base="https://api.pinboard.in/v1/posts/add"
-
-				curl -G --silent \
-					--data-urlencode "auth_token=${pinboard_api}" \
-					--data-urlencode "url=${url}" \
-					--data-urlencode "description=${title}" \
-					--data-urlencode "tags=${tags}" \
-					"${base}" >/dev/null 2>&1
-
-				echo "saved to pinboard!"
-			fi
-		}
-
-		local lnx; lnx="$(links | tr ' ' '\n')"
-
-		if [[ "$lnx" == "Error: No matching links" ]]; then
-			links
-		else
-			while read -r url; do
-				_get_info_and_post "$url" </dev/tty
-				sleep .2
-			done < <(echo "$lnx")
-		fi
-
-		unset pinboard_api
-		unset -f _pinboard
-		unset -f _pinboard_add
-	}
-
-	_wkhtmltopdf() {
-		_to_pdf() {
-			"$(command -v wkhtmltopdf)" --quiet --title "$url" "$url" "$title".pdf
-			sleep .2
-		}
-
-		# test for the existense of wkhtmltopdf
-		if [[ ! "$(command -v wkhtmltopdf)" ]]; then
-			echo "Error: wkhtmltopdf is not installed, or it is not in your \$PATH"
-			echo "Please visit http://wkhtmltopdf.org/downloads.html for installation instructions"
-		else
-			local lnx; lnx="$(links | tr ' ' '\n')"
-
-			while read -r url; do
-				echo "Converting \"${url}\" to PDF..."
-				_prog _to_pdf
-
-				local title
-				title="$(
-					readonly hxclean="$(command -v hxclean)";
-					readonly hxselect="$(command -v hxselect)";
-					curl -so - "$url" | $hxclean | "$hxselect" -s '\n' -c 'title'
-				)"
-
-				echo "Done - $(pwd)/${title}.pdf"
-			done < <(echo "$lnx")
-		fi
-
-		unset -f _wkhtmltopdf
-	}
-
-	if [[ "$option" == "-h" ]]; then
-		:
-	elif [[ ! "$option" ]]; then
-		:
-	elif [[ "$srch" == "" ]]; then
-		echo "Error: No search term entered"
-		option="--help"
-	fi
-
-	case "$option" in
-		# help
-		--help | -h) _lnx_help ;;
-		"") _lnx_help ;;
-		# option to save the list as a file
-		--save | -s) _save ;;
-		# copy to clipboard
-		--copy | -c) _copy ;;
-		# print
-		--print | -p) links ;;
-		# print markdown formatted links
-		--markdown | -m) _markdown ;;
-		# add to instapaper
-		--instapaper | -i) _instapaper && _instapaper_add ;;
-		# save to pinboard
-		--pinboard | -b) _pinboard && _pinboard_add ;;
-		# save url (as webpage) to pdf
-		--pdf | -w) _wkhtmltopdf ;;
-		*) _lnx_help ;;
+lnx:lib:color() {
+	local red="\033[31m" 
+	local green="\033[32m" 
+	local yellow="\033[33m" 
+	local blue="\033[34m" 
+	local reset="\033[39m" 
+	local black="\033[30m" 
+	local white="\033[37m" 
+	local magenta="\033[35m" 
+	local cyan="\033[36m" 
+	local opt="$1" 
+	shift
+  # shellcheck disable=SC2145
+	case "$opt" in
+		(red) echo -en "${red}$@${reset}" ;;
+		(green) echo -en "${green}$@${reset}" ;;
+		(yellow) echo -en "${yellow}$@${reset}" ;;
+		(blue) echo -en "${blue}$@${reset}" ;;
+		(black) echo -en "${black}$@${reset}" ;;
+		(white) echo -en "${white}$@${reset}" ;;
+		(magenta) echo -en "${magenta}$@${reset}" ;;
+		(cyan) echo -en "${cyan}$@${reset}" ;;
+		(help) echo -en "colors <red|green|yellow|blue|black|magenta|cyan> string" ;;
 	esac
-
-	# take only memories, leave no footprints
-	{
-		unset url
-		unset -f links; unset -f _lnx_help; unset -f _s
-		unset -f _c; unset -f _instapaper; unset -f _instapaper_add
-		unset -f _pinboard; unset -f _pinboard_add; unset -f _w
-
-		IFS="$OIFS"
-
-		unset -f erase
-	} >/dev/null 2>&1
 }
+
+# search $PATH for the presense of a tool. 
+# eg. `require gdate`
+lnx:lib:require() {
+	local comm; comm="$(command -v "$1")" 
+	if [[ -n $comm ]]
+	then
+    # `as` is a throwaway var added for clarity:
+    # `require tool_name as var_name` instead of
+    # `require tool_name var_name`
+    as="$2";echo "$as">/dev/null 2>&1
+    # `var` is the name of the function that will 
+    # pass $comm path to another command
+    var="$3"
+    if [[ -n $var ]]; 
+    then
+      # create a function to return comm path named $var
+      eval "function $var() { echo $comm; }"
+		  true
+    else 
+      # if we aren't creating a variable, just return true
+      true
+    fi
+	else
+    # if the required command isn't found then print an error message
+	  color red "$0: '$1' not found" #>/dev/null 2>&1
+    false
+	fi
+}
+
+# @note the top level helper namespace in this file is called `lnx`
+# @note helper methods are under the `lnx:run` namespace
+lnx:lib:help() {
+  echo "lnks <option> <search term>"
+  echo
+  echo "Options:"
+  echo "  -s|--save       save the link(s) to a .txt file on the desktop"
+  echo "  -p|--print      print the link(s) to the console"
+  echo "  -c|--copy       copy the link(s) to your clipboard"
+  echo "  -m|--markdown		print link(s) in mardown format: [title](url)"
+  echo "  -b|--pinboard   save the link(s) to pinboard.in"
+  echo "  -w|--pdf        save each url as a pdf (requires 'wkhtmltopdf')"
+# echo "  -u|--urls       read a list of plain text urls from a file and run a links option for each"
+# echo "  -x|--settings   add a setting to lnks.conf. 
+  echo "  -h|--help       print this help message"
+  echo
+}
+
+# file "$HOME/.lnks.conf" && <read conf>
+lnx:lib:file() {
+	local name="$1" 
+	if [[ -s "$name" ]]
+	then
+		true
+	else
+		# if the required file isn't found then print an error message
+	  color red "$0: file '$1' not found" #>/dev/null 2>&1
+    false
+	fi
+}
+
+# @todo is this needed? maybe for wkhtmltopdf and pinboard stuff?
+lnx:lib:prog() {
+  [[ -z "$1" ]] && exit 0
+
+  set +m
+  tput civis
+
+  eval "$1" >/dev/null 2>&1 &
+
+  local pid
+  pid=$!
+  local spin
+  spin="-\|/"
+  local i
+  i=0
+
+  while kill -0 "$pid" 2>/dev/null; do
+    i=$(((i + 1) % 4))
+    printf "\r%s" ${spin:$i:1}
+    sleep .07
+  done
+  printf "\r"
+
+  tput cnorm
+  set -m
+}
+
+# ------------------------------------------------------------------
+# @note The remaining code in this script will be rewritten entirely
+# ------------------------------------------------------------------
