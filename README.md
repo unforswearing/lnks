@@ -9,7 +9,7 @@ Clone this repository to use the latest version of `lnks`:
 
 ```console
 $ git clone https://github.com/unforswearing/lnks.git .
-$ cd lnks 
+$ cd lnks
 $ source lnks
 $ lnks -h
 ```
@@ -64,7 +64,7 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 
 **Optional**
 
-> `lnks` is basically functional without these tools, however they must be installed to use specific `lnks` options. 
+> `lnks` is basically functional without these tools, however they must be installed to use specific `lnks` options.
 
 - HTML-XML-utils: [https://www.w3.org/Tools/HTML-XML-utils/README](https://www.w3.org/Tools/HTML-XML-utils/README)
   - to get page titles from processed urls, used with `--markdown` and `--pinboard` options.
@@ -75,9 +75,4 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 
 ## To Do / Roadmap
 
-- Clean up code, add comments, make everything more readable
-- Feature: Read a list of links from a file and execute a single `lnks` option for each
-  -  eg. `lnks --read urls.txt --pdf`
-- Feature: Add support for [raindrop.io](https://raindrop.io) (if possible)
-- Feature: Create a plugin system and extract Instapaper and Pinboard as "plugins"
-  - eg. `lnks --plugin path/to/lnks_instapaper.bash "search-term"`
+See [todo.md](todo.md)
