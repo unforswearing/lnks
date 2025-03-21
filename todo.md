@@ -13,6 +13,7 @@ Last checked and this command no longer works (MacOS 15), so its time to update.
 - [ ] Set up some sort of tests
 - [ ] Remove Instapaper action
 - [ ] Remove Pinboard action
+- [ ] Remove `html-xml-utils` dependency
 - [ ] Consider adding Raindrop.io action (default posture: no)
 - [ ] Add action `--read <urls.txt>` to process a file containing a list urls in <format>
 - [ ] Consider adding an extension system, via `--extension` or `--plugin` flag
