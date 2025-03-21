@@ -4,6 +4,7 @@ readonly _lnks_src_dir="./src"
 declare -a source=(
   "/util.bash"
   "/main.bash"
+  "/initialize.bash"
 )
 for sourcefile in "${source[@]}"; do
   cat "${_lnks_src_dir}${sourcefile}" >> "./lnks.bash"
