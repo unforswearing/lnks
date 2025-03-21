@@ -17,25 +17,3 @@ function _util.color() {
 function _util.require() {
   test "$(command -v "$1")"
 }
-function _util.prog() {
-  [[ -z "$1" ]] && exit 0
-
-  set +m
-  tput civis
-
-  eval "$1" >/dev/null 2>&1 &
-
-  local pid; pid=$!
-  local spin; spin="-\|/"
-  local i; i=0
-
-  while kill -0 "$pid" 2>/dev/null; do
-	  i=$(((i + 1) % 4))
-	  printf "\r%s" ${spin:$i:1}
-	  sleep .07
-  done
-  printf "\r"
-
-  tput cnorm
-  set -m
-}
