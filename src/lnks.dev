@@ -1,10 +1,14 @@
 #!/bin/bash
-# ref: bash --version -> 3.2.57(1)-release (x86_64-apple-darwin24)
+#!/bin/zsh
+# ref: zsh 5.9 (x86_64-apple-darwin24.0)
 function lnks() {
 	local option; option="$1"
 	local srch; srch="$2"
 	local lfile; lfile="$3"
 
+	# TODO: If I am only using this tool to get the page title
+	#       replace html-xml-utils dependency with this curl cmd:
+	#       `curl -L unforswearing.com | grep '<title>'`
 	# https://www.w3.org/Tools/HTML-XML-utils/README
 	local hxclean; hxclean="$(__util.require hxclean)"
 	local hxselect; hxselect="$(__util.require hxselect)"
