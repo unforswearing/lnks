@@ -1,5 +1,5 @@
 #!/bin/bash
-# /bin/bash --version -> 3.2.57(1)-release (x86_64-apple-darwin24)
+# ref: bash --version -> 3.2.57(1)-release (x86_64-apple-darwin24)
 readonly _lnks_src_dir="./src"
 declare -a source=(
   "/util.bash"
