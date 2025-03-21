@@ -68,10 +68,16 @@
 # lnks [query] --json | --markdown
 #
 
+# ::~ File: "src/initialize.zsh"
+#
 # TODO: check for ~/.config/lnks, create if it doesn't exist
 # TODO: check for the existence of ~/.config/lnks/options.ext
 #       create if it doesn't exist
+# use $XDG_CONFIG_HOME if set, otherwise create a folder in
+# $HOME/.config, fall back to creating a folder in the $HOME directory
 readonly lnks_configuration="$HOME/.config/lnks/lnks.rc"
+#
+# ::~ EndFile
 
 # Option parsing starts here ------------------------
 #
@@ -99,6 +105,15 @@ test -z "${browser_application}" && {
 #
 # Option parsing ends here --------------------------
 # ---------------------------------------------------
+
+# ::~ File: "src/strict.zsh"
+# ::~ EndFile
+
+# ::~ File: "src/util.zsh"
+# ::~ EndFile
+
+# ::~ File: "src/help.zsh"
+# ::~ EndFile
 
 function query_browser_application_urls() {
   local browser="${1}"
