@@ -24,8 +24,8 @@
 
 # _util.require
 
-
-# Option parsing starts here --------------------------
+# ---------------------------------------------------
+# Option parsing starts here ------------------------
 #
 # TODO: Need better option parsing
 
@@ -50,6 +50,7 @@ readonly outfile="${3}"
 
 #
 # Option parsing ends here --------------------------
+# ---------------------------------------------------
 
 function query_browser_application_urls() {
   local browser="${1}"
@@ -80,6 +81,7 @@ function copy_urls() {
 # save_urls can be merged with save_markdown_urls
 function save_urls() {
 	local output_file="${1}"
+	# TODO: if file exists: warn "overwrite file?"
 	print_urls > "${output_file}"
 }
 
@@ -100,7 +102,6 @@ function print_markdown_urls() {
 # save_markdown_urls can be merged with save_urls
 function save_markdown_urls() {
 	local output_file="${1}"
+	# TODO: if file exists: warn "overwrite file?"
 	print_markdown_urls > "${output_file}"
 }
-
-
