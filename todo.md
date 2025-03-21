@@ -7,20 +7,24 @@ This todo file tracks progress on `src/main.zsh`.
 ## To Do
 
 - [ ] Change default config location to use `~/.config/lnks`
-- [ ] Change default config format to (anything not `.conf`, maybe `json`?)
+  - Filename `lnks.rc`, format will be plain `shell`
+- [ ] Revise available options
 - [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging)
 - [ ] Code comments
 - [ ] Set up some sort of tests
 - [ ] Consider adding Raindrop.io action (default posture: no)
+- [ ] Add action `--html` to save urls as a basic html list
+- [ ] Add action `--csv` to save urls as a csv file
 - [ ] Add action `--stdin` to read urls from the output of another program in a pipe
-    - Process urls from `stdin` using another lnks option.
+  - Process urls from `stdin` using another lnks option.
 - [ ] Add action `--read <urls.txt>` to process a file containing a list urls in <format>
-    - Process urls from `<urls.txt>` using another lnks option.
+  - Process urls from `<urls.txt>` using another lnks option.
 - [ ] Consider adding an extension system, via `--plugin` flag
-    - The extension would accept a serialized list of links for procesing using any language
+  - The extension would accept a serialized list of links for procesing using any language
 
 ## Complete
 
+- [x] Change default config format to (anything not `.conf`, maybe `json`?)
 - [x] Choose to switch base language (keep `bash`, use `python` / `ruby`)?
   - Keeping `bash`
 - [x] Specify which window to pull links from, or all windows
