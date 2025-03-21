@@ -6,23 +6,25 @@ This todo file tracks progress on `src/main.zsh`.
 
 ## To Do
 
-- [ ] Change default config location to use `~/.config/lnks`
-  - Filename `lnks.rc`, format will be plain `shell`
-- [ ] Revise available options
-- [ ] Develop prescedence for options
-  - eg. options that query / pull urls are higher prescedence than options that save urls as `<fmt>`
-- [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging)
-- [ ] Code comments
-- [ ] Set up some sort of tests
-- [ ] Consider adding Raindrop.io action (default posture: no)
-- [ ] Add action `--html` to save urls as a basic html list
-- [ ] Add action `--csv` to save urls as a csv file
-- [ ] Add action `--stdin` to read urls from the output of another program in a pipe
+- [ ] Change default config location to use `~/.config/lnks`.
+  - Filename `lnks.rc`, format will be plain `shell`.
+- [ ] Revise available options.
+- [ ] Develop prescedence for options.
+  - eg. options that query / pull urls are higher prescedence than options that save urls as `<fmt>`.
+- [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
+- [ ] Code comments.
+- [ ] Set up some sort of tests.
+- [ ] Consider adding Raindrop.io action (default posture: no).
+- [ ] Add action `--html` to save urls as a basic html list.
+- [ ] Add action `--csv` to save urls as a csv file.
+  - `Title,Date,URL`
+- [ ] Add action `--stdin` to read urls from the output of another program in a pipe.
   - Process urls from `stdin` using another lnks option.
-- [ ] Add action `--read <urls.txt>` to process a file containing a list urls in <format>
+- [ ] Add action `--read <urls.txt>` to process a file containing a list urls in <format>/
   - Process urls from `<urls.txt>` using another lnks option.
-- [ ] Consider adding an extension system, via `--plugin` flag
-  - The extension would accept a serialized list of links for procesing using any language
+- [ ] Consider adding output formats for other markup languages (TBD).
+- [ ] Consider adding an extension system, via `--plugin` flag.
+  - The extension would accept a serialized list of links for procesing using any language.
 
 ## Complete
 

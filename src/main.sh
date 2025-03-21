@@ -1,8 +1,8 @@
 #!/bin/bash
 #!/bin/zsh
 # ref: zsh 5.9 (x86_64-apple-darwin24.0)
-# this script uses the `zsh` extension but aims to be compatible with
-# GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
+# this script uses the `sh` extension but aims to be compatible with
+# zsh and GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
 
 # NOTE: Should I use zsh options (see below) if I want bash compat?
 # TODO: Are there any other relevant Zsh Shell options for this script?
@@ -40,6 +40,7 @@
 # lnks [query] --save [file.ext]
 # lnks [query] --copy
 # lnks [query] --print
+# lnks [query] --markdown
 #
 # If `--safari` flag follows query, search Safari URLs instead of Chrome.
 # This option can be set permanently in settings.
@@ -81,16 +82,16 @@ readonly lnks_configuration="$HOME/.config/lnks/lnks.rc"
 browser_application="Google Chrome"
 
 if [ "${1}" == "safari" ]; then
-	browser_application="Safari"
-	shift
+  browser_application="Safari"
+  shift
 # elif [ $(get_config_browser_setting) == "safari" ]; then
 #   :;:;
 fi
 
 # if defined?(browser_application)
 test -z "${browser_application}" && {
-	_util.color red "'$browser_application' unset or not found."
-	exit 1
+  _util.color red "'$browser_application' unset or not found."
+  exit 1
 }
 
 # readonly option="${1}"
@@ -120,67 +121,77 @@ EOT
 }
 
 function countof_urls() {
-	query_browser_application_urls "$browser_application"| \
-		tr ',' '\n' | \
-		wc -l | \
-		sed 's/^\s*//g'
+  query_browser_application_urls "$browser_application" |
+    tr ',' '\n' |
+    wc -l |
+    sed 's/^\s*//g'
 }
 
 function print_urls() {
-	query_browser_application_urls "$browser_application" | \
-		tr ',' '\n' | \
-		sed 's/^ //g'
+  query_browser_application_urls "$browser_application" |
+    tr ',' '\n' |
+    sed 's/^ //g'
 }
 
 # print_urls | copy_urls
 function copy_urls() {
-	# print_urls | pbcopy
+  # print_urls | pbcopy
   pbcopy
 }
 
 # save_urls can be merged with save_markdown_urls
 function save_urls() {
-	local output_file="${1}"
-	# TODO: if file exists: warn "overwrite file?"
-	print_urls > "${output_file}"
+  local output_file="${1}"
+  # TODO: if file exists: warn "overwrite file?"
+  print_urls >"${output_file}"
 }
 
 function query_url_title() {
-	local url="${1}"
-	curl -sL "${url}" | \
-		grep '<title>' | \
-		sed 's/<title>//g;s/<\/title>//g;s/^\s*//g'
+  local url="${1}"
+  curl -sL "${url}" |
+    grep '<title>' |
+    sed 's/<title>//g;s/<\/title>//g;s/^\s*//g'
 }
 
 # print_urls | create_markdown_urls
 function create_markdown_urls() {
-	# print_urls | while read -r this_url; do
+  # print_urls | while read -r this_url; do
   while read -r this_url; do
-		local title; title="$(query_url_title "${this_url}")"
-		echo "[${title}](${this_url})"
-	done
+    local title
+    title="$(query_url_title "${this_url}")"
+    echo "[${title}](${this_url})"
+  done
 }
 
 # save_markdown_urls can be merged with save_urls
 function save_markdown_urls() {
-	local output_file="${1}"
-	# TODO: if file exists: warn "overwrite file?"
-	# print_markdown_urls > "${output_file}"
-  cat -> "${output_file}"
+  local output_file="${1}"
+  # TODO: if file exists: warn "overwrite file?"
+  # print_markdown_urls > "${output_file}"
+  cat - >"${output_file}"
 }
 
 # NOTE: `read_urls_from_file` is incomplete
 # lnks [query] --read [urls.txt] [ --save | --copy | --markdown | --plugin  ]
 function read_urls_from_file() {
-	local input_file="${1}"
-	shift;
-	local processing_options="${*}"
+  local input_file="${1}"
+  shift
+  local processing_options="${*}"
   # TODO: this option parsing needs to happen in a loop
   #       it would be easiest to just call lnks again using the `input_file`
   #       as stdin. Maybe setup `lnks --stdin` option before `--read`
   case "$processing_options" in
-    --save) shift; cat "$input_file" | save_urls "${1}" ;;
-    --copy) shift; cat "$input_file" | copy_urls ;;
-    --markdown) shift; cat "$input_file" | create_markdown_urls ;;
+  --save)
+    shift
+    cat "$input_file" | save_urls "${1}"
+    ;;
+  --copy)
+    shift
+    cat "$input_file" | copy_urls
+    ;;
+  --markdown)
+    shift
+    cat "$input_file" | create_markdown_urls
+    ;;
   esac
 }
