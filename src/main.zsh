@@ -1,24 +1,23 @@
 #!/bin/bash
 #!/bin/zsh
 # ref: zsh 5.9 (x86_64-apple-darwin24.0)
+# this script uses the `zsh` extension but aims to be compatible with
+# GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
 
+# NOTE: Should I use zsh options (see below) if I want bash compat?
 # TODO: Are there any other relevant Zsh Shell options for this script?
 # https://zsh.sourceforge.io/Doc/Release/Options-Index.html
 # ---
-# Avoid using nested variables with same name as var in outer scope
-setopt warn_nested_var
-# Avoid polluting the environment
-setopt warn_create_global
-# Set function $0 arg to the name of function for error reporting
-setopt function_argzero
-# Don't overwrite files
-setopt no_clobber
-# Don't append to a file if it doesn't yet exist
-setopt no_append_create
-# No filename globbing (to prevent errors)
-setopt no_glob
-# Unset parameters are treated as empty / error
-setopt unset
+# declare -a strict=(
+# 	"warn_nested_var"
+# 	"warn_create_global"
+# 	"function_argzero"
+# 	"no_clobber"
+# 	"no_append_create"
+# 	"no_glob"
+# 	"unset"
+# )
+# setopt "$strict"
 
 # TODO: Errors / Logging
 
@@ -125,4 +124,15 @@ function save_markdown_urls() {
 	local output_file="${1}"
 	# TODO: if file exists: warn "overwrite file?"
 	print_markdown_urls > "${output_file}"
+}
+
+# lnks [query] --read [urls.txt] [ --save | --copy | --print | --pdf | --plugin  ]
+function read_urls_from_file() {
+	local input_file="${1}"
+	shift;
+	local processing_options="${@}"
+	while read input_url; do
+		# read additional lnks options and process
+		:;
+	done
 }
