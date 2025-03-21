@@ -2,6 +2,30 @@
 #!/bin/zsh
 # ref: zsh 5.9 (x86_64-apple-darwin24.0)
 
+# TODO: Are there any other relevant Zsh Shell options for this script?
+# https://zsh.sourceforge.io/Doc/Release/Options-Index.html
+# ---
+# Avoid using nested variables with same name as var in outer scope
+setopt warn_nested_var
+# Avoid polluting the environment
+setopt warn_create_global
+# Set function $0 arg to the name of function for error reporting
+setopt function_argzero
+# Don't overwrite files
+setopt no_clobber
+# Don't append to a file if it doesn't yet exist
+setopt no_append_create
+# No filename globbing (to prevent errors)
+setopt no_glob
+# Unset parameters are treated as empty / error
+setopt unset
+
+# TODO: Errors / Logging
+
+# TODO: should any default MacOS tools be 'require'd here?
+# _util.require
+
+# --------------------------------------------------------
 # I want to be able to process options in almost any order
 # the only rule being that query is first and outfile is last
 # outfile will always be preceded by flag --save.
@@ -21,10 +45,7 @@
 # To Do:
 # lnks [query] --read [urls.txt] [ --save | --copy | --print | --pdf | --plugin  ]
 # lnks [query] --plugin [plugin_name.ext]
-
-# _util.require
-
-# ---------------------------------------------------
+#
 # Option parsing starts here ------------------------
 #
 # TODO: Need better option parsing
