@@ -1,40 +1,6 @@
 #!/bin/bash
 # /bin/bash --version -> 3.2.57(1)-release (x86_64-apple-darwin24)
 
-__util.color() {
-  local red="\033[31m"
-  local green="\033[32m"
-  local blue="\033[34m"
-  local reset="\033[39m"
-  local opt="$1"
-  shift
-  case "$opt" in
-    red) print "${red}$@${reset}" ;;
-    green) print "${green}$@${reset}" ;;
-    blue) print "${blue}$@${reset}" ;;
-  esac
-}
-__util.require() {
-    local comm="$(command -v $1)"
-    if [[ $comm ]]; then
-      echo $comm
-    else
-      __util.color red "Command '$comm' is not installed, or it is not in your \$PATH"
-	  case $comm in
-		"hxclean"|"hxselect")
-			echo "Please visit https://www.w3.org/Tools/HTML-XML-utils/README for installation instructions"
-			echo "Or install the 'html-xml-utils' package via homebrew (https://brew.sh)"
-		;;
-		"osascript")
-			echo "Are you using an Apple device?"
-		;;
-		"wkhtmltopdf")
-			echo "Please visit http://wkhtmltopdf.org/downloads.html for installation instructions"
-		;;
-	  esac
-	fi
-}
-
 lnks() {
 	OIFS="$IFS"
 	IFS=$'\n\t'
@@ -63,29 +29,6 @@ lnks() {
 		echo "Note"
 		echo "  - one (and only one) option is permitted. lnks will fail if multiple options are specified."
 		echo "  - lnks will allow multiple options in a future version"
-	}
-
-	_prog() {
-		[[ -z "$1" ]] && exit 0
-
-		set +m
-		tput civis
-
-		eval "$1" >/dev/null 2>&1 &
-
-		local pid; pid=$!
-		local spin; spin="-\|/"
-		local i; i=0
-
-		while kill -0 "$pid" 2>/dev/null; do
-			i=$(((i + 1) % 4))
-			printf "\r%s" ${spin:$i:1}
-			sleep .07
-		done
-		printf "\r"
-
-		tput cnorm
-		set -m
 	}
 
 	links() {
