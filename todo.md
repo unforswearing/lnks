@@ -9,6 +9,8 @@ This todo file tracks progress on `src/main.zsh`.
 - [ ] Change default config location to use `~/.config/lnks`
   - Filename `lnks.rc`, format will be plain `shell`
 - [ ] Revise available options
+- [ ] Develop prescedence for options
+  - eg. options that query / pull urls are higher prescedence than options that save urls as `<fmt>`
 - [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging)
 - [ ] Code comments
 - [ ] Set up some sort of tests

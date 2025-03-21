@@ -6,18 +6,8 @@
 
 # NOTE: Should I use zsh options (see below) if I want bash compat?
 # TODO: Are there any other relevant Zsh Shell options for this script?
+# see "src/strict.zsh" for previous option ideas
 # https://zsh.sourceforge.io/Doc/Release/Options-Index.html
-# ---
-# declare -a strict=(
-# 	"warn_nested_var"
-# 	"warn_create_global"
-# 	"function_argzero"
-# 	"no_clobber"
-# 	"no_append_create"
-# 	"no_glob"
-# 	"unset"
-# )
-# setopt "$strict"
 
 # TODO: Errors / Logging
 
@@ -37,7 +27,7 @@
 #
 # 'save_format' - automatically convert urls to this format
 # when using the `--save` flag. you must still supply an output filename.
-# save_format = <txt|markdown|csv>; default: text
+# save_format = <txt|markdown|csv|html>; default: text
 
 # --------------------------------------------------------
 # I want to be able to process options in almost any order
@@ -57,15 +47,20 @@
 # lnks [query] --safari --pdf
 #
 # To Do:
+#
+# File format options:
 # lnks [query] --html
 # lnks [query] --csv
+#
+# Processing options:
 # lnks [query] --stdin [ --save | --copy | --print | --plugin  ]
 # lnks [query] --read [urls.txt] [ --save | --copy | --print | --plugin  ]
 # lnks [query] --plugin [plugin_name.ext]
 #
 # Future:
-# Consider adding output format options:
-# lnks [query] --json | --markdown
+# Consider adding output format options.
+# These are basically aliases for --save / 'save_format' config option
+# lnks [query] --markdown | --csv | --html
 #
 
 # ::~ File: "src/initialize.zsh"
