@@ -1,0 +1,141 @@
+#!/bin/bash
+# ref: bash --version -> 3.2.57(1)-release (x86_64-apple-darwin24)
+function lnks() {
+	local option; option="$1"
+	local srch; srch="$2"
+	local lfile; lfile="$3"
+
+	# https://www.w3.org/Tools/HTML-XML-utils/README
+	local hxclean; hxclean="$(__util.require hxclean)"
+	local hxselect; hxselect="$(__util.require hxselect)"
+
+	_lnx_help() {
+		echo "lnks <option> <search term>"
+		echo
+		echo "Options:"
+		echo "  -s|--save       save the links to a file on the desktop"
+		echo "  -c|--copy       copy the links to your clipboard"
+		echo "  -p|--print      print the links to stdout"
+		echo "  -m|--markdown		print links in mardown format: [title](url)"
+		echo "  -i|--instapaper save the link(s) to instapaper"
+		echo "  -b|--pinboard   save the link(s) to pinboard.in (requires 'html-xml-utils')"
+		echo "  -w|--pdf        save each url as a pdf (requires 'wkhtmltopdf')"
+		echo "  -h|--help       print this help message"
+		echo
+		echo "Note"
+		echo "  - one (and only one) option is permitted. lnks will fail if multiple options are specified."
+		echo "  - lnks will allow multiple options in a future version"
+	}
+
+	links() {
+		__util.require osascript >/dev/null 2>&1
+		_pull() {
+			osascript <<EOT
+				tell application "Google Chrome"
+					set links to get URL of tabs of first window
+					return links
+				end tell
+EOT
+		}
+
+		local count;
+		count="$(
+			_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l
+		)"
+
+		local links;
+		links="$(
+			_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g"
+		)"
+
+		if [[ "$count" -eq 0 ]]; then
+			echo "Error: No matching links"
+		else
+			echo "$links"
+		fi
+	}
+
+	_save() {
+		if [[ -z "$lfile" ]]; then
+			echo "No filename entered."
+			_lnx_help
+		fi
+
+		links > "$lfile" && echo "Links matching $srch saved to $lfile"
+	}
+
+	_copy() {
+		copylinks() {
+			links | pbcopy
+			echo "Links matching $srch copied to clipboard"
+		}
+
+		local lnx
+		lnx="$(links)"
+
+		if [[ "$lnx" == "Error: No matching links" ]]; then
+			links
+		else
+			copylinks
+		fi
+	}
+
+	_markdown() {
+		links | while read -r lnk; do
+			local title;
+			title="$(
+				curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title'
+			)"
+
+			echo -en "[${title}](${lnk})\n"
+		done
+	}
+
+	_wkhtmltopdf() {
+		htmltopdf=$(__util.require wkhtmltopdf)
+		_to_pdf() {
+			$htmltopdf --quiet --title "$url" "$url" "$title".pdf
+			sleep .2
+		}
+
+		local lnx; lnx="$(links | tr ' ' '\n')"
+
+		while read -r url; do
+			echo "Converting \"${url}\" to PDF..."
+			_prog _to_pdf
+
+			local title
+			title="$(
+				curl -so - "$url" | $hxclean | "$hxselect" -s '\n' -c 'title'
+			)"
+
+			echo "Done - $(pwd)/${title}.pdf"
+		done < <(echo "$lnx")
+	}
+
+	if [[ "$option" == "-h" ]]; then
+		:
+	elif [[ ! "$option" ]]; then
+		:
+	elif [[ "$srch" == "" ]]; then
+		echo "Error: No search term entered"
+		option="--help"
+	fi
+
+	case "$option" in
+		# help
+		--help | -h) _lnx_help ;;
+		"") _lnx_help ;;
+		# option to save the list as a file
+		--save | -s) _save ;;
+		# copy to clipboard
+		--copy | -c) _copy ;;
+		# print
+		--print | -p) links ;;
+		# print markdown formatted links
+		--markdown | -m) _markdown ;;
+		# save url (as webpage) to pdf
+		--pdf | -w) _wkhtmltopdf ;;
+		*) _lnx_help ;;
+	esac
+}
