@@ -23,7 +23,7 @@ lnks
 
 Quickly search your Google Chrome or Safari tabs for matching urls and process the results.
 
-Usage: lnks <OPTION> <SEARCH TERM> [FILE]
+Usage: lnks [query] <options> < --save [output file] >
 
 Options
   -h, --help      prints this help message
@@ -46,21 +46,22 @@ Examples
   This option can be set permanently in settings.
 
   lnks [query] --safari --csv
+  lnks [query] --safari --csv --save query.csv
 
   More Examples:
   lnks [query] --markdown
   lnks [query] --html
   lnks [query] --csv
 
-  lnks [query] --save [file.ext]
+  lnks [query] --save [query.ext]
 
-  lnks [query] --markdown --save [file.md]
-  lnks [query] --html --save [file.html]
-  lnks [query] --csv --save [file.csv]
+  lnks [query] --markdown --save [query.md]
+  lnks [query] --html --save [query.html]
+  lnks [query] --csv --save [query.csv]
 
   Processing options:
-  lnks [query] --stdin [ --markdown | --html | --csv ] --save [file.ext]
-  lnks [query] --read [urls.txt] [ --markdown | --html | --csv ] --save [file.ext]
+  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
+  lnks [query] --read [urls.txt] [ --markdown | --html | --csv ] --save [query.ext]
 
 Source
   <https://github.com/unforswearing/lnks>
@@ -160,10 +161,13 @@ function query_urls() {
 function print_urls() {
   tr ',' '\n' | sed 's/^ //g'
 }
-function countof_urls() {
+function pull_and_query_urls() {
   pull_browser_application_urls "$browser_application" |
     print_urls |
-    query_urls |
+    query_urls
+}
+function countof_urls() {
+  pull_and_query_urls |
     wc -l |
     sed 's/^\s*//g'
 }
@@ -259,9 +263,7 @@ for breaking_opt in "${args[@]}"; do
   # provide an explicit way to handle this task.
   if [[ $breaking_opt == "--print" ]]; then
     debug "option: $breaking_opt"
-    pull_browser_application_urls "$browser_application" |
-      print_urls |
-      query_urls
+    pull_and_query_urls
     exit
   fi
 done
@@ -298,11 +300,15 @@ for runtime_opt in "${args[@]}"; do
   # lnks <query> --save filename.txt
   if [[ $runtime_opt == "--save" ]]; then
     debug "option: $runtime_opt"
+    # --save must always be the second to last argument
+    # followed by output_file as the last argument
     output_filename="${args[$((${#args[@]} - 1))]}"
     flag_save=true
     debug "param: output_filename = $output_filename"
     debug "param: flag_save = $flag_save"
   fi
+  ((countof_ots++))
+  next=$(_util.null)
 done
 for processing_opt in "${args[@]}"; do
   # ------------------------------------
@@ -312,10 +318,7 @@ for processing_opt in "${args[@]}"; do
     debug "option: $processing_opt"
     debug "param: flag_save = $flag_save"
     md_urls="$(
-      pull_browser_application_urls "$browser_application" |
-        print_urls |
-        query_urls |
-        create_markdown_urls
+      pull_and_query_urls | create_markdown_urls
     )"
     if [[ "$flag_save" == true ]]; then
       executor="function executor() {
@@ -333,10 +336,7 @@ for processing_opt in "${args[@]}"; do
   if [[ $processing_opt == "--html" ]]; then
     debug "option: $processing_opt"
     html_urls="$(
-      pull_browser_application_urls "$browser_application" |
-        print_urls |
-        query_urls |
-        create_html_urls
+      pull_and_query_urls | create_html_urls
     )"
     if [[ "$flag_save" == true ]]; then
       executor="function executor() {
@@ -353,10 +353,7 @@ for processing_opt in "${args[@]}"; do
   if [[ $processing_opt == "--csv" ]]; then
     debug "option: $processing_opt"
     csv_urls="$(
-      pull_browser_application_urls "$browser_application" |
-        print_urls |
-        query_urls |
-        create_csv_urls
+      pull_and_query_urls | create_csv_urls
     )"
     if [[ "$flag_save" == true ]]; then
       executor="function executor() {
@@ -368,8 +365,6 @@ for processing_opt in "${args[@]}"; do
       }
     fi
   fi
-  ((countof_ots++))
-  next=$(_util.null)
 done
 
 #
