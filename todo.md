@@ -2,12 +2,13 @@
 
 Last checked and this command no longer works (MacOS 15), so its time to update.
 
-This todo file tracks progress on `src/main.zsh`.
+This todo file tracks progress on `src/main.zsh`. These changes will constitute `version 2.0.0` of this script (according to the old [package.json](package.json) file).
 
 ## To Do
 
 - [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
 - [ ] Code comments.
+- [ ] Add additional processing options for url formatting in other markup languages (TBD).
 - [ ] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
   - Process urls from `stdin` using another lnks option.
 - [ ] Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>/
@@ -17,7 +18,6 @@ This todo file tracks progress on `src/main.zsh`.
 
 ## Future
 
-- [ ] Consider adding output formats for other markup languages (TBD).
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
 - [ ] Consider adding Raindrop.io action (default posture: no).
