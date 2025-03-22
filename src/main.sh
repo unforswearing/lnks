@@ -73,21 +73,27 @@ EOT
 # ::~ EndFile
 
 # ::~ File: "src/initialize.zsh"
+function initialize_lnks_configuration() {
+  test -d "$HOME/.config/lnks" || {
+    mkdir "$HOME/.config/lnks"
+    {
+      echo "default_browser=chrome"
+      echo "default_action="
+      echo "save_format=text"
+    } > "$HOME/.config/lnks/lnks.rc"
+  }
+}
 # ::~ EndFile
-
-readonly stdin
-stdin=$(cat -)
 
 # use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
 readonly lnks_configuration="$HOME/.config/lnks/lnks.rc"
-if [[ -f "lnks_configuration" ]]; then
-  _util.color blue "No configuration file found at '~/.config/lnks'. Creating..."
+if [[ ! -f "$lnks_configuration" ]]; then
+  echo "No configuration file found at '~/.config/lnks'. Creating..."
   # create configuration files
-  # initialize
+  initialize_lnks_configuration
 fi
 
-readonly user_query
 user_query="${1}"
 if [[ -z ${user_query+x} ]]; then
   _util.color red "No query was passed to lnks. Exiting..."
@@ -209,122 +215,3 @@ EOT
 
 # Option parsing starts here ------------------------
 #
-function executor() { true; }
-#
-function main() {
-  local args
-  args="${*}"
-
-  # if lnks was called with only a query, print urls
-  # matching that query and exit the script. A non-alias
-  # for the --print option (retained below).
-  if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
-    query_urls | print_urls
-    return
-  fi
-
-  local flag_save
-  local input_filename
-  local output_filename
-
-  local countof_opts
-  countof_opts=0
-
-  for opt in "${args[@]}"; do
-    # ------------------------------------
-    # --safari, --stdin, --read, and --save are higher-prescedence
-    # actions / options. they are also the only actions / options that
-    # do not break the ${args[@]} loop.
-    if [[ $opt == "--safari" ]]; then
-      browser_application="Safari"
-    fi
-    if [[ $opt == "--stdin" ]]; then
-      function pull_browser_application_urls() {
-        # var 'stdin' is captured at the top of the lnks script
-        echo -en "${stdin}"
-      }
-    fi
-    # lnks <query> --read urls.txt --save query.txt
-    if [[ $opt == "--read" ]]; then
-      local next
-      next=$((countof_opts++))
-      input_filename="${args[$next]}"
-      function pull_browser_application_urls() {
-        grep '^.*$' "$input_filename"
-      }
-    fi
-    # lnks <query> --save filename.txt
-    if [[ $opt == "--save" ]]; then
-      local next
-      next=$((countof_opts++))
-      output_filename="${args[$next]}"
-      flag_save=true
-    fi
-    # ------------------------------------
-    # In order to limit actions to combinations that make the most sense
-    # --help and --print will break the loop, preventing any
-    # addtional options from being parsed. This avoids (subjectively)
-    # random combination of options like `lnks --print --copy --html --stdin`
-    if [[ $opt == "--help" ]] || [[ $opt == "-h" ]]; then
-      echo "help text"
-      break
-    fi
-    # lnks <query> with no other arguments acts as an alias for --print
-    # the --print option is kept to mitigate surprise behavior and
-    # provide an explicit way to handle this task.
-    if [[ $opt == "--print" ]]; then
-      query_urls | print_urls
-      break
-    fi
-    # ------------------------------------
-    # lnks <query> --markdown
-    # lnks <query> --markdown --save filename.md
-    if [[ $opt == "--markdown" ]]; then
-      local md_urls
-      md_urls="$(print_urls | create_markdown_urls)"
-      if [[ "$flag_save" == true ]]; then
-        function executor() {
-          echo "$md_urls" >"$output_filename"
-        }
-        break
-      fi
-      function executor() { print "$md_urls"; }
-      break
-    fi
-    # lnks <query> --html
-    # lnks <query> --html --save filename.html
-    if [[ $opt == "--html" ]]; then
-      local html_urls
-      html_urls="$(print_urls | create_html_urls)"
-      if [[ "$flag_save" == true ]]; then
-        function executor() {
-          echo "$html_urls" >"$output_filename"
-        }
-        break
-      fi
-      function executor() { echo "$html_urls"; }
-      break
-    fi
-    # lnks <query> --csv
-    # lnks <query> --csv --save filename.csv
-    if [[ $opt == "--csv" ]]; then
-      local csv_urls
-      csv_urls="$(print_urls | create_csv_urls)"
-      if [[ "$flag_save" == true ]]; then
-        function executor() {
-          echo "$csv_urls" >"$output_filename"
-        }
-        break
-      fi
-      function executor() { echo "$csv_urls"; }
-      break
-    fi
-    ((countof_ots++))
-    next=$(_util.null)
-  done
-}
-#
-# Option parsing ends here --------------------------
-# ---------------------------------------------------
-
-main "$@" && executor
