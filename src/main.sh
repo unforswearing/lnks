@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/zsh
 # ref: zsh 5.9 (x86_64-apple-darwin24.0)
 # this script uses the `sh` extension but aims to be compatible with
 # zsh and GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
@@ -14,6 +13,8 @@
 # TODO: should any default MacOS tools be 'require'd here?
 # _util.require
 
+args=("${@}")
+
 # ::~ File: "src/help.zsh"
 #
 function help() {
@@ -25,13 +26,13 @@ Quickly search your Google Chrome or Safari tabs for matching urls and process t
 Usage: lnks <OPTION> <SEARCH TERM> [FILE]
 
 Options
-	-h, --help		  prints this help message
+  -h, --help      prints this help message
   --safari        search for urls in Safari instead of Google Chrome
-	--print		      print urls to stdout
+  --print         print urls to stdout
   --markdown      print markdown formattined urls to stdout
   --html          print html formatted list of urls to stdout
   --csv           print csv formatted urls to stdout
-	--save [FILE]	  saves processed urls to a file
+  --save [FILE]   saves processed urls to a file
   --stdin         read urls from stdin for processing with other lnks options
   --read          read urls from a file for processing with other lnks options
 
@@ -114,16 +115,16 @@ function _util.color() {
   local opt="$1"
   shift
   case "$opt" in
-  red) print "${red}$*${reset}" ;;
-  green) print "${green}$*${reset}" ;;
-  blue) print "${blue}$*${reset}" ;;
+  red) echo -en "${red}$*${reset}" ;;
+  green) echo -en "${green}$*${reset}" ;;
+  blue) echo -en "${blue}$*${reset}" ;;
   esac
 }
 function _util.require() {
   test "$(command -v "$1")"
 }
 function _util.null() {
-  dd if=/dev/null bs=3 count=1
+  cat /dev/null
 }
 function _util.timestamp() {
   date +'%Y-%m-%d %H:%M:%S'
@@ -151,19 +152,20 @@ function pull_browser_application_urls() {
     end tell
 EOT
 }
-function countof_urls() {
-  pull_browser_application_urls "$browser_application" |
-    tr ',' '\n' |
-    wc -l |
-    sed 's/^\s*//g'
-}
 function query_urls() {
-  pull_browser_application_urls "$browser_application" |
-    awk "/${user_query}/"
+  debug "user query: $user_query"
+  awk "/${user_query}/"
 }
 # query_urls | print_urls
 function print_urls() {
   tr ',' '\n' | sed 's/^ //g'
+}
+function countof_urls() {
+  pull_browser_application_urls "$browser_application" |
+    print_urls |
+    query_urls |
+    wc -l |
+    sed 's/^\s*//g'
 }
 function query_url_title() {
   local url="${1}"
@@ -215,3 +217,146 @@ EOT
 
 # Option parsing starts here ------------------------
 #
+# echo "${args[@]}"
+
+#
+# case "${1}" in
+#   -h|--help) help ; return ;;
+# esac
+
+# if lnks was called with only a query, print urls
+# matching that query and exit the script. A non-alias
+# for the --print option (retained below).
+if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
+  # query_urls | print_urls
+  return
+fi
+
+flag_save=
+input_filename=
+output_filename=
+executor=
+
+countof_opts=0
+
+readonly debug_flag=true
+debug() {
+  test $debug_flag == true && {
+    _util.color blue "$@"; echo;
+  }
+}
+
+debug "input args: ${args[*]}"
+debug "user query: ${user_query}"
+for breaking_opt in "${args[@]}"; do
+  # Breaking flags - Stop execution and output
+  # ------------------------------------
+  # In order to limit actions to combinations that make the most sense
+  # --help and --print will break the loop, preventing any
+  # addtional options from being parsed. This avoids (subjectively)
+  # random combination of options like `lnks --print --copy --html --stdin`
+  if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
+    debug "option: $breaking_opt"
+    help
+    exit
+  fi
+  # lnks <query> with no other arguments acts as an alias for --print
+  # the --print option is kept to mitigate surprise behavior and
+  # provide an explicit way to handle this task.
+  if [[ $breaking_opt == "--print" ]]; then
+    debug "option: $breaking_opt"
+    pull_browser_application_urls "$browser_application" |
+      print_urls |
+      query_urls
+    exit
+  fi
+done
+for runtime_opt in "${args[@]}"; do
+  # ------------------------------------
+  # Runtime flags - options that affect processing.
+  # --safari, --stdin, --read, and --save are higher-prescedence
+  # actions / options. they are also the only actions / options that
+  # do not break the ${args[@]} loop.
+  if [[ $runtime_opt == "--safari" ]]; then
+    debug "option: $runtime_opt"
+    browser_application="Safari"
+  fi
+  if [[ $runtime_opt == "--stdin" ]]; then
+    debug "option: $runtime_opt"
+    readonly stdin
+    stdin=$(cat -)
+    function pull_browser_application_urls() {
+      # var 'stdin' is captured at the top of the lnks script
+      echo -en "${stdin}"
+    }
+  fi
+  # lnks <query> --read urls.txt --save query.txt
+  if [[ $runtime_opt == "--read" ]]; then
+    debug "option: $runtime_opt"
+    next=$((countof_opts++))
+    input_filename="${args[$next]}"
+    function pull_browser_application_urls() {
+      grep '^.*$' "$input_filename"
+    }
+    debug "param: input_filename = $input_filename"
+    # debug "param: flag_save = $flag_save"
+  fi
+  # lnks <query> --save filename.txt
+  if [[ $runtime_opt == "--save" ]]; then
+    debug "option: $runtime_opt"
+    output_filename="${args[$((${#args[@]} - 1))]}"
+    flag_save=true
+    debug "param: output_filename = $output_filename"
+    debug "param: flag_save = $flag_save"
+  fi
+done
+for processing_opt in "${args[@]}"; do
+  # ------------------------------------
+  # lnks <query> --markdown
+  # lnks <query> --markdown --save filename.md
+  if [[ $processing_opt == "--markdown" ]]; then
+    debug "option: $processing_opt"
+    debug "param: flag_save = $flag_save"
+    if [[ "$flag_save" == true ]]; then
+      executor="function executor() {
+          md_urls=\"\$(print_urls | create_markdown_urls)\"
+          echo \"\$md_urls\" > \"\$output_filename\"
+        }"
+    else
+      executor="function executor() { echo \"\$md_urls\";}"
+    fi
+    debug "param: executor = ${executor}"
+  fi
+  # lnks <query> --html
+  # lnks <query> --html --save filename.html
+  if [[ $processing_opt == "--html" ]]; then
+    debug "option: $processing_opt"
+    if [[ "$flag_save" == true ]]; then
+      executor="function executor() {
+        html_urls=\"\$(print_urls | create_html_urls)\"
+        echo \"\$html_urls\" \> \"\$output_filename\"
+      }"
+    else
+      executor="function executor() { echo \"\$html_urls\"; }"
+    fi
+  fi
+  # lnks <query> --csv
+  # lnks <query> --csv --save filename.csv
+  if [[ $processing_opt == "--csv" ]]; then
+    debug "option: $processing_opt"
+    if [[ "$flag_save" == true ]]; then
+      executor="function executor() {
+        csv_urls=\"\$(print_urls | create_csv_urls)\"
+        echo \"\$csv_urls\" \> \"\$output_filename\"
+      }"
+    else
+      executor="function executor() { echo \"\$csv_urls\"; }"
+    fi
+  fi
+  ((countof_ots++))
+  next=$(_util.null)
+done
+
+#
+# Option parsing ends here --------------------------
+# ---------------------------------------------------
