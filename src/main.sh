@@ -14,55 +14,35 @@
 # TODO: should any default MacOS tools be 'require'd here?
 # _util.require
 
-# --------------------------------------------------------
-# Permanent options for use with `~/.config/lnks/options.ext`
-#
-# 'default_browser' will skip the check in the script
-#  default_browser = <safari | chrome>; default: chrome
-#
-# 'default_action' will allow you to run lnks with no flags
-# note: if your default_action is 'save', you must still supply
-# a filename. eg `lnks output.md`
-# default_action = <print|copy|save>; default: unset
-#
-# 'save_format' - automatically convert urls to this format
-# when using the `--save` flag. you must still supply an output filename.
-# save_format = <txt|markdown|csv|html>; default: text
+readonly stdin; stdin=$(cat -)
+readonly lnks_configuration="$HOME/.config/lnks/lnks.rc"
+readonly user_query; user_query="${1}"
 
-# --------------------------------------------------------
-# I want to be able to process options in almost any order
-# the only rule being that query is first and outfile is last
-# outfile will always be preceded by flag --save.
-#
-# Command line options:
-#
-# lnks --help
-# lnks [query] --save [file.ext]
-# lnks [query] --copy
-# lnks [query] --print
-# lnks [query] --markdown
-#
-# If `--safari` flag follows query, search Safari URLs instead of Chrome.
-# This option can be set permanently in settings.
-#
-# lnks [query] --safari --pdf
-#
-# To Do:
-#
-# File format options:
-# lnks [query] --html
-# lnks [query] --csv
-#
-# Processing options:
-# lnks [query] --stdin [ --save | --copy | --print | --plugin  ]
-# lnks [query] --read [urls.txt] [ --save | --copy | --print | --plugin  ]
-# lnks [query] --plugin [plugin_name.ext]
-#
-# Future:
-# Consider adding output format options.
-# These are basically aliases for --save / 'save_format' config option
-# lnks [query] --markdown | --csv | --html
-#
+shift
+
+function _util.color() {
+  local red="\033[31m"
+  local green="\033[32m"
+  local blue="\033[34m"
+  local reset="\033[39m"
+  local opt="$1"
+  shift
+  case "$opt" in
+    red) print "${red}$*${reset}" ;;
+    green) print "${green}$*${reset}" ;;
+    blue) print "${blue}$*${reset}" ;;
+  esac
+}
+function _util.require() {
+  test "$(command -v "$1")"
+}
+function _util.null() {
+  dd if=/dev/null bs=3 count=1
+}
+function _util.get_config_item() {
+  local keyname="${1}"
+  grep "$keyname" "$lnks_configuration" | awk -F= '{ print $2 }'
+}
 
 # ::~ File: "src/initialize.zsh"
 #
@@ -71,32 +51,121 @@
 #       create if it doesn't exist
 # use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
-readonly lnks_configuration="$HOME/.config/lnks/lnks.rc"
+config_browser="$(_util.get_config_item default_browser)"
+# config_default_action="$(_util.get_config_item default_action)"
+# config_save_format="$(_util.get_config_item save_format)"
 #
 # ::~ EndFile
 
-# Option parsing starts here ------------------------
-#
-# TODO: Need better option parsing
-
-browser_application="Google Chrome"
-
-if [ "${1}" == "safari" ]; then
-  browser_application="Safari"
-  shift
-# elif [ $(get_config_browser_setting) == "safari" ]; then
-#   :;:;
-fi
-
+browser_application="$config_browser"
 # if defined?(browser_application)
 test -z "${browser_application}" && {
   _util.color red "'$browser_application' unset or not found."
   exit 1
 }
 
-# readonly option="${1}"
-# readonly query="${2}"
-# readonly outfile="${3}"
+# Option parsing starts here ------------------------
+function executor() { :; }
+function optparse() {
+  local args; args="${*}"
+  local flag_save
+  local input_filename
+  local output_filename
+  local countof_opts; countof_opts=0
+  for opt in "${args[@]}"; do
+    # ------------------------------------
+    # --safari, --stdin, --read, and --save are higher-prescedence
+    # actions / options. they are also the only actions / options that
+    # do not break the ${args[@]} loop.
+    if [[ $opt == "--safari" ]]; then
+      browser_application="Safari"
+    fi;
+    if [[ $opt == "--stdin" ]]; then
+      function pull_browser_application_urls() {
+        # var 'stdin' is captured at the top of the lnks script
+        echo -en "${stdin}"
+      }
+    fi;
+    # lnks <query> --read urls.txt --save query.txt
+    if [[ $opt == "--read" ]]; then
+      local next; next=$((countof_opts++))
+      input_filename="${args[$next]}"
+      function pull_browser_application_urls() {
+        grep '^.*$' "$input_filename"
+      }
+    fi;
+    # lnks <query> --save filename.txt
+    if [[ $opt == "--save" ]]; then
+      local next; next=$((countof_opts++))
+      output_filename="${args[$next]}"
+      flag_save=true
+    fi;
+    # ------------------------------------
+    # In order to limit actions to combinations that make the most sense
+    # --help, --copy, and --print will break the loop, preventing any
+    # addtional options from being parsed. This avoids (subjectively)
+    # random combination of options like `lnks --print --copy --html --stdin`
+    if [[ $opt == "--help" ]] || [[ $opt == "-h" ]]; then
+      echo "help text"
+      break
+    fi;
+    if [[ $opt == "--copy" ]]; then
+      query_urls | print_urls | copy_urls
+      break
+    fi;
+    if [[ $opt == "--print" ]]; then
+      query_urls | print_urls
+      break
+    fi;
+    # ------------------------------------
+    # lnks <query> --markdown
+    # lnks <query> --markdown --save filename.md
+    if [[ $opt == "--markdown" ]]; then
+      local md_urls; md_urls="$(print_urls | create_markdown_urls)"
+      if [[ "$flag_save" == true ]]; then
+        function executor() {
+          echo "$md_urls" > "$output_filename"
+        }
+        break
+      fi
+      function executor() { print "$md_urls"; }
+      break
+    fi;
+    # lnks <query> --html
+    # lnks <query> --html --save filename.html
+    if [[ $opt == "--html" ]]; then
+      local html_urls; html_urls="$(print_urls | create_html_urls)"
+      if [[ "$flag_save" == true ]]; then
+        function executor() {
+          echo "$html_urls" > "$output_filename"
+        }
+        break
+      fi
+      function executor() { echo "$html_urls"; }
+      break
+    fi;
+    # lnks <query> --csv
+    # lnks <query> --csv --save filename.csv
+    if [[ $opt == "--csv" ]]; then
+      local csv_urls; csv_urls="$(print_urls | create_csv_urls)"
+      if [[ "$flag_save" == true ]]; then
+        function executor() {
+          echo "$csv_urls" > "$output_filename"
+        }
+        break
+      fi
+      function executor() { echo "$csv_urls"; }
+      break
+    fi;
+    # ------------------------------------
+    # if [[ $opt == "--plugin" ]]; then
+    #   :;
+    # fi;
+    # ------------------------------------
+    ((countof_ots++))
+    next=$(_util.null)
+  done
+}
 
 #
 # Option parsing ends here --------------------------
@@ -111,7 +180,7 @@ test -z "${browser_application}" && {
 # ::~ File: "src/help.zsh"
 # ::~ EndFile
 
-function query_browser_application_urls() {
+function pull_browser_application_urls() {
   local browser="${1}"
   osascript <<EOT
     tell application "$browser"
@@ -121,19 +190,23 @@ EOT
 }
 
 function countof_urls() {
-  query_browser_application_urls "$browser_application" |
+  pull_browser_application_urls "$browser_application" |
     tr ',' '\n' |
     wc -l |
     sed 's/^\s*//g'
 }
 
-function print_urls() {
-  query_browser_application_urls "$browser_application" |
-    tr ',' '\n' |
-    sed 's/^ //g'
+function query_urls() {
+  pull_browser_application_urls "$browser_application" | \
+    awk "/${user_query}/"
 }
 
-# print_urls | copy_urls
+# query_urls | print_urls
+function print_urls() {
+  tr ',' '\n' | sed 's/^ //g'
+}
+
+# query_urls | print_urls | copy_urls
 function copy_urls() {
   # print_urls | pbcopy
   pbcopy
@@ -143,7 +216,7 @@ function copy_urls() {
 function save_urls() {
   local output_file="${1}"
   # TODO: if file exists: warn "overwrite file?"
-  print_urls >"${output_file}"
+  cat - >"${output_file}"
 }
 
 function query_url_title() {
@@ -163,35 +236,36 @@ function create_markdown_urls() {
   done
 }
 
-# save_markdown_urls can be merged with save_urls
-function save_markdown_urls() {
-  local output_file="${1}"
-  # TODO: if file exists: warn "overwrite file?"
-  # print_markdown_urls > "${output_file}"
-  cat - >"${output_file}"
+function create_html_urls() {
+  declare -a list_html
+  while read -r this_url; do
+    local title
+    local tmpl
+    title="$(query_url_title "${this_url}")"
+    tmpl="<li><a href=\"$this_url\">$title</a></li>"
+    list_html+=("$tmpl")
+  done
+  cat <<EOT
+    <ul>
+      ${list_html[@]}
+    </ul>
+EOT
 }
 
-# NOTE: `read_urls_from_file` is incomplete
-# lnks [query] --read [urls.txt] [ --save | --copy | --markdown | --plugin  ]
-function read_urls_from_file() {
-  local input_file="${1}"
-  shift
-  local processing_options="${*}"
-  # TODO: this option parsing needs to happen in a loop
-  #       it would be easiest to just call lnks again using the `input_file`
-  #       as stdin. Maybe setup `lnks --stdin` option before `--read`
-  case "$processing_options" in
-  --save)
-    shift
-    cat "$input_file" | save_urls "${1}"
-    ;;
-  --copy)
-    shift
-    cat "$input_file" | copy_urls
-    ;;
-  --markdown)
-    shift
-    cat "$input_file" | create_markdown_urls
-    ;;
-  esac
+function create_csv_urls() {
+  local csv_header_row="Date,Title,URL"
+  declare -a urls_csv
+  while read -r this_url; do
+    local title
+    local tmpl
+    title="$(query_url_title "${this_url}")"
+    tmpl="$(_util.timestamp),${title},${this_url}"
+    urls_csv+=("$tmpl")
+  done
+  cat <<EOT
+    ${csv_header_row}
+    ${urls_csv[@]}
+EOT
 }
+
+optparse "$@" && executor

@@ -17,3 +17,6 @@ function _util.color() {
 function _util.require() {
   test "$(command -v "$1")"
 }
+function _util.null() {
+  dd if=/dev/null bs=3 count=1
+}
