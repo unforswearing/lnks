@@ -39,6 +39,9 @@ function _util.require() {
 function _util.null() {
   dd if=/dev/null bs=3 count=1
 }
+function _util.timestamp() {
+ date +'%Y-%m-%d %H:%M:%S'
+}
 function _util.get_config_item() {
   local keyname="${1}"
   grep "$keyname" "$lnks_configuration" | awk -F= '{ print $2 }'
@@ -65,7 +68,7 @@ test -z "${browser_application}" && {
 }
 
 # Option parsing starts here ------------------------
-function executor() { :; }
+function executor() { true; }
 function optparse() {
   local args; args="${*}"
   local flag_save
