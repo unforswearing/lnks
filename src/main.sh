@@ -82,7 +82,7 @@ function initialize_lnks_configuration() {
       echo "default_browser=chrome"
       echo "default_action="
       echo "save_format=text"
-    } > "$HOME/.config/lnks/lnks.rc"
+    } >"$HOME/.config/lnks/lnks.rc"
   }
 }
 # ::~ EndFile
@@ -240,7 +240,8 @@ countof_opts=0
 readonly debug_flag=
 debug() {
   test "$debug_flag" == true && {
-    _util.color blue "$@"; echo;
+    _util.color blue "$@"
+    echo
   }
 }
 
