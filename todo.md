@@ -8,11 +8,15 @@ This todo file tracks progress on `src/main.zsh`.
 
 - [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
 - [ ] Code comments.
-- [ ] Set up some sort of tests.
-- [ ] Add action `--stdin` to read urls from the output of another program in a pipe.
+- [ ] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
   - Process urls from `stdin` using another lnks option.
-- [ ] Add action `--read <urls.txt>` to process a file containing a list urls in <format>/
+- [ ] Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>/
   - Process urls from `<urls.txt>` using another lnks option.
+- [ ] Set up some sort of tests.
+  - [ ] Start by testing "Runtime" options: `--safari`, `--save`, `--stdin`, and `--read`.
+
+## Future
+
 - [ ] Consider adding output formats for other markup languages (TBD).
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.

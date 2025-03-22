@@ -171,7 +171,8 @@ function query_url_title() {
   local url="${1}"
   curl -sL "${url}" |
     grep '<title>' |
-    sed 's/<title>//g;s/<\/title>//g;s/^\s*//g'
+    sed 's/<title>//g;s/<\/title>//g' |
+    sed 's/^\s*//g'
 }
 # print_urls | create_markdown_urls
 function create_markdown_urls() {
@@ -217,13 +218,6 @@ EOT
 
 # Option parsing starts here ------------------------
 #
-# echo "${args[@]}"
-
-#
-# case "${1}" in
-#   -h|--help) help ; return ;;
-# esac
-
 # if lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
@@ -239,9 +233,9 @@ executor=
 
 countof_opts=0
 
-readonly debug_flag=true
+readonly debug_flag=
 debug() {
-  test $debug_flag == true && {
+  test "$debug_flag" == true && {
     _util.color blue "$@"; echo;
   }
 }
@@ -317,13 +311,20 @@ for processing_opt in "${args[@]}"; do
   if [[ $processing_opt == "--markdown" ]]; then
     debug "option: $processing_opt"
     debug "param: flag_save = $flag_save"
+    md_urls="$(
+      pull_browser_application_urls "$browser_application" |
+        print_urls |
+        query_urls |
+        create_markdown_urls
+    )"
     if [[ "$flag_save" == true ]]; then
       executor="function executor() {
-          md_urls=\"\$(print_urls | create_markdown_urls)\"
           echo \"\$md_urls\" > \"\$output_filename\"
         }"
     else
-      executor="function executor() { echo \"\$md_urls\";}"
+      {
+        echo "$md_urls"
+      }
     fi
     debug "param: executor = ${executor}"
   fi
@@ -331,26 +332,40 @@ for processing_opt in "${args[@]}"; do
   # lnks <query> --html --save filename.html
   if [[ $processing_opt == "--html" ]]; then
     debug "option: $processing_opt"
+    html_urls="$(
+      pull_browser_application_urls "$browser_application" |
+        print_urls |
+        query_urls |
+        create_html_urls
+    )"
     if [[ "$flag_save" == true ]]; then
       executor="function executor() {
-        html_urls=\"\$(print_urls | create_html_urls)\"
         echo \"\$html_urls\" \> \"\$output_filename\"
       }"
     else
-      executor="function executor() { echo \"\$html_urls\"; }"
+      {
+        echo "$html_urls"
+      }
     fi
   fi
   # lnks <query> --csv
   # lnks <query> --csv --save filename.csv
   if [[ $processing_opt == "--csv" ]]; then
     debug "option: $processing_opt"
+    csv_urls="$(
+      pull_browser_application_urls "$browser_application" |
+        print_urls |
+        query_urls |
+        create_csv_urls
+    )"
     if [[ "$flag_save" == true ]]; then
       executor="function executor() {
-        csv_urls=\"\$(print_urls | create_csv_urls)\"
         echo \"\$csv_urls\" \> \"\$output_filename\"
       }"
     else
-      executor="function executor() { echo \"\$csv_urls\"; }"
+      {
+        echo "$csv_urls"
+      }
     fi
   fi
   ((countof_ots++))
