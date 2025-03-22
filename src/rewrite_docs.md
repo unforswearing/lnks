@@ -40,10 +40,8 @@ lnks [query] --csv
 Processing options:
 lnks [query] --stdin [ --save | --copy | --print | --plugin  ]
 lnks [query] --read [urls.txt] [ --save | --copy | --print | --plugin  ]
-lnks [query] --plugin [plugin_name.ext]
 
 Future:
-Consider adding output format options.
-These are basically aliases for --save / 'save_format' config option
-lnks [query] --markdown | --csv | --html
+lnks [query] --plugin [plugin_name.ext]
+Consider adding output format options for various markup languages
 

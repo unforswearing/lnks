@@ -9,9 +9,9 @@ function _util.color() {
   local opt="$1"
   shift
   case "$opt" in
-    red) print "${red}$*${reset}" ;;
-    green) print "${green}$*${reset}" ;;
-    blue) print "${blue}$*${reset}" ;;
+  red) print "${red}$*${reset}" ;;
+  green) print "${green}$*${reset}" ;;
+  blue) print "${blue}$*${reset}" ;;
   esac
 }
 function _util.require() {
@@ -19,4 +19,11 @@ function _util.require() {
 }
 function _util.null() {
   dd if=/dev/null bs=3 count=1
+}
+function _util.timestamp() {
+  date +'%Y-%m-%d %H:%M:%S'
+}
+function _util.get_config_item() {
+  local keyname="${1}"
+  grep "$keyname" "$lnks_configuration" | awk -F= '{ print $2 }'
 }
