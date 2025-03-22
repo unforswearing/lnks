@@ -105,15 +105,11 @@ function optparse() {
     fi;
     # ------------------------------------
     # In order to limit actions to combinations that make the most sense
-    # --help, --copy, and --print will break the loop, preventing any
+    # --help and --print will break the loop, preventing any
     # addtional options from being parsed. This avoids (subjectively)
     # random combination of options like `lnks --print --copy --html --stdin`
     if [[ $opt == "--help" ]] || [[ $opt == "-h" ]]; then
       echo "help text"
-      break
-    fi;
-    if [[ $opt == "--copy" ]]; then
-      query_urls | print_urls | copy_urls
       break
     fi;
     if [[ $opt == "--print" ]]; then
@@ -207,12 +203,6 @@ function query_urls() {
 # query_urls | print_urls
 function print_urls() {
   tr ',' '\n' | sed 's/^ //g'
-}
-
-# query_urls | print_urls | copy_urls
-function copy_urls() {
-  # print_urls | pbcopy
-  pbcopy
 }
 
 # save_urls can be merged with save_markdown_urls
