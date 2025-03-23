@@ -6,13 +6,9 @@ This todo file tracks progress on `src/main.zsh`. These changes will constitute 
 
 ## To Do
 
-- [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
-- [ ] Code comments.
 - [ ] Add additional processing options for url formatting in other markup languages (TBD).
-- [ ] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
-  - Process urls from `stdin` using another lnks option.
-- [ ] Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>/
-  - Process urls from `<urls.txt>` using another lnks option.
+- [ ] Code comments.
+- [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
 - [ ] Set up some sort of tests.
   - [ ] Start by testing "Runtime" options: `--safari`, `--save`, `--stdin`, and `--read`.
 
@@ -24,6 +20,10 @@ This todo file tracks progress on `src/main.zsh`. These changes will constitute 
 
 ## Complete
 
+- [x] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
+  - Process urls from `stdin` using another lnks option.
+- [x] Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>/
+  - Process urls from `<urls.txt>` using another lnks option.
 - [x] Change default config location to use `~/.config/lnks`.
   - Filename `lnks.rc`, format will be plain `shell`.
 - [x] Develop prescedence for options.

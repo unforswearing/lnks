@@ -99,22 +99,24 @@ function initialize_lnks_configuration() {
 
 # use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
-readonly lnks_configuration="$HOME/.config/lnks/lnks.rc"
+lnks_configuration="$HOME/.config/lnks/lnks.rc"
 if [[ ! -f "$lnks_configuration" ]]; then
   echo "No configuration file found at '~/.config/lnks'. Creating..."
   # create configuration files
   initialize_lnks_configuration
 fi
 
+# the first argument to lnks will always be the user query.
 user_query="${1}"
-if [[ -z ${user_query+x} ]]; then
-  _util.color red "No query was passed to lnks. Exiting..."
+if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
+  echo "No query was passed to lnks."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
-  return
+  exit
+else
+  # shift the args array to remove user_query item
+  args=("${args[@]:1}")
 fi
-
-shift
 
 # ::~ File: "src/util.zsh"
 #
@@ -179,7 +181,7 @@ function pull_and_query_urls() {
 function countof_urls() {
   pull_and_query_urls |
     wc -l |
-    sed 's/^\s*//g'
+    awk '{$1=$1}1'
 }
 function query_url_title() {
   local url="${1}"
@@ -230,21 +232,24 @@ EOT
 #
 # ::~ EndFile
 
+# ---------------------------------------------------
 # Option parsing starts here ------------------------
 #
+if [[ $(countof_urls) -lt 1 ]]; then
+  echo "No match for '$user_query' in $browser_application Urls."
+  exit
+fi
 # if lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
 if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
-  # query_urls | print_urls
-  return
+  pull_and_query_urls
+  exit
 fi
 
 flag_save=
 input_filename=
 output_filename=
-
-countof_opts=0
 
 debug "input args: ${args[*]}"
 debug "user query: ${user_query}"
@@ -256,16 +261,15 @@ for breaking_opt in "${args[@]}"; do
   # addtional options from being parsed. This avoids (subjectively)
   # random combination of options like `lnks --print --copy --html --stdin`
   if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
-    debug "option: $breaking_opt"
     help
+    debug "option: $breaking_opt"
     exit
-  fi
   # lnks <query> with no other arguments acts as an alias for --print
   # the --print option is kept to mitigate surprise behavior and
   # provide an explicit way to handle this task.
-  if [[ $breaking_opt == "--print" ]]; then
-    debug "option: $breaking_opt"
+  elif [[ $breaking_opt == "--print" ]]; then
     pull_and_query_urls
+    debug "option: $breaking_opt"
     exit
   fi
 done
@@ -275,37 +279,35 @@ for runtime_opt in "${args[@]}"; do
   # --safari, --stdin, --read, and --save are higher-prescedence
   # actions / options. they are also the only actions / options that
   # do not break the ${args[@]} loop.
+  # Option --save works with any other flag listed here.
+  # All other flags are mutually exclusive and cannot be combined
   if [[ $runtime_opt == "--safari" ]]; then
-    debug "option: $runtime_opt"
     browser_application="Safari"
-  elif [[ $runtime_opt == "--stdin" ]]; then
     debug "option: $runtime_opt"
+  elif [[ $runtime_opt == "--stdin" ]]; then
     stdin=$(cat -)
     function pull_browser_application_urls() {
       # var 'stdin' is captured at the top of the lnks script
       echo -en "${stdin}"
     }
+    debug "option: $runtime_opt"
   # lnks <query> --save filename.txt
   elif [[ $runtime_opt == "--save" ]]; then
-    debug "option: $runtime_opt"
     # --save must always be the second to last argument
     # followed by output_file as the last argument
     output_filename="${args[$((${#args[@]} - 1))]}"
     flag_save=true
+    debug "option: $runtime_opt"
     debug "param: output_filename = $output_filename"
     debug "param: flag_save = $flag_save"
   # lnks <query> --read urls.txt --save query.txt
   elif [[ $runtime_opt == "--read" ]]; then
-    debug "option: $runtime_opt"
     input_filename="${args[2]}"
-    debug "param: input_filename = $input_filename"
     function pull_browser_application_urls() {
       grep '^.*$' "$input_filename"
     }
+    debug "option: $runtime_opt"
     debug "param: input_filename = $input_filename"
-    # debug "param: flag_save = $flag_save"
-  # else
-  #   echo $runtime_opt
   fi
 done
 for processing_opt in "${args[@]}"; do
@@ -313,8 +315,6 @@ for processing_opt in "${args[@]}"; do
   # lnks <query> --markdown
   # lnks <query> --markdown --save filename.md
   if [[ $processing_opt == "--markdown" ]]; then
-    debug "option: $processing_opt"
-    debug "param: flag_save = $flag_save"
     md_urls="$(
       pull_and_query_urls | create_markdown_urls
     )"
@@ -323,11 +323,11 @@ for processing_opt in "${args[@]}"; do
     else
       echo "$md_urls"
     fi
-  fi
+    debug "option: $processing_opt"
+    debug "param: flag_save = $flag_save"
   # lnks <query> --html
   # lnks <query> --html --save filename.html
-  if [[ $processing_opt == "--html" ]]; then
-    debug "option: $processing_opt"
+  elif [[ $processing_opt == "--html" ]]; then
     html_urls="$(
       pull_and_query_urls | create_html_urls
     )"
@@ -336,11 +336,10 @@ for processing_opt in "${args[@]}"; do
     else
       echo "$html_urls"
     fi
-  fi
+    debug "option: $processing_opt"
   # lnks <query> --csv
   # lnks <query> --csv --save filename.csv
-  if [[ $processing_opt == "--csv" ]]; then
-    debug "option: $processing_opt"
+  elif [[ $processing_opt == "--csv" ]]; then
     csv_urls="$(
       pull_and_query_urls | create_csv_urls
     )"
@@ -349,9 +348,9 @@ for processing_opt in "${args[@]}"; do
     else
       echo "$csv_urls"
     fi
+    debug "option: $processing_opt"
   fi
 done
-
 #
 # Option parsing ends here --------------------------
 # ---------------------------------------------------

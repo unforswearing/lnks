@@ -27,3 +27,25 @@ function _util.get_config_item() {
   local keyname="${1}"
   grep "$keyname" "$lnks_configuration" | awk -F= '{ print $2 }'
 }
+  function _prog() {
+		[[ -z "$1" ]] && exit 0
+
+		set +m
+		tput civis
+
+		eval "$1" >/dev/null 2>&1 &
+
+		local pid; pid=$!
+		local spin; spin="-\|/"
+		local i; i=0
+
+		while kill -0 "$pid" 2>/dev/null; do
+			i=$(((i + 1) % 4))
+			printf "\r%s" ${spin:$i:1}
+			sleep .07
+		done
+		printf "\r"
+
+		tput cnorm
+		set -m
+	}
