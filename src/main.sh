@@ -102,6 +102,7 @@ if [[ ! -f "$lnks_configuration" ]]; then
   initialize_lnks_configuration
 fi
 
+# TODO: can i move this section to "argument parsing", lower in the script?
 # the first argument to lnks will always be the user query.
 user_query="${1}"
 if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
@@ -179,10 +180,13 @@ function countof_urls() {
 }
 function query_url_title() {
   local url="${1}"
-  curl -sL "${url}" |
-    grep '<title>' |
-    sed 's/^.*<title>//g;s/<\/title>.*$//g' |
-    sed 's/^\s+*//g'
+  {
+    curl -skLZ "${url}" |
+      grep '<title>' |
+      sed 's/^.*<title>//g;s/<\/title>.*$//g' |
+      sed 's/^\s+*//g'
+  } &
+  wait
 }
 # print_urls | create_markdown_urls
 function create_markdown_urls() {
@@ -214,7 +218,9 @@ function create_csv_urls() {
   while read -r this_url; do
     local title
     local tmpl
-    title="$(query_url_title "${this_url}")"
+    title="$(
+      query_url_title "${this_url}"
+    )"
     tmpl="$(_util.timestamp),\"${title}\",${this_url}"
     urls_csv+=("$tmpl")
   done
