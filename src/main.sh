@@ -3,19 +3,13 @@
 # this script uses the `sh` extension but aims to be compatible with
 # zsh and GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
 
-# NOTE: Should I use zsh options (see below) if I want bash compat?
-# TODO: Are there any other relevant Zsh Shell options for this script?
-# see "src/strict.zsh" for previous option ideas
-# https://zsh.sourceforge.io/Doc/Release/Options-Index.html
-
 # TODO: Errors / Logging
-
 # TODO: should any default MacOS tools be 'require'd here?
 # _util.require
 
 args=("${@}")
 
-readonly debug_flag=
+debug_flag=
 debug() {
   test "$debug_flag" == true && {
     local blue="\033[34m"
@@ -85,6 +79,7 @@ EOT
 # ::~ EndFile
 
 # ::~ File: "src/initialize.zsh"
+#
 function initialize_lnks_configuration() {
   test -d "$HOME/.config/lnks" || {
     mkdir "$HOME/.config/lnks"
@@ -95,9 +90,10 @@ function initialize_lnks_configuration() {
     } >"$HOME/.config/lnks/lnks.rc"
   }
 }
+#
 # ::~ EndFile
 
-# use $XDG_CONFIG_HOME if set, otherwise create a folder in
+# TODO: use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
 lnks_configuration="$HOME/.config/lnks/lnks.rc"
 if [[ ! -f "$lnks_configuration" ]]; then
@@ -166,7 +162,6 @@ function pull_browser_application_urls() {
 EOT
 }
 function query_urls() {
-  debug "user query: $user_query"
   awk "/${user_query}/"
 }
 # query_urls | print_urls
@@ -209,9 +204,9 @@ function create_html_urls() {
     list_html+=("$tmpl")
   done
   cat <<EOT
-    <ul>
-      ${list_html[@]}
-    </ul>
+<ul>
+$(for item in "${list_html[@]}"; do echo "  $item"; done)
+</ul>
 EOT
 }
 function create_csv_urls() {
@@ -221,12 +216,12 @@ function create_csv_urls() {
     local title
     local tmpl
     title="$(query_url_title "${this_url}")"
-    tmpl="$(_util.timestamp),${title},${this_url}"
+    tmpl="$(_util.timestamp),\"${title}\",${this_url}"
     urls_csv+=("$tmpl")
   done
   cat <<EOT
-    ${csv_header_row}
-    ${urls_csv[@]}
+${csv_header_row}
+$(for item in "${urls_csv[@]}"; do echo "$item"; done)
 EOT
 }
 #
@@ -260,6 +255,8 @@ for breaking_opt in "${args[@]}"; do
   # --help and --print will break the loop, preventing any
   # addtional options from being parsed. This avoids (subjectively)
   # random combination of options like `lnks --print --copy --html --stdin`
+  #
+  # lnks --help
   if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
     help
     debug "option: $breaking_opt"
@@ -267,6 +264,9 @@ for breaking_opt in "${args[@]}"; do
   # lnks <query> with no other arguments acts as an alias for --print
   # the --print option is kept to mitigate surprise behavior and
   # provide an explicit way to handle this task.
+  #
+  # lnks <query>
+  # lnks <query> --print
   elif [[ $breaking_opt == "--print" ]]; then
     pull_and_query_urls
     debug "option: $breaking_opt"
@@ -281,11 +281,16 @@ for runtime_opt in "${args[@]}"; do
   # do not break the ${args[@]} loop.
   # Option --save works with any other flag listed here.
   # All other flags are mutually exclusive and cannot be combined
+  #
+  # lnks <query> --safari --html
   if [[ $runtime_opt == "--safari" ]]; then
     browser_application="Safari"
     debug "option: $runtime_opt"
+  # echo $bookmarks | lnks <query> --stdin --markdown
   elif [[ $runtime_opt == "--stdin" ]]; then
     stdin=$(cat -)
+    # if option is --stdin, overwrite the pull_browser_application_urls
+    # to redirect query to urls from previous command in pipe
     function pull_browser_application_urls() {
       # var 'stdin' is captured at the top of the lnks script
       echo -en "${stdin}"
@@ -303,6 +308,8 @@ for runtime_opt in "${args[@]}"; do
   # lnks <query> --read urls.txt --save query.txt
   elif [[ $runtime_opt == "--read" ]]; then
     input_filename="${args[2]}"
+    # if option is --read, overwrite the pull_browser_application_urls
+    # to redirect query to urls from $input_filename.
     function pull_browser_application_urls() {
       grep '^.*$' "$input_filename"
     }

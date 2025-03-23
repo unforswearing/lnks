@@ -45,3 +45,7 @@ Future:
 lnks [query] --plugin [plugin_name.ext]
 Consider adding output format options for various markup languages
 
+# NOTE: Should I use zsh options (see below) if I want bash compat?
+# TODO: Are there any other relevant Zsh Shell options for this script?
+# see "src/strict.zsh" for previous option ideas
+# https://zsh.sourceforge.io/Doc/Release/Options-Index.html
