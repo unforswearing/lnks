@@ -161,12 +161,11 @@ function pull_browser_application_urls() {
     end tell
 EOT
 }
-function query_urls() {
-  awk "/${user_query}/"
-}
-# query_urls | print_urls
 function print_urls() {
   tr ',' '\n' | sed 's/^ //g'
+}
+function query_urls() {
+  awk "/${user_query}/"
 }
 function pull_and_query_urls() {
   pull_browser_application_urls "$browser_application" |
@@ -246,20 +245,17 @@ flag_save=
 input_filename=
 output_filename=
 
-debug "input args: ${args[*]}"
-debug "user query: ${user_query}"
+# Breaking flags - Stop execution and output
+# ------------------------------------
+# In order to limit actions to combinations that make the most sense
+# --help and --print will break the loop, preventing any
+# addtional options from being parsed. This avoids (subjectively)
+# random combination of options like `lnks --print --copy --html --stdin`
+#
 for breaking_opt in "${args[@]}"; do
-  # Breaking flags - Stop execution and output
-  # ------------------------------------
-  # In order to limit actions to combinations that make the most sense
-  # --help and --print will break the loop, preventing any
-  # addtional options from being parsed. This avoids (subjectively)
-  # random combination of options like `lnks --print --copy --html --stdin`
-  #
   # lnks --help
   if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
     help
-    debug "option: $breaking_opt"
     exit
   # lnks <query> with no other arguments acts as an alias for --print
   # the --print option is kept to mitigate surprise behavior and
@@ -269,23 +265,21 @@ for breaking_opt in "${args[@]}"; do
   # lnks <query> --print
   elif [[ $breaking_opt == "--print" ]]; then
     pull_and_query_urls
-    debug "option: $breaking_opt"
     exit
   fi
 done
+# ------------------------------------
+# Runtime flags - options that affect processing.
+# --safari, --stdin, --read, and --save are higher-prescedence
+# actions / options. they are also the only actions / options that
+# do not break the ${args[@]} loop.
+# Option --save works with any other flag listed here.
+# All other flags are mutually exclusive and cannot be combined
+#
 for runtime_opt in "${args[@]}"; do
-  # ------------------------------------
-  # Runtime flags - options that affect processing.
-  # --safari, --stdin, --read, and --save are higher-prescedence
-  # actions / options. they are also the only actions / options that
-  # do not break the ${args[@]} loop.
-  # Option --save works with any other flag listed here.
-  # All other flags are mutually exclusive and cannot be combined
-  #
   # lnks <query> --safari --html
   if [[ $runtime_opt == "--safari" ]]; then
     browser_application="Safari"
-    debug "option: $runtime_opt"
   # echo $bookmarks | lnks <query> --stdin --markdown
   elif [[ $runtime_opt == "--stdin" ]]; then
     stdin=$(cat -)
@@ -295,16 +289,12 @@ for runtime_opt in "${args[@]}"; do
       # var 'stdin' is captured at the top of the lnks script
       echo -en "${stdin}"
     }
-    debug "option: $runtime_opt"
   # lnks <query> --save filename.txt
   elif [[ $runtime_opt == "--save" ]]; then
     # --save must always be the second to last argument
     # followed by output_file as the last argument
     output_filename="${args[$((${#args[@]} - 1))]}"
     flag_save=true
-    debug "option: $runtime_opt"
-    debug "param: output_filename = $output_filename"
-    debug "param: flag_save = $flag_save"
   # lnks <query> --read urls.txt --save query.txt
   elif [[ $runtime_opt == "--read" ]]; then
     input_filename="${args[2]}"
@@ -313,8 +303,6 @@ for runtime_opt in "${args[@]}"; do
     function pull_browser_application_urls() {
       grep '^.*$' "$input_filename"
     }
-    debug "option: $runtime_opt"
-    debug "param: input_filename = $input_filename"
   fi
 done
 for processing_opt in "${args[@]}"; do
@@ -326,12 +314,10 @@ for processing_opt in "${args[@]}"; do
       pull_and_query_urls | create_markdown_urls
     )"
     if [[ "$flag_save" == true ]]; then
-      echo "$md_urls" > "$output_filename"
+      echo "$md_urls" >"$output_filename"
     else
       echo "$md_urls"
     fi
-    debug "option: $processing_opt"
-    debug "param: flag_save = $flag_save"
   # lnks <query> --html
   # lnks <query> --html --save filename.html
   elif [[ $processing_opt == "--html" ]]; then
@@ -339,11 +325,10 @@ for processing_opt in "${args[@]}"; do
       pull_and_query_urls | create_html_urls
     )"
     if [[ "$flag_save" == true ]]; then
-      echo "$html_urls" > "$output_filename"
+      echo "$html_urls" >"$output_filename"
     else
       echo "$html_urls"
     fi
-    debug "option: $processing_opt"
   # lnks <query> --csv
   # lnks <query> --csv --save filename.csv
   elif [[ $processing_opt == "--csv" ]]; then
@@ -351,11 +336,10 @@ for processing_opt in "${args[@]}"; do
       pull_and_query_urls | create_csv_urls
     )"
     if [[ "$flag_save" == true ]]; then
-      echo "$csv_urls" > "$output_filename"
+      echo "$csv_urls" >"$output_filename"
     else
       echo "$csv_urls"
     fi
-    debug "option: $processing_opt"
   fi
 done
 #
