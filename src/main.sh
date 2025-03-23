@@ -229,11 +229,13 @@ EOT
 # ---------------------------------------------------
 # Option parsing starts here ------------------------
 #
+# 1. Exit if no urls matching user query are found
+# if ((countof_urls < 1)); then
 if [[ $(countof_urls) -lt 1 ]]; then
   echo "No match for '$user_query' in $browser_application Urls."
   exit
 fi
-# if lnks was called with only a query, print urls
+# 2. If lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
 if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
@@ -245,7 +247,7 @@ flag_save=
 input_filename=
 output_filename=
 
-# Breaking flags - Stop execution and output
+# 3. Breaking flags - Stop execution and output
 # ------------------------------------
 # In order to limit actions to combinations that make the most sense
 # --help and --print will break the loop, preventing any
@@ -269,7 +271,7 @@ for breaking_opt in "${args[@]}"; do
   fi
 done
 # ------------------------------------
-# Runtime flags - options that affect processing.
+# 4. Runtime flags - options that affect processing.
 # --safari, --stdin, --read, and --save are higher-prescedence
 # actions / options. they are also the only actions / options that
 # do not break the ${args[@]} loop.
@@ -280,7 +282,7 @@ for runtime_opt in "${args[@]}"; do
   # lnks <query> --safari --html
   if [[ $runtime_opt == "--safari" ]]; then
     browser_application="Safari"
-  # echo $bookmarks | lnks <query> --stdin --markdown
+  # cat "bookmarks.txt" | lnks <query> --stdin --markdown
   elif [[ $runtime_opt == "--stdin" ]]; then
     stdin=$(cat -)
     # if option is --stdin, overwrite the pull_browser_application_urls
@@ -293,10 +295,14 @@ for runtime_opt in "${args[@]}"; do
   elif [[ $runtime_opt == "--save" ]]; then
     # --save must always be the second to last argument
     # followed by output_file as the last argument
+    # TODO: would prefer to explicitly step through the array
+    # rather than use this incantation.
     output_filename="${args[$((${#args[@]} - 1))]}"
     flag_save=true
   # lnks <query> --read urls.txt --save query.txt
   elif [[ $runtime_opt == "--read" ]]; then
+    # TODO: would prefer to explicitly step through the array
+    # rather than guess (to some degree) the index of input_filename
     input_filename="${args[2]}"
     # if option is --read, overwrite the pull_browser_application_urls
     # to redirect query to urls from $input_filename.
@@ -305,6 +311,8 @@ for runtime_opt in "${args[@]}"; do
     }
   fi
 done
+# 5. Processing flags - options that convert links to various
+# markup and data fomats.
 for processing_opt in "${args[@]}"; do
   # ------------------------------------
   # lnks <query> --markdown
