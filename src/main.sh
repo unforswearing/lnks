@@ -15,6 +15,16 @@
 
 args=("${@}")
 
+readonly debug_flag=
+debug() {
+  test "$debug_flag" == true && {
+    local blue="\033[34m"
+    local reset="\033[39m"
+    echo -en "${blue}$*${reset}"
+    echo
+  }
+}
+
 # ::~ File: "src/help.zsh"
 #
 function help() {
@@ -175,8 +185,8 @@ function query_url_title() {
   local url="${1}"
   curl -sL "${url}" |
     grep '<title>' |
-    sed 's/<title>//g;s/<\/title>//g' |
-    sed 's/^\s*//g'
+    sed 's/^.*<title>//g;s/<\/title>.*$//g' |
+    sed 's/^\s+*//g'
 }
 # print_urls | create_markdown_urls
 function create_markdown_urls() {
@@ -233,17 +243,8 @@ fi
 flag_save=
 input_filename=
 output_filename=
-executor=
 
 countof_opts=0
-
-readonly debug_flag=
-debug() {
-  test "$debug_flag" == true && {
-    _util.color blue "$@"
-    echo
-  }
-}
 
 debug "input args: ${args[*]}"
 debug "user query: ${user_query}"
@@ -277,29 +278,15 @@ for runtime_opt in "${args[@]}"; do
   if [[ $runtime_opt == "--safari" ]]; then
     debug "option: $runtime_opt"
     browser_application="Safari"
-  fi
-  if [[ $runtime_opt == "--stdin" ]]; then
+  elif [[ $runtime_opt == "--stdin" ]]; then
     debug "option: $runtime_opt"
-    readonly stdin
     stdin=$(cat -)
     function pull_browser_application_urls() {
       # var 'stdin' is captured at the top of the lnks script
       echo -en "${stdin}"
     }
-  fi
-  # lnks <query> --read urls.txt --save query.txt
-  if [[ $runtime_opt == "--read" ]]; then
-    debug "option: $runtime_opt"
-    next=$((countof_opts++))
-    input_filename="${args[$next]}"
-    function pull_browser_application_urls() {
-      grep '^.*$' "$input_filename"
-    }
-    debug "param: input_filename = $input_filename"
-    # debug "param: flag_save = $flag_save"
-  fi
   # lnks <query> --save filename.txt
-  if [[ $runtime_opt == "--save" ]]; then
+  elif [[ $runtime_opt == "--save" ]]; then
     debug "option: $runtime_opt"
     # --save must always be the second to last argument
     # followed by output_file as the last argument
@@ -307,9 +294,19 @@ for runtime_opt in "${args[@]}"; do
     flag_save=true
     debug "param: output_filename = $output_filename"
     debug "param: flag_save = $flag_save"
+  # lnks <query> --read urls.txt --save query.txt
+  elif [[ $runtime_opt == "--read" ]]; then
+    debug "option: $runtime_opt"
+    input_filename="${args[2]}"
+    debug "param: input_filename = $input_filename"
+    function pull_browser_application_urls() {
+      grep '^.*$' "$input_filename"
+    }
+    debug "param: input_filename = $input_filename"
+    # debug "param: flag_save = $flag_save"
+  # else
+  #   echo $runtime_opt
   fi
-  ((countof_ots++))
-  next=$(_util.null)
 done
 for processing_opt in "${args[@]}"; do
   # ------------------------------------
@@ -322,15 +319,10 @@ for processing_opt in "${args[@]}"; do
       pull_and_query_urls | create_markdown_urls
     )"
     if [[ "$flag_save" == true ]]; then
-      executor="function executor() {
-          echo \"\$md_urls\" > \"\$output_filename\"
-        }"
+      echo "$md_urls" > "$output_filename"
     else
-      {
-        echo "$md_urls"
-      }
+      echo "$md_urls"
     fi
-    debug "param: executor = ${executor}"
   fi
   # lnks <query> --html
   # lnks <query> --html --save filename.html
@@ -340,13 +332,9 @@ for processing_opt in "${args[@]}"; do
       pull_and_query_urls | create_html_urls
     )"
     if [[ "$flag_save" == true ]]; then
-      executor="function executor() {
-        echo \"\$html_urls\" \> \"\$output_filename\"
-      }"
+      echo "$html_urls" > "$output_filename"
     else
-      {
-        echo "$html_urls"
-      }
+      echo "$html_urls"
     fi
   fi
   # lnks <query> --csv
@@ -357,13 +345,9 @@ for processing_opt in "${args[@]}"; do
       pull_and_query_urls | create_csv_urls
     )"
     if [[ "$flag_save" == true ]]; then
-      executor="function executor() {
-        echo \"\$csv_urls\" \> \"\$output_filename\"
-      }"
+      echo "$csv_urls" > "$output_filename"
     else
-      {
-        echo "$csv_urls"
-      }
+      echo "$csv_urls"
     fi
   fi
 done
