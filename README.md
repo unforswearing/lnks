@@ -1,22 +1,18 @@
 # lnks
 List / Save / Instapaper your Google Chrome links from the terminal (on OS X/MacOS)
-
 <br><br>
 
 ## Installation
+Clone
 
-Clone this repository to use the latest version of `lnks`:
-
-```console
+```
 $ git clone https://github.com/unforswearing/lnks.git .
-$ cd lnks
-$ source lnks
-$ lnks -h
+$ cd lnks && bash lnks -h
 ```
 
-Or install using `npm`
+Or with `npm`
 
-```console
+```
 $ npm install -g lnks
 ```
 
@@ -24,7 +20,7 @@ $ npm install -g lnks
 
 ## Usage
 
-```console
+```
  lnks <option> <search term>
 
  Options:
@@ -56,16 +52,10 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 <br><br>
 
 ## Dependencies
-
 **Required**
-
-- Applescript (`osascript`)
 - Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
 **Optional**
-
-> `lnks` is basically functional without these tools, however they must be installed to use specific `lnks` options.
-
 - HTML-XML-utils: [https://www.w3.org/Tools/HTML-XML-utils/README](https://www.w3.org/Tools/HTML-XML-utils/README)
   - to get page titles from processed urls, used with `--markdown` and `--pinboard` options.
 - PDF creation (`lnks --pdf`)
@@ -73,6 +63,3 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
   - Visit [http://wkhtmltopdf.org/downloads.html](http://wkhtmltopdf.org/downloads.html).
 <br><br>
 
-## To Do / Roadmap
-
-See [todo.md](todo.md)

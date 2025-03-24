@@ -1,6 +1,6 @@
 {
   "name": "lnks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "List / Save / Instapaper your Google Chrome links from the terminal - on MacOS",
   "main": "lnks",
   "scripts": {

@@ -13,10 +13,13 @@ This todo file tracks progress on `src/main.zsh`. These changes will constitute 
 
 ## Future
 
+- [ ] Option (breaking): use flag `--nb` to add urls to [nb](https://xwmx.github.io/nb)
+- [ ] Option (breaking): use flag `--archivebox` to add urls to [archivebox](https://github.com/ArchiveBox/ArchiveBox)
 - [ ] Option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
   - https://www.ii.com/links-footnotes-markdown/
+- [ ] Option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Option (processing): `--json` to output a `json` object / file.
-- [ ] Consider adding an experimental `--pandoc` flag that converts `curl` output
+- [ ] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
       html to some other format.
 - [ ] Runtime options can be created to toggle tool options or swap tools
   - `--verbose` to show `curl` progress

@@ -24,7 +24,7 @@ __util.require() {
 			echo "Please visit https://www.w3.org/Tools/HTML-XML-utils/README for installation instructions"
 			echo "Or install the 'html-xml-utils' package via homebrew (https://brew.sh)"
 		;;
-		"osascript") 
+		"osascript")
 			echo "Are you using an Apple device?"
 		;;
 		"wkhtmltopdf")
@@ -98,12 +98,12 @@ lnks() {
 EOT
 		}
 
-		local count; 
+		local count;
 		count="$(
 			_pull | grep -i "$srch" | sed "s|^ ||g" | wc -l
 		)"
 
-		local links; 
+		local links;
 		links="$(
 			_pull | tr ',' '\n' | grep -i "$srch" | sed "s|^ ||g"
 		)"
@@ -142,7 +142,7 @@ EOT
 
 	_markdown() {
 		links | while read -r lnk; do
-			local title; 
+			local title;
 			title="$(
 				curl "${lnk}" -so - | "$hxclean" | "$hxselect" -s '\n' -c 'title'
 			)"

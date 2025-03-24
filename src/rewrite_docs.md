@@ -49,3 +49,13 @@ Consider adding output format options for various markup languages
 # TODO: Are there any other relevant Zsh Shell options for this script?
 # see "src/strict.zsh" for previous option ideas
 # https://zsh.sourceforge.io/Doc/Release/Options-Index.html
+
+# Stage 3. add option (and docs) for creating and using plugins
+#   - @note this will require planning to properly incorporate into the script
+#   - plugin setting for lnks.conf
+#     - `plugins={true|false}`
+#   - using plugins
+#     - plugins should accept a title and url.
+#     - plugins should perform some external action.
+#     - plugins can store their credentials with the plugin or in `lnks.conf`
+#     - more TBD
