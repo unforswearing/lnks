@@ -1,3 +1,6 @@
 https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
 https://stackoverflow.com/questions/638975/how-do-i-tell-if-a-file-does-not-exist-in-bash
 https://stackoverflow.com/questions/16860877/remove-an-element-from-a-bash-array
+https://news.ycombinator.com/news
+https://news.ycombinator.com/item?id=43421324
+https://unforswearing.com

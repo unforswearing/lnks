@@ -9,7 +9,7 @@
 
 args=("${@}")
 
-debug_flag=true
+debug_flag=
 # debug "${LINENO}" "we debuggin"
 debug() {
   test "$debug_flag" == true && {
@@ -43,7 +43,6 @@ Options
   --csv           print csv formatted urls to stdout
   --save [FILE]   saves processed urls to a file
   --stdin         read urls from stdin for processing with other lnks options
-  --read          read urls from a file for processing with other lnks options
 
 Examples
   Print urls matching <query> from Google Chrome:
@@ -70,10 +69,9 @@ Examples
 
   Processing options:
   lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
-  lnks [query] --read [urls.txt] [ --markdown | --html | --csv ] --save [query.ext]
 
 Bugs
-  --stdin or --read followed by --print will produce inaccurate results.
+  --stdin followed by --print will produce inaccurate results.
 
 Source
   <https://github.com/unforswearing/lnks>
@@ -228,7 +226,7 @@ $(for item in "${list_html[@]}"; do echo "  $item"; done)
 EOT
 }
 function create_csv_urls() {
-  local csv_header_row="Date,Title,URL"
+  local csv_header_row="date,title,url"
   declare -a urls_csv
   while read -r this_url; do
     local title
@@ -252,10 +250,10 @@ EOT
 #
 # 1. Exit if no urls matching user query are found
 # if ((countof_urls < 1)); then
-if [[ $(countof_urls) -lt 1 ]]; then
-  echo "No match for '$user_query' in $browser_application Urls."
-  exit
-fi
+# if [[ $(countof_urls) -lt 1 ]]; then
+#   echo "No match for '$user_query' in $browser_application Urls."
+#   exit
+# fi
 # 2. If lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
@@ -264,9 +262,7 @@ fi
 #   exit
 # fi
 
-flag_read=
 flag_save=
-input_filename=
 output_filename=
 
 # 3. Breaking flags - Stop execution and output
@@ -288,27 +284,23 @@ for breaking_opt in "${args[@]}"; do
   # lnks <query>
   # lnks <query> --print
   elif [[ $breaking_opt == "--print" ]]; then
-    pull_and_query_urls
-    exit
+      pull_and_query_urls
   fi
 done
 # ------------------------------------
 # 4. Runtime flags - options that affect processing.
-# --safari, --stdin, --read, and --save are higher-prescedence
+# --safari, --stdin, and --save are higher-prescedence
 # actions / options. they are also the only actions / options that
 # do not break the ${args[@]} loop.
 # Option --save works with any other flag listed here.
 # All other flags are mutually exclusive and cannot be combined
 #
 for runtime_opt in "${args[@]}"; do
-  has_runtime_flag=false
   # lnks <query> --safari --html
   if [[ $runtime_opt == "--safari" ]]; then
-    has_runtime_flag=true
     browser_application="Safari"
   # cat "bookmarks.txt" | lnks <query> --stdin --markdown
   elif [[ $runtime_opt == "--stdin" ]]; then
-    has_runtime_flag=true
     stdin=$(cat -)
     # if option is --stdin, overwrite the pull_browser_application_urls
     # to redirect query to urls from previous command in pipe
@@ -317,26 +309,12 @@ for runtime_opt in "${args[@]}"; do
     }
   # lnks <query> --save filename.txt
   elif [[ $runtime_opt == "--save" ]]; then
-    has_runtime_flag=true
     # --save must always be the second to last argument
     # followed by output_file as the last argument
     # TODO: would prefer to explicitly step through the array
     # rather than use this incantation.
     output_filename="${args[$((${#args[@]} - 1))]}"
     flag_save=true
-  # lnks <query> --read urls.txt --save query.txt
-  elif [[ $runtime_opt == "--read" ]]; then
-    has_runtime_flag=true
-    flag_read=true
-    # TODO: would prefer to explicitly step through the array
-    # rather than guess (to some degree) the index of input_filename
-    input_filename="${args[1]}"
-    # if option is --read, overwrite the pull_browser_application_urls
-    # to redirect query to urls from $input_filename.
-    # TODO: --read followed by --print will drop the last line of the file
-    function pull_browser_application_urls() {
-      cat "$input_filename"
-    }
   fi
 done
 # 5. Processing flags - options that convert links to various
@@ -345,9 +323,7 @@ for processing_opt in "${args[@]}"; do
   # ------------------------------------
   # lnks <query> --markdown
   # lnks <query> --markdown --save filename.md
-  has_processing_flag=false
   if [[ $processing_opt == "--markdown" ]]; then
-    has_processing_flag=true
     md_urls="$(
       pull_and_query_urls | create_markdown_urls
     )"
@@ -359,7 +335,6 @@ for processing_opt in "${args[@]}"; do
   # lnks <query> --html
   # lnks <query> --html --save filename.html
   elif [[ $processing_opt == "--html" ]]; then
-    has_processing_flag=true
     html_urls="$(
       pull_and_query_urls | create_html_urls
     )"
@@ -371,7 +346,6 @@ for processing_opt in "${args[@]}"; do
   # lnks <query> --csv
   # lnks <query> --csv --save filename.csv
   elif [[ $processing_opt == "--csv" ]]; then
-    has_processing_flag=true
     csv_urls="$(
       pull_and_query_urls | create_csv_urls
     )"
@@ -380,9 +354,9 @@ for processing_opt in "${args[@]}"; do
     else
       echo "$csv_urls"
     fi
-  # elif [[ $breaking_opt == "--print" ]]; then
-  #   pull_and_query_urls
-  #   exit
+  elif [[ $breaking_opt == "--print" ]]; then
+    pull_and_query_urls
+    exit
   fi
 done
 #
