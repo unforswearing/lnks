@@ -1,6 +1,6 @@
 #!/bin/bash
-#!/bin/zsh
-# ref: zsh 5.9 (x86_64-apple-darwin24.0)
+# ::~ File: "src/lib.zsh"
+#
 function pull_browser_application_urls() {
   local browser="${1}"
   osascript <<EOT
@@ -9,41 +9,46 @@ function pull_browser_application_urls() {
     end tell
 EOT
 }
-function countof_urls() {
-  pull_browser_application_urls "$browser_application" |
-    tr ',' '\n' |
-    wc -l |
-    sed 's/^\s*//g'
+function format_urls() {
+  tr ',' '\n' | awk '{$1=$1}1'
 }
 function query_urls() {
+  awk "/${user_query}/"
+}
+function pull_and_query_urls() {
   pull_browser_application_urls "$browser_application" |
-    awk "/${user_query}/"
+    format_urls |
+    query_urls
 }
-# query_urls | print_urls
-function print_urls() {
-  tr ',' '\n' | sed 's/^ //g'
-}
-# save_urls can be merged with save_markdown_urls
-function save_urls() {
-  local output_file="${1}"
-  # TODO: if file exists: warn "overwrite file?"
-  cat - >"${output_file}"
+function countof_urls() {
+  pull_and_query_urls |
+    wc -l |
+    awk '{$1=$1}1'
 }
 function query_url_title() {
   local url="${1}"
-  curl -sL "${url}" |
-    grep '<title>' |
-    sed 's/<title>//g;s/<\/title>//g;s/^\s*//g'
+  local url_title
+  url_title="$(
+    curl -skLZ "${url}" |
+      grep '<title>' |
+      sed 's/^.*<title>//g;s/<\/title>.*$//g'
+  )"
+  if [[ -z ${url_title+x} ]]; then
+    _util.color red "Unable to retrieve url title."
+    exit 1
+  fi
+  echo "${url_title}"
 }
-# print_urls | create_markdown_urls
+# format_urls | create_markdown_urls
 function create_markdown_urls() {
-  # print_urls | while read -r this_url; do
+  # format_urls | while read -r this_url; do
   while read -r this_url; do
     local title
     title="$(query_url_title "${this_url}")"
     echo "[${title}](${this_url})"
   done
 }
+# format_urls | create_html_urls
 function create_html_urls() {
   declare -a list_html
   while read -r this_url; do
@@ -54,23 +59,28 @@ function create_html_urls() {
     list_html+=("$tmpl")
   done
   cat <<EOT
-    <ul>
-      ${list_html[@]}
-    </ul>
+<ul>
+$(for item in "${list_html[@]}"; do echo "  $item"; done)
+</ul>
 EOT
 }
+# format_urls | create_csv_urls
 function create_csv_urls() {
-  local csv_header_row="Date,Title,URL"
+  local csv_header_row="date,title,url"
   declare -a urls_csv
   while read -r this_url; do
     local title
     local tmpl
-    title="$(query_url_title "${this_url}")"
-    tmpl="$(_util.timestamp),${title},${this_url}"
+    title="$(
+      query_url_title "${this_url}"
+    )"
+    tmpl="$(_util.timestamp),\"${title}\",${this_url}"
     urls_csv+=("$tmpl")
   done
   cat <<EOT
-    ${csv_header_row}
-    ${urls_csv[@]}
+${csv_header_row}
+$(for item in "${urls_csv[@]}"; do echo "$item"; done)
 EOT
 }
+#
+# ::~ EndFile

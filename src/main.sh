@@ -38,37 +38,45 @@ Options
   -h, --help      prints this help message
   --safari        search for urls in Safari instead of Google Chrome
   --print         print urls to stdout
+  --stdin         read new-line-separated urls from stdin for use with other options
   --markdown      print markdown formattined urls to stdout
   --html          print html formatted list of urls to stdout
   --csv           print csv formatted urls to stdout
-  --save [FILE]   saves processed urls to a file
-  --stdin         read urls from stdin for processing with other lnks options
+  --save [FILE]   saves plaintext or processed urls to a file
 
 Examples
   Print urls matching <query> from Google Chrome:
+
   lnks [query]
   lnks [query] --print
 
+  Save urls matching <query> to a file:
+
+  lnks [query] --save [query.txt]
+
   Use Safari instead of Google Chrome:
+
   If the '--safari' flag follows query, search Safari URLs instead of Chrome.
   This option can be set permanently in settings.
 
   lnks [query] --safari --csv
   lnks [query] --safari --csv --save query.csv
 
-  More Examples:
+  Read urls from files or other commands:
+
+  Use the '--stdin' flag to read urls from standard input.
+  cat urls.txt | lnks --stdin --csv
+
+  Processing options:
+
+  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
+
   lnks [query] --markdown
   lnks [query] --html
   lnks [query] --csv
-
-  lnks [query] --save [query.ext]
-
   lnks [query] --markdown --save [query.md]
   lnks [query] --html --save [query.html]
   lnks [query] --csv --save [query.csv]
-
-  Processing options:
-  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
 
 Bugs
   --stdin followed by --print will produce inaccurate results.
@@ -78,7 +86,6 @@ Source
 
 Author
   unforswearing <https://github.com/unforswearing>
-
 EOT
 }
 #
@@ -115,6 +122,7 @@ fi
 # the first argument to lnks will always be the user query.
 user_query="${1}"
 if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
+  debug "${LINENO}" "No query passed to script."
   echo "No query was passed to lnks."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
@@ -134,9 +142,9 @@ function _util.color() {
   local opt="$1"
   shift
   case "$opt" in
-  red) echo -en "${red}$*${reset}" ;;
-  green) echo -en "${green}$*${reset}" ;;
-  blue) echo -en "${blue}$*${reset}" ;;
+  red) echo -en "${red}$*${reset}\n" ;;
+  green) echo -en "${green}$*${reset}\n" ;;
+  blue) echo -en "${blue}$*${reset}\n" ;;
   esac
 }
 function _util.require() {
@@ -210,6 +218,7 @@ function create_markdown_urls() {
     echo "[${title}](${this_url})"
   done
 }
+# format_urls | create_html_urls
 function create_html_urls() {
   declare -a list_html
   while read -r this_url; do
@@ -225,6 +234,7 @@ $(for item in "${list_html[@]}"; do echo "  $item"; done)
 </ul>
 EOT
 }
+# format_urls | create_csv_urls
 function create_csv_urls() {
   local csv_header_row="date,title,url"
   declare -a urls_csv
@@ -244,16 +254,19 @@ EOT
 }
 #
 # ::~ EndFile
-
+debug "${LINENO}" "args: ${args[*]}"
+debug "${LINENO}" "user query: ${user_query}"
+debug "${LINENO}" "found urls: $(countof_urls)"
 # ---------------------------------------------------
 # Option parsing starts here ------------------------
 #
 # 1. Exit if no urls matching user query are found
 # if ((countof_urls < 1)); then
-# if [[ $(countof_urls) -lt 1 ]]; then
-#   echo "No match for '$user_query' in $browser_application Urls."
-#   exit
-# fi
+if [[ $(countof_urls) -lt 1 ]]; then
+  debug "${LINENO}" "No match for user query: '$user_query'"
+  echo "No match for '$user_query' in $browser_application Urls."
+  exit
+fi
 # 2. If lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
@@ -263,7 +276,32 @@ EOT
 # fi
 
 flag_save=
+flag_stdin=
 output_filename=
+
+has_flag_breaking=$(
+  printf '%s\n' "${args[@]}" |
+    awk '/--help|--print/ { exit 0 } { exit 1 }'
+)
+debug "${LINENO}" "has flag: breaking? $(
+  test "$has_flag_breaking" && echo "true" || echo "false"
+)"
+
+has_flag_runtime=$(
+  printf '%s\n' "${args[@]}" |
+    awk '/--safari|--stdin|--save/ { exit 0 } { exit 1 }'
+)
+debug "${LINENO}" "has flag: runtime? $(
+  test "$has_flag_runtime" && echo "true" || echo "false"
+)"
+
+has_flag_processing=$(
+  printf '%s\n' "${args[@]}" |
+    awk '/--markdown|--html|--csv/ { exit 0 } { exit 1 }'
+)
+debug "${LINENO}" "has flag: processing? $(
+  test "$has_flag_processing" && echo "true" || echo "false"
+)"
 
 # 3. Breaking flags - Stop execution and output
 # ------------------------------------
@@ -284,7 +322,10 @@ for breaking_opt in "${args[@]}"; do
   # lnks <query>
   # lnks <query> --print
   elif [[ $breaking_opt == "--print" ]]; then
+    #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
+    if [[ -z ${flag_stdin+x} ]]; then
       pull_and_query_urls
+    fi
   fi
 done
 # ------------------------------------
@@ -307,6 +348,7 @@ for runtime_opt in "${args[@]}"; do
     function pull_browser_application_urls() {
       echo -en "${stdin}"
     }
+    flag_stdin=true
   # lnks <query> --save filename.txt
   elif [[ $runtime_opt == "--save" ]]; then
     # --save must always be the second to last argument
@@ -340,6 +382,7 @@ for processing_opt in "${args[@]}"; do
     )"
     if [[ "$flag_save" == true ]]; then
       echo "$html_urls" >"$output_filename"
+      _util.color green "Url saved to $output_filename."
     else
       echo "$html_urls"
     fi
@@ -351,12 +394,22 @@ for processing_opt in "${args[@]}"; do
     )"
     if [[ "$flag_save" == true ]]; then
       echo "$csv_urls" >"$output_filename"
+      _util.color green "Url saved to $output_filename."
     else
       echo "$csv_urls"
     fi
-  elif [[ $breaking_opt == "--print" ]]; then
-    pull_and_query_urls
-    exit
+  elif [[ $processing_opt == "--save" ]]; then
+    plain_urls="$(pull_and_query_urls)"
+    if [[ "$flag_save" == true ]] && [[ ! $has_flag_processing ]]; then
+       echo "$plain_urls" > "$output_filename"
+       _util.color green "Url saved to $output_filename."
+    else
+      echo "$md_urls"
+    fi
+  elif [[ $processing_opt == "--print" ]]; then
+    # if [[ ${has_flag_breaking} ]]; then
+      pull_and_query_urls
+    # fi
   fi
 done
 #

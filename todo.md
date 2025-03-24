@@ -27,6 +27,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
     - See other `jc` parsers that could be useful (specifically `url`)
 - [ ] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
       html to some other format.
+- [ ] Option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
 - [ ] Runtime options can be created to toggle tool options or swap tools
   - `--verbose` to show `curl` progress
   - `--wget` to use `wget` instead of `curl` (default)
