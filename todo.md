@@ -6,17 +6,28 @@ This todo file tracks progress on `src/main.zsh`. These changes will constitute 
 
 ## To Do
 
-- [ ] Add additional processing options for url formatting in other markup languages (TBD).
-- [ ] Code comments.
 - [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
 - [ ] Set up some sort of tests.
-  - [ ] Start by testing "Runtime" options: `--safari`, `--save`, `--stdin`, and `--read`.
+  - [ ] Start by testing "Runtime" options: `--safari`, `--save`, `--stdin`, and `--read`
+- [ ] Revise / update the project `readme.md`
 
 ## Future
 
+- [ ] Option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
+  - https://www.ii.com/links-footnotes-markdown/
+- [ ] Option (processing): `--json` to output a `json` object / file.
+- [ ] Consider adding an experimental `--pandoc` flag that converts `curl` output
+      html to some other format.
+- [ ] Runtime options can be created to toggle tool options or swap tools
+  - `--verbose` to show `curl` progress
+  - `--wget` to use `wget` instead of `curl` (default)
+  - etc...
+- [ ] Discard all non-url content when using options `--read` and `--stdin`.
+  - Match and output urls only, discard any other sort of formatting.
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
 - [ ] Consider adding Raindrop.io action (default posture: no).
+  - Also add as option in `lnks.rc` config file.
 
 ## Complete
 

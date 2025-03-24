@@ -27,7 +27,7 @@ function _util.get_config_item() {
   local keyname="${1}"
   grep "$keyname" "$lnks_configuration" | awk -F= '{ print $2 }'
 }
-  function _prog() {
+  function spin() {
 		[[ -z "$1" ]] && exit 0
 
 		set +m

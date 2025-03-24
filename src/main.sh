@@ -9,16 +9,21 @@
 
 args=("${@}")
 
-debug_flag=
+debug_flag=true
+# debug "${LINENO}" "we debuggin"
 debug() {
   test "$debug_flag" == true && {
+    local lineno="$1"
+    shift
     local blue="\033[34m"
     local reset="\033[39m"
-    echo -en "${blue}$*${reset}"
-    echo
+    local ts
+    ts="$(date +'%Y-%m-%d %H:%M:%S')"
+    echo "DEBUG: ${ts} [line $lineno]"
+    echo -en ":: ${blue}$*${reset} "
+    echo; echo;
   }
 }
-
 # ::~ File: "src/help.zsh"
 #
 function help() {
@@ -67,6 +72,9 @@ Examples
   lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
   lnks [query] --read [urls.txt] [ --markdown | --html | --csv ] --save [query.ext]
 
+Bugs
+  --stdin or --read followed by --print will produce inaccurate results.
+
 Source
   <https://github.com/unforswearing/lnks>
 
@@ -80,14 +88,17 @@ EOT
 
 # ::~ File: "src/initialize.zsh"
 #
+configuration_base_path="$HOME/.config/lnks"
+configuration_rc_path="$HOME/.config/lnks/lnks.rc"
 function initialize_lnks_configuration() {
-  test -d "$HOME/.config/lnks" || {
-    mkdir "$HOME/.config/lnks"
+  test -d "$configuration_base_path" || {
+    mkdir "$configuration_base_path"
     {
       echo "default_browser=chrome"
       echo "default_action="
       echo "save_format=text"
-    } >"$HOME/.config/lnks/lnks.rc"
+    } >"$configuration_rc_path"
+    echo "lnks config file created at $configuration_rc_path"
   }
 }
 #
@@ -95,9 +106,9 @@ function initialize_lnks_configuration() {
 
 # TODO: use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
-lnks_configuration="$HOME/.config/lnks/lnks.rc"
+lnks_configuration="$configuration_rc_path"
 if [[ ! -f "$lnks_configuration" ]]; then
-  echo "No configuration file found at '~/.config/lnks'. Creating..."
+  echo "No configuration file found at '$configuration_base_path'. Creating..."
   # create configuration files
   initialize_lnks_configuration
 fi
@@ -162,15 +173,15 @@ function pull_browser_application_urls() {
     end tell
 EOT
 }
-function print_urls() {
-  tr ',' '\n' | sed 's/^ //g'
+function format_urls() {
+  tr ',' '\n' | awk '{$1=$1}1'
 }
 function query_urls() {
   awk "/${user_query}/"
 }
 function pull_and_query_urls() {
   pull_browser_application_urls "$browser_application" |
-    print_urls |
+    format_urls |
     query_urls
 }
 function countof_urls() {
@@ -180,17 +191,21 @@ function countof_urls() {
 }
 function query_url_title() {
   local url="${1}"
-  {
+  local url_title
+  url_title="$(
     curl -skLZ "${url}" |
       grep '<title>' |
-      sed 's/^.*<title>//g;s/<\/title>.*$//g' |
-      sed 's/^\s+*//g'
-  } &
-  wait
+      sed 's/^.*<title>//g;s/<\/title>.*$//g'
+  )"
+  if [[ -z ${url_title+x} ]]; then
+    _util.color red "Unable to retrieve url title."
+    exit 1
+  fi
+  echo "${url_title}"
 }
-# print_urls | create_markdown_urls
+# format_urls | create_markdown_urls
 function create_markdown_urls() {
-  # print_urls | while read -r this_url; do
+  # format_urls | while read -r this_url; do
   while read -r this_url; do
     local title
     title="$(query_url_title "${this_url}")"
@@ -244,11 +259,12 @@ fi
 # 2. If lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
-if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
-  pull_and_query_urls
-  exit
-fi
+# if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
+#   pull_and_query_urls
+#   exit
+# fi
 
+flag_read=
 flag_save=
 input_filename=
 output_filename=
@@ -285,20 +301,23 @@ done
 # All other flags are mutually exclusive and cannot be combined
 #
 for runtime_opt in "${args[@]}"; do
+  has_runtime_flag=false
   # lnks <query> --safari --html
   if [[ $runtime_opt == "--safari" ]]; then
+    has_runtime_flag=true
     browser_application="Safari"
   # cat "bookmarks.txt" | lnks <query> --stdin --markdown
   elif [[ $runtime_opt == "--stdin" ]]; then
+    has_runtime_flag=true
     stdin=$(cat -)
     # if option is --stdin, overwrite the pull_browser_application_urls
     # to redirect query to urls from previous command in pipe
     function pull_browser_application_urls() {
-      # var 'stdin' is captured at the top of the lnks script
       echo -en "${stdin}"
     }
   # lnks <query> --save filename.txt
   elif [[ $runtime_opt == "--save" ]]; then
+    has_runtime_flag=true
     # --save must always be the second to last argument
     # followed by output_file as the last argument
     # TODO: would prefer to explicitly step through the array
@@ -307,13 +326,16 @@ for runtime_opt in "${args[@]}"; do
     flag_save=true
   # lnks <query> --read urls.txt --save query.txt
   elif [[ $runtime_opt == "--read" ]]; then
+    has_runtime_flag=true
+    flag_read=true
     # TODO: would prefer to explicitly step through the array
     # rather than guess (to some degree) the index of input_filename
-    input_filename="${args[2]}"
+    input_filename="${args[1]}"
     # if option is --read, overwrite the pull_browser_application_urls
     # to redirect query to urls from $input_filename.
+    # TODO: --read followed by --print will drop the last line of the file
     function pull_browser_application_urls() {
-      grep '^.*$' "$input_filename"
+      cat "$input_filename"
     }
   fi
 done
@@ -323,7 +345,9 @@ for processing_opt in "${args[@]}"; do
   # ------------------------------------
   # lnks <query> --markdown
   # lnks <query> --markdown --save filename.md
+  has_processing_flag=false
   if [[ $processing_opt == "--markdown" ]]; then
+    has_processing_flag=true
     md_urls="$(
       pull_and_query_urls | create_markdown_urls
     )"
@@ -335,6 +359,7 @@ for processing_opt in "${args[@]}"; do
   # lnks <query> --html
   # lnks <query> --html --save filename.html
   elif [[ $processing_opt == "--html" ]]; then
+    has_processing_flag=true
     html_urls="$(
       pull_and_query_urls | create_html_urls
     )"
@@ -346,6 +371,7 @@ for processing_opt in "${args[@]}"; do
   # lnks <query> --csv
   # lnks <query> --csv --save filename.csv
   elif [[ $processing_opt == "--csv" ]]; then
+    has_processing_flag=true
     csv_urls="$(
       pull_and_query_urls | create_csv_urls
     )"
@@ -354,6 +380,9 @@ for processing_opt in "${args[@]}"; do
     else
       echo "$csv_urls"
     fi
+  # elif [[ $breaking_opt == "--print" ]]; then
+  #   pull_and_query_urls
+  #   exit
   fi
 done
 #
