@@ -1,0 +1,101 @@
+# using shelltestrunner
+# https://github.com/simonmichael/shelltestrunner
+
+# 1. Test that the --help option properly prints the full help text.
+
+$ src/main.sh --help
+lnks - help
+
+Quickly search your Google Chrome or Safari tabs for matching urls and process the results.
+
+Usage: lnks [query] <options> < --save [output file] >
+
+Options
+  -h, --help      prints this help message
+  --safari        search for urls in Safari instead of Google Chrome
+  --print         print urls to stdout
+  --stdin         read new-line-separated urls from stdin for use with other options
+  --markdown      print markdown formattined urls to stdout
+  --html          print html formatted list of urls to stdout
+  --csv           print csv formatted urls to stdout
+  --save [FILE]   saves plaintext or processed urls to a file
+
+Examples
+  Print urls matching <query> from Google Chrome:
+
+  lnks [query]
+  lnks [query] --print
+
+  Save urls matching <query> to a file:
+
+  lnks [query] --save [query.txt]
+
+  Use Safari instead of Google Chrome:
+
+  If the '--safari' flag follows query, search Safari URLs instead of Chrome.
+  This option can be set permanently in settings.
+
+  lnks [query] --safari --csv
+  lnks [query] --safari --csv --save query.csv
+
+  Read urls from files or other commands:
+
+  Use the '--stdin' flag to read urls from standard input.
+  cat urls.txt | lnks --stdin --csv
+
+  Processing options:
+
+  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
+
+  lnks [query] --markdown
+  lnks [query] --markdown --save [query.md]
+
+  lnks [query] --html
+  lnks [query] --html --save [query.html]
+
+  lnks [query] --csv
+  lnks [query] --csv --save [query.csv]
+
+Bugs
+  --stdin followed by --print will produce inaccurate results.
+
+Source
+  <https://github.com/unforswearing/lnks>
+
+Author
+  unforswearing <https://github.com/unforswearing>
+
+# 2. Test that unknown options are properly handled.
+
+$ src/main.sh --fake-option
+Usage: lnks [query] <options...>
+Use 'lnks --help' to view the full help document
+>2 /Please specify a query before passing any options./
+>=!0
+
+# 3. Test that the --print option can print a url matching 'query'
+
+$ open "https://www.example.com"; src/main.sh example --print
+https://www.example.com/
+>=0
+
+# 4. Test that the --markdown option can print markdown formatted urls
+
+$ src/main.sh example --markdown
+[Example Domain](https://www.example.com/)
+>=0
+
+# 5. Test that the --html option can print html formatted urls
+
+# $ src/main.sh example --html
+# <ul>
+#  <li><a href="https://www.example.com/">Example Domain</a></li>
+# </ul>
+# >=0
+
+# 6. Test that the --csv option can print csv formatted urls
+
+$ src/main.sh example --csv
+> /date,title,url
+^.*,"Example Domain",https\:\/\/www.example.com\//
+>=0

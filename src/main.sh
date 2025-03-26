@@ -32,7 +32,7 @@ debug() {
 #
 function help() {
   cat <<EOT
-lnks
+lnks - help
 
 Quickly search your Google Chrome or Safari tabs for matching urls and process the results.
 
@@ -76,10 +76,12 @@ Examples
   lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
 
   lnks [query] --markdown
-  lnks [query] --html
-  lnks [query] --csv
   lnks [query] --markdown --save [query.md]
+
+  lnks [query] --html
   lnks [query] --html --save [query.html]
+
+  lnks [query] --csv
   lnks [query] --csv --save [query.csv]
 
 Bugs
@@ -135,9 +137,6 @@ function _util.color() {
   green) echo -en "${green}$*${reset}\n" ;;
   blue) echo -en "${blue}$*${reset}\n" ;;
   esac
-}
-function _util.require() {
-  test "$(command -v "$1")"
 }
 function _util.null() {
   cat /dev/null
@@ -260,12 +259,22 @@ debug "${LINENO}" "found urls: $(countof_urls)"
 # TODO: can i move this section to "argument parsing", lower in the script?
 # the first argument to lnks will always be the user query.
 user_query="${1}"
-if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
-  debug "${LINENO}" "No query passed to script."
-  echo "No query was passed to lnks."
+if [[ "$user_query" == "--help" ]]; then
+  help
+  exit 0
+elif [[ "$user_query" =~ -- ]]; then
+  >&2 _util.color red "Please specify a query before passing any options."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
-  exit
+  exit 1
+fi
+
+if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
+  debug "${LINENO}" "No query passed to script."
+  >&2 _util.color red "No query was passed to lnks."
+  echo "Usage: lnks [query] <options...>"
+  echo "Use 'lnks --help' to view the full help document"
+  exit 1
 else
   # shift the args array to remove user_query item
   args=("${args[@]:1}")
@@ -295,7 +304,7 @@ has_flag_processing=false
 
 for argument in "${args[@]}"; do
   case "$argument" in
-  --help | --print)
+  --print)
     has_flag_breaking=true
     debug "${LINENO}" "has flag: breaking. $has_flag_breaking"
     ;;
@@ -315,6 +324,7 @@ for argument in "${args[@]}"; do
     _util.color red "Unknown argument: '$argument'"
     echo "Usage: lnks [query] <options...>"
     echo "Use 'lnks --help' to view the full help document"
+    exit 1
     ;;
   esac
 done
