@@ -101,3 +101,28 @@ $ src/main.sh example --csv
 > /date,title,url
 ^.*,"Example Domain",https\:\/\/www.example.com\//
 >=0
+
+# 7. Test that --stdin does not print anything when used alone.
+
+# $ src/main.sh example --stdin
+
+# 8. Test that the --markdown option works with --stdin
+
+$ echo "https://www.example.com" | src/main.sh example --stdin --markdown
+[Example Domain](https://www.example.com)
+>=0
+
+# 9. Test that the --html option works with --stdin
+
+# $ echo "https://www.example.com" | src/main.sh example --stdin --html
+# <ul>
+#  <li><a href="https://www.example.com/">Example Domain</a></li>
+# </ul>
+# >=0
+
+# 10. Test that the --csv option works with --stdin
+
+$ echo "https://www.example.com" | src/main.sh example --stdin --csv
+> /date,title,url
+^.*,"Example Domain",https\:\/\/www.example.com/
+>=0

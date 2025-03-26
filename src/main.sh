@@ -263,6 +263,15 @@ debug "${LINENO}" "found urls: $(countof_urls)"
 #
 # TODO: can i move this section to "argument parsing", lower in the script?
 # the first argument to lnks will always be the user query.
+
+flag_save=
+flag_stdin=
+output_filename=
+
+has_flag_breaking=false
+has_flag_runtime=false
+has_flag_processing=false
+
 if [[ "$user_query" == "--help" ]]; then
   help
   exit 0
@@ -284,30 +293,6 @@ else
   # shift the args array to remove user_query item
   args=("${args[@]:1}")
 fi
-# 1. Exit if no urls matching user query are found
-# if ((countof_urls < 1)); then
-if [[ $(countof_urls) -lt 1 ]]; then
-  debug "${LINENO}" "No match for user query: '$user_query'"
-  echo "No match for '$user_query' in $browser_application Urls."
-  exit
-fi
-# 2. If lnks was called with only a query, print urls
-# matching that query and exit the script. A non-alias
-# for the --print option (retained below).
-if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
-  debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
-  pull_and_query_urls
-  exit
-fi
-
-flag_save=
-flag_stdin=
-output_filename=
-
-has_flag_breaking=false
-has_flag_runtime=false
-has_flag_processing=false
-
 for argument in "${args[@]}"; do
   case "$argument" in
   --print)
@@ -335,6 +320,21 @@ for argument in "${args[@]}"; do
     ;;
   esac
 done
+# 1. Exit if no urls matching user query are found
+# if ((countof_urls < 1)); then
+if [[ $(countof_urls) -lt 1 ]] && [[ $has_flag_runtime == false ]]; then
+  debug "${LINENO}" "No match for user query: '$user_query'"
+  echo "No match for '$user_query' in $browser_application Urls."
+  exit
+fi
+# 2. If lnks was called with only a query, print urls
+# matching that query and exit the script. A non-alias
+# for the --print option (retained below).
+if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
+  debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
+  pull_and_query_urls
+  exit
+fi
 # 3. Breaking flags - Stop execution and output
 # ------------------------------------
 # In order to limit actions to combinations that make the most sense
@@ -371,6 +371,12 @@ for runtime_opt in "${args[@]}"; do
   # cat "bookmarks.txt" | lnks <query> --stdin --markdown
   elif [[ $runtime_opt == "--stdin" ]]; then
     stdin=$(cat -)
+
+    if [[ -z "${stdin}" ]]; then
+      >&2 _util.color red "No processing options passed for --stdin"
+      echo "Usage: lnks [query] <options...>"
+      echo "Use 'lnks --help' to view the full help document"
+    fi
     # if option is --stdin, overwrite the pull_browser_application_urls
     # to redirect query to urls from previous command in pipe
     function pull_browser_application_urls() {
