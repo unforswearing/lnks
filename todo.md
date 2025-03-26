@@ -1,47 +1,46 @@
 # Lnks Update
 
-Last checked and this command no longer works (MacOS 15), so its time to update.
+The first version of `lnks` was created in 2016. Last checked and this command no longer works (MacOS 15), so its time to update.
 
 This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.0.0` of this script (according to the old [package.json](package.json) file).
 
-## To Do
+## To Do (Version 2 - Rewrite)
 
+- [ ] Option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
+  - https://www.ii.com/links-footnotes-markdown/
+- [ ] Option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [x] Set up some sort of tests.
   - [ ] Start by testing "Runtime" options: `--safari`, `--save`, and `--stdin`
 - [ ] Revise / update the project `readme.md`
   - Update header line to read "Triage your Google Chrome / Safari links on MacOS".
 - [ ] Publish a new `npm` version if possible.
 
-## Future (version 3?)
+## Future (Version 2 - Features)
 
-> Updating for version 2 made me realize why bash is not usable for larger scripts. Version 3 of this script will use a different programming language.
-
-- [ ] Option (breaking): use flag `--nb` to add urls to [nb](https://xwmx.github.io/nb)
-- [ ] Option (breaking): use flag `--archivebox` to add urls to [archivebox](https://github.com/ArchiveBox/ArchiveBox)
-- [ ] Option (breaking): use flag `--monolith` to add urls to [monolith](https://github.com/Y2Z/monolith)
-- [ ] Option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
-  - https://www.ii.com/links-footnotes-markdown/
-- [ ] Option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Option (processing): `--json` to output a `json` object / file.
-  - This can be added easily using the `jc` tool as a dependency.
+  - This can be added using the `jc` tool as a dependency.
     - https://github.com/kellyjonbrazil/jc
     - See other `jc` parsers that could be useful (specifically `url`)
-- [ ] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
-      html to some other format.
-- [ ] Option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
+- [ ] Discard all non-url content when using options `--stdin`.
+  - Match and output urls only, discard any other sort of formatting.
+
+## Version 3 (Non-shell based)
+
+> Updating for version 2 made me realize why bash is not usable for larger scripts. Version 3 of this script will use a different programming language to accommodate more complex features. Completion date: TBD.
+
+- [ ] Update all processing options to use language-native tooling, removing shell tools.
+- [ ] Rewrite script option parsing logic.
+- [ ] Preserve all Version 2 options and features (color output, logging, tests).
+- [ ] Add option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
   - `--merge` should work with all? options: `lnks <query> --merge --select --markdown`
-- [ ] Option (runtime): `--select` to select one or more urls via `fzf`.
-  - Use `$FZF_DEFAULT_OPTS='--multi ...'`, or pass flag to `fzf`. Use `tab` to select urls.
 - [ ] Runtime options can be created to toggle tool options or swap tools
   - `--verbose` to show `curl` progress
   - `--wget` to use `wget` instead of `curl` (default)
   - etc...
-- [ ] Discard all non-url content when using options `--stdin`.
-  - Match and output urls only, discard any other sort of formatting.
+- [ ] Add option (runtime): `--select` to select one or more urls via `fzf`.
+  - Use `$FZF_DEFAULT_OPTS='--multi ...'`, or pass flag to `fzf`. Use `tab` to select urls.
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
-- [ ] Consider adding Raindrop.io action (default posture: no).
-  - Also add as option in `lnks.rc` config file.
 
 ## Complete
 
@@ -87,3 +86,15 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - There are better ways to save / archive web pages.
   - Eventually `lnks` will hand off urls / webpages to `--pandoc` (via `curl`)
     - Possibly also tools like ArchiveBox and `nb` (see "Future" section above)
+- [x] Consider adding Raindrop.io action (default posture: no).
+  - No, do not add an external (Web/API-based) service to `lnks`.
+  - Also add as option in `lnks.rc` config file.
+- [x] Option (breaking): use flag `--nb` to add urls to [nb](https://xwmx.github.io/nb)
+  - No.
+- [x] Option (breaking): use flag `--archivebox` to add urls to [archivebox](https://github.com/ArchiveBox/ArchiveBox)
+  - No.
+- [x] Option (breaking): use flag `--monolith` to add urls to [monolith](https://github.com/Y2Z/monolith)
+  - No.
+- [x] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
+      html to some other format.
+  - No.

@@ -5,14 +5,14 @@ List / Save / Instapaper your Google Chrome links from the terminal (on OS X/Mac
 ## Installation
 Clone
 
-```
+```command
 $ git clone https://github.com/unforswearing/lnks.git .
 $ cd lnks && bash lnks -h
 ```
 
 Or with `npm`
 
-```
+```command
 $ npm install -g lnks
 ```
 
@@ -20,7 +20,7 @@ $ npm install -g lnks
 
 ## Usage
 
-```
+```txt
  lnks <option> <search term>
 
  Options:
@@ -48,18 +48,26 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 - Pinboard access requires your **API token**
   - This can be found at [https://pinboard.in/settings/password](https://pinboard.in/settings/password).
 
-
 <br><br>
 
 ## Dependencies
-**Required**
-- Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
-**Optional**
-- HTML-XML-utils: [https://www.w3.org/Tools/HTML-XML-utils/README](https://www.w3.org/Tools/HTML-XML-utils/README)
-  - to get page titles from processed urls, used with `--markdown` and `--pinboard` options.
-- PDF creation (`lnks --pdf`)
-  - `wkhtmltopdf` is required to save the url/webpage as a pdf.
-  - Visit [http://wkhtmltopdf.org/downloads.html](http://wkhtmltopdf.org/downloads.html).
+- **Required**
+  - Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
+
+- **Optional**
+  - HTML-XML-utils: [https://www.w3.org/Tools/HTML-XML-utils/README](https://www.w3.org/Tools/HTML-XML-utils/README)
+    - to get page titles from processed urls, used with `--markdown` and `--pinboard` options.
+  - PDF creation (`lnks --pdf`)
+    - `wkhtmltopdf` is required to save the url/webpage as a pdf.
+    - Visit [http://wkhtmltopdf.org/downloads.html](http://wkhtmltopdf.org/downloads.html).
+
 <br><br>
 
+## To Do / Roadmap
+
+As of march 2025 `lnks` is currently being rewritting for version 2. These updates will allow lnks to operate as a "url triage" tool that can help you move urls from Chrome / Safari to other command line tools or output urls in various formats.
+
+Version 2 of `lnks` will be a stripped-down iteration of the script that removes redundant options (`--copy`, `--save`) and external (web/API-based) services (`--instapaper`, `--pinboard`). The `--pdf` option was also removed as `wkhtmltopdf` is currently unmaintained, and `lnks` is best at reformatting urls not pdf generation.
+
+Please see [todo.md](todo.md) for a full list of changes for version 2, and a list of features for version 3.
