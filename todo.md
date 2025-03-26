@@ -6,18 +6,28 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 ## To Do (Version 2 - Rewrite)
 
-- [ ] Option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
-  - https://www.ii.com/links-footnotes-markdown/
-- [ ] Option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
-- [ ] Consider creating output formats that can be piped to `jc`
-  - https://github.com/kellyjonbrazil/jc
-  - See other `jc` parsers that could be useful (specifically `url`) 
-- [ ] Test the following:
-  - New options: `--reference`, `--wiki`, etc
-  - `--safari` (with all processing options)
+> The basic `lnks 2.0` will be published pending the following updates:
+
+- [ ] Additional testing for all options, especially runtime options.
+- [ ] Attempt to create tests for internal functions
 - [ ] Revise / update the project `readme.md`
   - Update header line to read "Triage your Google Chrome / Safari links on MacOS".
+  - Revise installation, usage description, options explanation, etc.
 - [ ] Publish a new `npm` version if possible.
+
+### Future Version 2 Updates
+
+- [ ] Add option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
+  - https://www.ii.com/links-footnotes-markdown/
+- [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
+- [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
+- [ ] Add option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
+  - `--merge` should work with all? options: `lnks <query> --merge --select --markdown`
+- [ ] Runtime options can be created to toggle tool options or swap tools
+  - `--verbose` to show `curl` progress
+  - `--wget` to use `wget` instead of `curl` (default)
+  - etc...
+- [ ] Test all new options.
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
 
@@ -28,17 +38,13 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Update all processing options to use language-native tooling, removing shell tools.
 - [ ] Rewrite script option parsing logic.
 - [ ] Preserve all Version 2 options and features (color output, logging, tests).
-- [ ] Add option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
-  - `--merge` should work with all? options: `lnks <query> --merge --select --markdown`
-- [ ] Runtime options can be created to toggle tool options or swap tools
-  - `--verbose` to show `curl` progress
-  - `--wget` to use `wget` instead of `curl` (default)
-  - etc...
-- [ ] Option (processing): `--json` to output a `json` object / file.
-- [ ] Add option (runtime): `--select` to select one or more urls via `fzf`.
-  - Use `$FZF_DEFAULT_OPTS='--multi ...'`, or pass flag to `fzf`. Use `tab` to select urls.
+- [ ] Add option (processing): `--json` to output a `json` object / file.
+- [ ] Add option (runtime): `--md-image` and `--html-image` to detect image file extensions and generate markdown or html formatted image src blocks using the image urls.
+- [ ] Interact with Chrome and Safari bookmarks (via the bookmarks `json` file)
+  - `/Users/$USER/Library/Application Support/Google/Chrome/Default/Bookmarks`
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
+  - Could implement `--input-plugin` and `--output-plugin` to connect to services that provide urls for `lnks` input, or accept urls from `lnks` output.
 
 ## Complete
 
@@ -48,9 +54,11 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - Added debugging and error checking (both with colorized output)
 - [x] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
   - Process urls from `stdin` using another lnks option.
+- [x] REMOVED: `--copy` is not a useful option. Use `lnks <query> --markdown | pbcopy` instead.
+- [x] REMOVED: `--save` is not a useful option. Use `lnks <query> --markdown > urls.md` instead.
 - [x] REMOVED: `--read` is redundant with `--stdin`, but more complicated to implement
   - Do `cat urls.txt | lnks <query> --stdin` instead.
-  - Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>/
+  - Note: too complex for a `bash` script: Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>
     - Process urls from `<urls.txt>` using another lnks option.
 - [x] Change default config location to use `~/.config/lnks`.
   - Filename `lnks.rc`, format will be plain `shell`.
@@ -98,3 +106,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [x] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
       html to some other format.
   - No.
+- [x] Consider creating output formats that can be piped to `jc`
+  - Nothing to add to `lnks` at this time.
+  - https://github.com/kellyjonbrazil/jc
+  - See other `jc` parsers that could be useful (specifically `url`)
