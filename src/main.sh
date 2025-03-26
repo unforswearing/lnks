@@ -294,7 +294,7 @@ for argument in "${args[@]}"; do
     ;;
   --copy | --save)
     debug "${LINENO}" "redundant option selected: '$argument'."
-    _util.color blue "Option '$argument' has been removed from 'lnks'."
+    echo "Option '$argument' has been removed from 'lnks'."
     echo "Use a redirect to perform --save actions, eg:"
     echo "  'lnks <query> --markdown > file.md'"
     echo
@@ -306,7 +306,7 @@ for argument in "${args[@]}"; do
     ;;
   --instapaper | --pdf | --pinboard)
     debug "${LINENO}" "old option selected: '$argument'."
-    _util.color blue "Option '$argument' has been removed from 'lnks'."
+    echo "Option '$argument' has been removed from 'lnks'."
     echo "Use 'lnks --help' to view the full help document"
     exit
     ;;

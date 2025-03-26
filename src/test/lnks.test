@@ -92,9 +92,13 @@ $ src/main.sh example --csv
 ^.*,"Example Domain",https\:\/\/www.example.com\//
 >=0
 
-# 7. Test that --stdin does not print anything when used alone.
+# 7. Test that unknown options are caught futher in the script.
 
-# $ src/main.sh example --stdin
+$ src/main.sh example --print --fake-option
+Usage: lnks [query] <options...>
+Use 'lnks --help' to view the full help document
+>2 /Unknown argument: '--fake-option'/
+>=!0
 
 # 8. Test that the --markdown option works with --stdin
 
@@ -117,8 +121,71 @@ $ echo "https://www.example.com" | src/main.sh example --stdin --csv
 ^.*,"Example Domain",https\:\/\/www.example.com/
 >=0
 
-# 11. Test that the --safari option works to use Safari instead of Chrome
+# 11. Test that the --safari option works to use Safari instead of Chrome with the --print option
 
 $ open -a Safari "https://www.example.com"; src/main.sh example --safari --print
 https://www.example.com/
 >=0
+
+# 12. Test that the --safari option works to use Safari instead of Chrome with the --markdown option
+
+$ src/main.sh example --safari --markdown
+[Example Domain](https://www.example.com/)
+>=0
+
+# 13. est that the --safari option works to use Safari instead of Chrome with the --html option
+
+$ echo "https://www.example.com" | src/main.sh example --stdin --html
+> /.ul.
+  .li..a href="https...www.example.com".Example Domain..a...li.
+..ul./
+>=0
+
+# 14. Test that the --safari option works to use Safari instead of Chrome with the --csv option
+
+$ echo "https://www.example.com" | src/main.sh example --stdin --csv
+> /date,title,url
+^.*,"Example Domain",https\:\/\/www.example.com/
+>=0
+
+# 15. Test that the removed --copy option prints a specific usage message.
+
+$ src/main.sh example --copy
+> /Option '--copy' has been removed from 'lnks'.*/
+>=0
+
+# 16. Test that the removed --save option prints a specific usage message.
+
+$ src/main.sh example --save
+> /Option '--save' has been removed from 'lnks'.*/
+>=0
+
+# 17. Test that the removed --pdf option prints a specific usage message.
+
+$ src/main.sh example --pdf
+> /Option '--pdf' has been removed from 'lnks'.*/
+>=0
+
+# 18. Test that the removed --instapaper option prints a specific usage message.
+
+$ src/main.sh example --instapaper
+> /Option '--instapaper' has been removed from 'lnks'.*/
+>=0
+
+# 19. Test that the removed --pinboard option prints a specific usage message.
+
+$ src/main.sh example --pinboard
+> /Option '--pinboard' has been removed from 'lnks'.*/
+>=0
+
+# 20. Test that lnks prints a message when no urls matching query are found.
+
+$ src/main.sh yyy-example-zzz --print
+No match for 'yyy-example-zzz' in chrome Urls.
+>=0
+
+# 21. Test that lnks prints a message when no urls matching query are found in Safari.
+
+# $ src/main.sh yyy-example-zzz --safari --print
+# No match for 'yyy-example-zzz' in safari Urls.
+# >=0
