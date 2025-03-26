@@ -299,7 +299,7 @@ for argument in "${args[@]}"; do
     echo "  'lnks <query> --markdown > file.md'"
     echo
     echo "Pipe to 'pbpaste' to perform --copy actions, eg:"
-    echo "  'lnks <query> --print | pbcopy"
+    echo "  'lnks <query> --print | pbcopy'"
     echo
     echo "Use 'lnks --help' to view the full help document"
     exit
