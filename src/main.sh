@@ -297,15 +297,15 @@ for argument in "${args[@]}"; do
   case "$argument" in
   --help | --print)
     has_flag_breaking=true
-    debug "${LINENO}" "has flag: breaking."
+    debug "${LINENO}" "has flag: breaking. $has_flag_breaking"
     ;;
   --safari | --stdin | --save)
     has_flag_runtime=true
-    debug "${LINENO}" "has flag: runtime."
+    debug "${LINENO}" "has flag: runtime. $has_flag_runtime"
     ;;
   --markdown | --html | --csv)
     has_flag_processing=true
-    debug "${LINENO}" "has flag: processing."
+    debug "${LINENO}" "has flag: processing. $has_flag_processing"
     ;;
   --copy | --instapaper | --pdf | --pinboard)
     debug "${LINENO}" "old option selected: '$argument'."

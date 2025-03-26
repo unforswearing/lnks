@@ -13,7 +13,8 @@ debug() {
     ts="$(date +'%Y-%m-%d %H:%M:%S')"
     echo "DEBUG: ${ts} [line $lineno]"
     echo -en ":: ${blue}$*${reset} "
-    echo; echo;
+    echo
+    echo
   }
 }
 #

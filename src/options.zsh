@@ -45,26 +45,26 @@ has_flag_processing=false
 
 for argument in "${args[@]}"; do
   case "$argument" in
-    --help|--print)
-      has_flag_breaking=true
-      debug "${LINENO}" "has flag: breaking."
+  --help | --print)
+    has_flag_breaking=true
+    debug "${LINENO}" "has flag: breaking. $has_flag_breaking"
     ;;
-    --safari|--stdin|--save)
-      has_flag_runtime=true
-      debug "${LINENO}" "has flag: runtime."
+  --safari | --stdin | --save)
+    has_flag_runtime=true
+    debug "${LINENO}" "has flag: runtime. $has_flag_runtime"
     ;;
-    --markdown|--html|--csv)
-      has_flag_processing=true
-      debug "${LINENO}" "has flag: processing."
+  --markdown | --html | --csv)
+    has_flag_processing=true
+    debug "${LINENO}" "has flag: processing. $has_flag_processing"
     ;;
-    --copy|--instapaper|--pdf|--pinboard)
-      debug "${LINENO}" "old option selected: '$argument'."
-      _util.color blue "Option '$argument' has been removed from 'lnks'."
+  --copy | --instapaper | --pdf | --pinboard)
+    debug "${LINENO}" "old option selected: '$argument'."
+    _util.color blue "Option '$argument' has been removed from 'lnks'."
     ;;
-    *)
-      _util.color red "Unknown argument: '$argument'"
-      echo "Usage: lnks [query] <options...>"
-      echo "Use 'lnks --help' to view the full help document"
+  *)
+    _util.color red "Unknown argument: '$argument'"
+    echo "Usage: lnks [query] <options...>"
+    echo "Use 'lnks --help' to view the full help document"
     ;;
   esac
 done
@@ -166,14 +166,14 @@ for processing_opt in "${args[@]}"; do
   elif [[ $processing_opt == "--save" ]]; then
     plain_urls="$(pull_and_query_urls)"
     if [[ "$flag_save" == true ]] && [[ ! $has_flag_processing == true ]]; then
-       echo "$plain_urls" > "$output_filename"
-       _util.color green "Url saved to $output_filename."
+      echo "$plain_urls" >"$output_filename"
+      _util.color green "Url saved to $output_filename."
     else
       echo "$md_urls"
     fi
   elif [[ $processing_opt == "--print" ]]; then
     # if [[ ${has_flag_breaking} ]]; then
-      pull_and_query_urls
+    pull_and_query_urls
     # fi
   fi
 done
