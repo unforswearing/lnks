@@ -66,7 +66,7 @@ If you choose the Instapaper or Pinboard options, `lnks` will ask for informatio
 
 ## To Do / Roadmap
 
-As of march 2025 `lnks` is currently being rewritting for version 2. These updates will allow lnks to operate as a "url triage" tool that can help you move urls from Chrome / Safari to other command line tools or output urls in various formats.
+As of march 2025 `lnks` is currently being rewritten for version 2. These updates will allow lnks to operate as a "url triage" tool that can help you move urls from Chrome / Safari to other command line tools or output urls in various formats.
 
 Version 2 of `lnks` will be a stripped-down iteration of the script that removes redundant options (`--copy`, `--save`) and external (web/API-based) services (`--instapaper`, `--pinboard`). The `--pdf` option was also removed as `wkhtmltopdf` is currently unmaintained, and `lnks` is best at reformatting urls not pdf generation.
 
