@@ -7,7 +7,7 @@
 #
 args=("${@}")
 
-# ::~ File: "src/debug.zsh"
+# ::~ File: "src/debug.sh"
 #
 debug_flag=
 # debug "${LINENO}" "we debuggin"
@@ -28,7 +28,7 @@ debug() {
 #
 # ::~ EndFile
 
-# ::~ File: "src/help.zsh"
+# ::~ File: "src/help.sh"
 #
 function help() {
   cat <<EOT
@@ -97,7 +97,7 @@ EOT
 #
 # ::~ EndFile
 
-# ::~ File: "src/initialize.zsh"
+# ::~ File: "src/initialize.sh"
 #
 configuration_base_path="$HOME/.config/lnks"
 configuration_rc_path="$HOME/.config/lnks/lnks.rc"
@@ -123,7 +123,7 @@ fi
 #
 # ::~ EndFile
 
-# ::~ File: "src/util.zsh"
+# ::~ File: "src/util.sh"
 #
 function _util.color() {
   local red="\033[31m"
@@ -151,7 +151,7 @@ function _util.get_config_item() {
 #
 # ::~ EndFile
 
-# ::~ File: "src/configuration.zsh"
+# ::~ File: "src/configuration.sh"
 #
 # After config is initialized, set some variables:
 # config_default_action="$(_util.get_config_item default_action)"
@@ -162,7 +162,7 @@ test -z "${browser_application+x}" && browser_application="Google Chrome"
 #
 # ::~ EndFile
 
-# ::~ File: "src/lib.zsh"
+# ::~ File: "src/lib.sh"
 #
 function pull_browser_application_urls() {
   local browser="${1}"
@@ -197,7 +197,7 @@ function query_url_title() {
       sed 's/^.*<title>//g;s/<\/title>.*$//g'
   )"
   if [[ -z ${url_title+x} ]]; then
-    _util.color red "Unable to retrieve url title."
+    >&2 _util.color red "Unable to retrieve url title."
     exit 1
   fi
   echo "${url_title}"
@@ -248,7 +248,7 @@ EOT
 #
 # ::~ EndFile
 
-# ::~ File: "src/options.zsh"
+# ::~ File: "src/options.sh"
 #
 debug "${LINENO}" "args: ${args[*]}"
 debug "${LINENO}" "user query: ${user_query}"
@@ -321,7 +321,7 @@ for argument in "${args[@]}"; do
     _util.color blue "Option '$argument' has been removed from 'lnks'."
     ;;
   *)
-    _util.color red "Unknown argument: '$argument'"
+    >&2 _util.color red "Unknown argument: '$argument'"
     echo "Usage: lnks [query] <options...>"
     echo "Use 'lnks --help' to view the full help document"
     exit 1
