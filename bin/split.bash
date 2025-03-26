@@ -21,5 +21,5 @@ for sourcefile in "${source[@]}"; do
     printf '%s\n' "#!/bin/bash"
     printf '%s\n' "${section_content}"
   } > "src/${sourcefile}"
-  sleep 1
+  sleep 0.2
 done

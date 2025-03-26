@@ -1,7 +1,10 @@
 #!/bin/bash
-# ref: zsh 5.9 (x86_64-apple-darwin24.0)
-# this script uses the `sh` extension but aims to be compatible with
-# zsh and GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
+# This script uses the `sh` extension but aims to be compatible with zsh and bash:
+#   - zsh 5.9 (x86_64-apple-darwin24.0)
+#   - GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
+#
+# Tested using interactive zsh and bash, and this script has no shellcheck errors.
+#
 args=("${@}")
 
 # ::~ File: "src/debug.zsh"
@@ -18,7 +21,8 @@ debug() {
     ts="$(date +'%Y-%m-%d %H:%M:%S')"
     echo "DEBUG: ${ts} [line $lineno]"
     echo -en ":: ${blue}$*${reset} "
-    echo; echo;
+    echo
+    echo
   }
 }
 #
@@ -176,7 +180,7 @@ function query_urls() {
   awk "/${user_query}/"
 }
 function pull_and_query_urls() {
-  { pull_browser_application_urls "$browser_application" & }|
+  pull_browser_application_urls "$browser_application" |
     format_urls |
     query_urls
 }
@@ -291,26 +295,26 @@ has_flag_processing=false
 
 for argument in "${args[@]}"; do
   case "$argument" in
-    --help|--print)
-      has_flag_breaking=true
-      debug "${LINENO}" "has flag: breaking."
+  --help | --print)
+    has_flag_breaking=true
+    debug "${LINENO}" "has flag: breaking."
     ;;
-    --safari|--stdin|--save)
-      has_flag_runtime=true
-      debug "${LINENO}" "has flag: runtime."
+  --safari | --stdin | --save)
+    has_flag_runtime=true
+    debug "${LINENO}" "has flag: runtime."
     ;;
-    --markdown|--html|--csv)
-      has_flag_processing=true
-      debug "${LINENO}" "has flag: processing."
+  --markdown | --html | --csv)
+    has_flag_processing=true
+    debug "${LINENO}" "has flag: processing."
     ;;
-    --copy|--instapaper|--pdf|--pinboard)
-      debug "${LINENO}" "old option selected: '$argument'."
-      _util.color blue "Option '$argument' has been removed from 'lnks'."
+  --copy | --instapaper | --pdf | --pinboard)
+    debug "${LINENO}" "old option selected: '$argument'."
+    _util.color blue "Option '$argument' has been removed from 'lnks'."
     ;;
-    *)
-      _util.color red "Unknown argument: '$argument'"
-      echo "Usage: lnks [query] <options...>"
-      echo "Use 'lnks --help' to view the full help document"
+  *)
+    _util.color red "Unknown argument: '$argument'"
+    echo "Usage: lnks [query] <options...>"
+    echo "Use 'lnks --help' to view the full help document"
     ;;
   esac
 done
@@ -321,26 +325,24 @@ done
 # addtional options from being parsed. This avoids (subjectively)
 # random combination of options like `lnks --print --copy --html --stdin`
 #
-if [[ $has_flag_breaking == true ]]; then
-  for breaking_opt in "${args[@]}"; do
-    # lnks --help
-    if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
-      help
-      exit
-    # lnks <query> with no other arguments acts as an alias for --print
-    # the --print option is kept to mitigate surprise behavior and
-    # provide an explicit way to handle this task.
-    #
-    # lnks <query>
-    # lnks <query> --print
-    elif [[ $breaking_opt == "--print" ]]; then
-      #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
-      if [[ -z ${flag_stdin+x} ]]; then
-        pull_and_query_urls
-      fi
+for breaking_opt in "${args[@]}"; do
+  # lnks --help
+  if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
+    help
+    exit
+  # lnks <query> with no other arguments acts as an alias for --print
+  # the --print option is kept to mitigate surprise behavior and
+  # provide an explicit way to handle this task.
+  #
+  # lnks <query>
+  # lnks <query> --print
+  elif [[ $breaking_opt == "--print" ]]; then
+    #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
+    if [[ -z ${flag_stdin+x} ]]; then
+      pull_and_query_urls
     fi
-  done
-fi
+  fi
+done
 # ------------------------------------
 # 4. Runtime flags - options that affect processing.
 # --safari, --stdin, and --save are higher-prescedence
@@ -414,14 +416,14 @@ for processing_opt in "${args[@]}"; do
   elif [[ $processing_opt == "--save" ]]; then
     plain_urls="$(pull_and_query_urls)"
     if [[ "$flag_save" == true ]] && [[ ! $has_flag_processing == true ]]; then
-       echo "$plain_urls" > "$output_filename"
-       _util.color green "Url saved to $output_filename."
+      echo "$plain_urls" >"$output_filename"
+      _util.color green "Url saved to $output_filename."
     else
       echo "$md_urls"
     fi
   elif [[ $processing_opt == "--print" ]]; then
     # if [[ ${has_flag_breaking} ]]; then
-      pull_and_query_urls
+    pull_and_query_urls
     # fi
   fi
 done

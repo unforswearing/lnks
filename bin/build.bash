@@ -1,12 +1,8 @@
 #!/bin/bash
-#!/bin/zsh
-# ref: zsh 5.9 (x86_64-apple-darwin24.0)
-readonly _lnks_src_dir="./src"
-declare -a source=(
-  "/util.zsh"
-  "/main.zsh"
-  "/initialize.zsh"
-)
-for sourcefile in "${source[@]}"; do
-  cat "${_lnks_src_dir}${sourcefile}" >> "./lnks.bash"
-done
+
+shfmt -i 2 src/main.sh > /tmp/links.main.sh.sc
+cat /tmp/links.main.sh.sc > src/main.sh
+#
+# \shellcheck src/main.sh || exit 1
+#
+# shc -f src/main.sh -o src/lnks
