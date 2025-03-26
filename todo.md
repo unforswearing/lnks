@@ -9,6 +9,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [x] Set up some sort of tests.
   - [ ] Start by testing "Runtime" options: `--safari`, `--save`, and `--stdin`
 - [ ] Revise / update the project `readme.md`
+  - Update header line to read "Triage your Google Chrome / Safari links on MacOS".
+- [ ] Publish a new `npm` version if possible.
 
 ## Future (version 3?)
 
@@ -27,6 +29,9 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
       html to some other format.
 - [ ] Option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
+  - `--merge` should work with all? options: `lnks <query> --merge --select --markdown`
+- [ ] Option (runtime): `--select` to select one or more urls via `fzf`.
+  - Use `$FZF_DEFAULT_OPTS='--multi ...'`, or pass flag to `fzf`. Use `tab` to select urls.
 - [ ] Runtime options can be created to toggle tool options or swap tools
   - `--verbose` to show `curl` progress
   - `--wget` to use `wget` instead of `curl` (default)
