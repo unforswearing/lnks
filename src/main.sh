@@ -73,8 +73,6 @@ Examples
 
   Processing options:
 
-  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
-
   lnks [query] --markdown
   lnks [query] --markdown --save [query.md]
 
@@ -83,6 +81,8 @@ Examples
 
   lnks [query] --csv
   lnks [query] --csv --save [query.csv]
+
+  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
 
 Bugs
   --stdin followed by --print will produce inaccurate results.
