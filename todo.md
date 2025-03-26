@@ -9,18 +9,15 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
   - https://www.ii.com/links-footnotes-markdown/
 - [ ] Option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
-- [x] Set up some sort of tests.
-  - [ ] Start by testing "Runtime" options: `--safari`, `--save`, and `--stdin`
+- [ ] Consider creating output formats that can be piped to `jc`
+  - https://github.com/kellyjonbrazil/jc
+  - See other `jc` parsers that could be useful (specifically `url`) 
+- [ ] Test the following:
+  - New options: `--reference`, `--wiki`, etc
+  - `--safari` (with all processing options)
 - [ ] Revise / update the project `readme.md`
   - Update header line to read "Triage your Google Chrome / Safari links on MacOS".
 - [ ] Publish a new `npm` version if possible.
-
-## Future (Version 2 - Features)
-
-- [ ] Option (processing): `--json` to output a `json` object / file.
-  - This can be added using the `jc` tool as a dependency.
-    - https://github.com/kellyjonbrazil/jc
-    - See other `jc` parsers that could be useful (specifically `url`)
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
 
@@ -37,6 +34,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - `--verbose` to show `curl` progress
   - `--wget` to use `wget` instead of `curl` (default)
   - etc...
+- [ ] Option (processing): `--json` to output a `json` object / file.
 - [ ] Add option (runtime): `--select` to select one or more urls via `fzf`.
   - Use `$FZF_DEFAULT_OPTS='--multi ...'`, or pass flag to `fzf`. Use `tab` to select urls.
 - [ ] Consider adding an extension system, via `--plugin` flag.
@@ -44,6 +42,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 ## Complete
 
+- [x] Set up some sort of tests.
+  - `bin/build.sh` uses `shellcheck` and `shelltest` for testing. More tests to be added.
 - [x] Add a touch of *class* (colorized output, robust error checking, maybe logging).
   - Added debugging and error checking (both with colorized output)
 - [x] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
