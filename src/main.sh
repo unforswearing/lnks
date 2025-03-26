@@ -36,7 +36,7 @@ lnks - help
 
 Quickly search your Google Chrome or Safari tabs for matching urls and process the results.
 
-Usage: lnks [query] <options> < --save [output file] >
+Usage: lnks [query] <options>
 
 Options
   -h, --help      prints this help message
@@ -46,7 +46,6 @@ Options
   --markdown      print markdown formattined urls to stdout
   --html          print html formatted list of urls to stdout
   --csv           print csv formatted urls to stdout
-  --save [FILE]   saves plaintext or processed urls to a file
 
 Examples
   Print urls matching <query> from Google Chrome:
@@ -54,17 +53,12 @@ Examples
   lnks [query]
   lnks [query] --print
 
-  Save urls matching <query> to a file:
-
-  lnks [query] --save [query.txt]
-
   Use Safari instead of Google Chrome:
 
   If the '--safari' flag follows query, search Safari URLs instead of Chrome.
   This option can be set permanently in settings.
 
   lnks [query] --safari --csv
-  lnks [query] --safari --csv --save query.csv
 
   Read urls from files or other commands:
 
@@ -74,15 +68,10 @@ Examples
   Processing options:
 
   lnks [query] --markdown
-  lnks [query] --markdown --save [query.md]
-
   lnks [query] --html
-  lnks [query] --html --save [query.html]
-
   lnks [query] --csv
-  lnks [query] --csv --save [query.csv]
 
-  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
+  lnks [query] --stdin [ --markdown | --html | --csv ]
 
 Bugs
   --stdin followed by --print will produce inaccurate results.
@@ -107,7 +96,6 @@ function initialize_lnks_configuration() {
     {
       echo "default_browser=chrome"
       echo "default_action="
-      echo "save_format=text"
     } >"$configuration_rc_path"
     echo "lnks config file created at $configuration_rc_path"
   }
@@ -157,7 +145,6 @@ function _util.get_config_item() {
 debug "${LINENO}" "Attempting to create variables from lnks configuration file"
 # After config is initialized, set some variables:
 # config_default_action="$(_util.get_config_item default_action)"
-# config_save_format="$(_util.get_config_item save_format)"
 config_browser="$(_util.get_config_item default_browser)"
 browser_application="$config_browser"
 test -z "${browser_application+x}" && browser_application="Google Chrome"
@@ -264,9 +251,7 @@ debug "${LINENO}" "found urls: $(countof_urls)"
 # TODO: can i move this section to "argument parsing", lower in the script?
 # the first argument to lnks will always be the user query.
 
-flag_save=
 flag_stdin=
-output_filename=
 
 has_flag_breaking=false
 has_flag_runtime=false
@@ -299,7 +284,7 @@ for argument in "${args[@]}"; do
     has_flag_breaking=true
     debug "${LINENO}" "has flag: breaking. $has_flag_breaking"
     ;;
-  --safari | --stdin | --save)
+  --safari | --stdin)
     has_flag_runtime=true
     debug "${LINENO}" "has flag: runtime. $has_flag_runtime"
     ;;
@@ -358,10 +343,9 @@ for breaking_opt in "${args[@]}"; do
 done
 # ------------------------------------
 # 4. Runtime flags - options that affect processing.
-# --safari, --stdin, and --save are higher-prescedence
+# --safari and --stdin are higher-prescedence
 # actions / options. they are also the only actions / options that
 # do not break the ${args[@]} loop.
-# Option --save works with any other flag listed here.
 # All other flags are mutually exclusive and cannot be combined
 #
 for runtime_opt in "${args[@]}"; do
@@ -383,14 +367,6 @@ for runtime_opt in "${args[@]}"; do
       echo -en "${stdin}"
     }
     flag_stdin=true
-  # lnks <query> --save filename.txt
-  elif [[ "$runtime_opt" == "--save" ]]; then
-    # --save must always be the second to last argument
-    # followed by output_file as the last argument
-    # TODO: would prefer to explicitly step through the array
-    # rather than use this incantation.
-    output_filename="${args[$((${#args[@]} - 1))]}"
-    flag_save=true
   fi
 done
 # 5. Processing flags - options that convert links to various
@@ -398,48 +374,23 @@ done
 for processing_opt in "${args[@]}"; do
   # ------------------------------------
   # lnks <query> --markdown
-  # lnks <query> --markdown --save filename.md
   if [[ "$processing_opt" == "--markdown" ]]; then
     md_urls="$(
       pull_and_query_urls | create_markdown_urls
     )"
-    if [[ "$flag_save" == true ]]; then
-      echo "$md_urls" >"$output_filename"
-    else
-      echo "$md_urls"
-    fi
+    echo "$md_urls"
   # lnks <query> --html
-  # lnks <query> --html --save filename.html
   elif [[ "$processing_opt" == "--html" ]]; then
     html_urls="$(
       pull_and_query_urls | create_html_urls
     )"
-    if [[ "$flag_save" == true ]]; then
-      echo "$html_urls" >"$output_filename"
-      _util.color green "Url saved to $output_filename."
-    else
-      echo "$html_urls"
-    fi
+    echo "$html_urls"
   # lnks <query> --csv
-  # lnks <query> --csv --save filename.csv
   elif [[ "$processing_opt" == "--csv" ]]; then
     csv_urls="$(
       pull_and_query_urls | create_csv_urls
     )"
-    if [[ "$flag_save" == true ]]; then
-      echo "$csv_urls" >"$output_filename"
-      _util.color green "Url saved to $output_filename."
-    else
-      echo "$csv_urls"
-    fi
-  elif [[ "$processing_opt" == "--save" ]]; then
-    plain_urls="$(pull_and_query_urls)"
-    if [[ "$flag_save" == true ]] && [[ "$has_flag_processing" == false ]]; then
-      echo "$plain_urls" >"$output_filename"
-      _util.color green "Url saved to $output_filename."
-    else
-      echo "$md_urls"
-    fi
+    echo "$csv_urls"
   elif [[ "$processing_opt" == "--print" ]]; then
     # if [[ ${has_flag_breaking} ]]; then
     pull_and_query_urls

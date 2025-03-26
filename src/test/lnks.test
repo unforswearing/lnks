@@ -10,7 +10,7 @@ lnks - help
 
 Quickly search your Google Chrome or Safari tabs for matching urls and process the results.
 
-Usage: lnks [query] <options> < --save [output file] >
+Usage: lnks [query] <options>
 
 Options
   -h, --help      prints this help message
@@ -20,7 +20,6 @@ Options
   --markdown      print markdown formattined urls to stdout
   --html          print html formatted list of urls to stdout
   --csv           print csv formatted urls to stdout
-  --save [FILE]   saves plaintext or processed urls to a file
 
 Examples
   Print urls matching <query> from Google Chrome:
@@ -28,17 +27,12 @@ Examples
   lnks [query]
   lnks [query] --print
 
-  Save urls matching <query> to a file:
-
-  lnks [query] --save [query.txt]
-
   Use Safari instead of Google Chrome:
 
   If the '--safari' flag follows query, search Safari URLs instead of Chrome.
   This option can be set permanently in settings.
 
   lnks [query] --safari --csv
-  lnks [query] --safari --csv --save query.csv
 
   Read urls from files or other commands:
 
@@ -47,16 +41,11 @@ Examples
 
   Processing options:
 
-  lnks [query] --stdin [ --markdown | --html | --csv ] --save [query.ext]
-
   lnks [query] --markdown
-  lnks [query] --markdown --save [query.md]
-
   lnks [query] --html
-  lnks [query] --html --save [query.html]
-
   lnks [query] --csv
-  lnks [query] --csv --save [query.csv]
+
+  lnks [query] --stdin [ --markdown | --html | --csv ]
 
 Bugs
   --stdin followed by --print will produce inaccurate results.
@@ -66,6 +55,7 @@ Source
 
 Author
   unforswearing <https://github.com/unforswearing>
+>=0
 
 # 2. Test that unknown options are properly handled.
 
