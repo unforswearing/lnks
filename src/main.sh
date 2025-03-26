@@ -434,7 +434,7 @@ for processing_opt in "${args[@]}"; do
     fi
   elif [[ $processing_opt == "--save" ]]; then
     plain_urls="$(pull_and_query_urls)"
-    if [[ "$flag_save" == true ]] && [[ ! $has_flag_processing == true ]]; then
+    if [[ "$flag_save" == true ]] && [[ $has_flag_processing == false ]]; then
       echo "$plain_urls" >"$output_filename"
       _util.color green "Url saved to $output_filename."
     else
