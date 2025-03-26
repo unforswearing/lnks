@@ -2,13 +2,10 @@
 # ref: zsh 5.9 (x86_64-apple-darwin24.0)
 # this script uses the `sh` extension but aims to be compatible with
 # zsh and GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
-
-# TODO: Errors / Logging
-# TODO: should any default MacOS tools be 'require'd here?
-# _util.require
-
 args=("${@}")
 
+# ::~ File: "src/debug.zsh"
+#
 debug_flag=
 # debug "${LINENO}" "we debuggin"
 debug() {
@@ -24,6 +21,9 @@ debug() {
     echo; echo;
   }
 }
+#
+# ::~ EndFile
+
 # ::~ File: "src/help.zsh"
 #
 function help() {
@@ -106,9 +106,6 @@ function initialize_lnks_configuration() {
     echo "lnks config file created at $configuration_rc_path"
   }
 }
-#
-# ::~ EndFile
-
 # TODO: use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
 lnks_configuration="$configuration_rc_path"
@@ -117,20 +114,8 @@ if [[ ! -f "$lnks_configuration" ]]; then
   # create configuration files
   initialize_lnks_configuration
 fi
-
-# TODO: can i move this section to "argument parsing", lower in the script?
-# the first argument to lnks will always be the user query.
-user_query="${1}"
-if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
-  debug "${LINENO}" "No query passed to script."
-  echo "No query was passed to lnks."
-  echo "Usage: lnks [query] <options...>"
-  echo "Use 'lnks --help' to view the full help document"
-  exit
-else
-  # shift the args array to remove user_query item
-  args=("${args[@]:1}")
-fi
+#
+# ::~ EndFile
 
 # ::~ File: "src/util.zsh"
 #
@@ -163,11 +148,16 @@ function _util.get_config_item() {
 #
 # ::~ EndFile
 
+# ::~ File: "src/configuration.zsh"
+#
+# After config is initialized, set some variables:
 # config_default_action="$(_util.get_config_item default_action)"
 # config_save_format="$(_util.get_config_item save_format)"
 config_browser="$(_util.get_config_item default_browser)"
 browser_application="$config_browser"
 test -z "${browser_application+x}" && browser_application="Google Chrome"
+#
+# ::~ EndFile
 
 # ::~ File: "src/lib.zsh"
 #
@@ -186,7 +176,7 @@ function query_urls() {
   awk "/${user_query}/"
 }
 function pull_and_query_urls() {
-  pull_browser_application_urls "$browser_application" |
+  { pull_browser_application_urls "$browser_application" & }|
     format_urls |
     query_urls
 }
@@ -254,12 +244,28 @@ EOT
 }
 #
 # ::~ EndFile
+
+# ::~ File: "src/options.zsh"
+#
 debug "${LINENO}" "args: ${args[*]}"
 debug "${LINENO}" "user query: ${user_query}"
 debug "${LINENO}" "found urls: $(countof_urls)"
 # ---------------------------------------------------
 # Option parsing starts here ------------------------
 #
+# TODO: can i move this section to "argument parsing", lower in the script?
+# the first argument to lnks will always be the user query.
+user_query="${1}"
+if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
+  debug "${LINENO}" "No query passed to script."
+  echo "No query was passed to lnks."
+  echo "Usage: lnks [query] <options...>"
+  echo "Use 'lnks --help' to view the full help document"
+  exit
+else
+  # shift the args array to remove user_query item
+  args=("${args[@]:1}")
+fi
 # 1. Exit if no urls matching user query are found
 # if ((countof_urls < 1)); then
 if [[ $(countof_urls) -lt 1 ]]; then
@@ -270,39 +276,44 @@ fi
 # 2. If lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
-# if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
-#   pull_and_query_urls
-#   exit
-# fi
+if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
+  pull_and_query_urls
+  exit
+fi
 
 flag_save=
 flag_stdin=
 output_filename=
 
-has_flag_breaking=$(
-  printf '%s\n' "${args[@]}" |
-    awk '/--help|--print/ { exit 0 } { exit 1 }'
-)
-debug "${LINENO}" "has flag: breaking? $(
-  test "$has_flag_breaking" && echo "true" || echo "false"
-)"
+has_flag_breaking=false
+has_flag_runtime=false
+has_flag_processing=false
 
-has_flag_runtime=$(
-  printf '%s\n' "${args[@]}" |
-    awk '/--safari|--stdin|--save/ { exit 0 } { exit 1 }'
-)
-debug "${LINENO}" "has flag: runtime? $(
-  test "$has_flag_runtime" && echo "true" || echo "false"
-)"
-
-has_flag_processing=$(
-  printf '%s\n' "${args[@]}" |
-    awk '/--markdown|--html|--csv/ { exit 0 } { exit 1 }'
-)
-debug "${LINENO}" "has flag: processing? $(
-  test "$has_flag_processing" && echo "true" || echo "false"
-)"
-
+for argument in "${args[@]}"; do
+  case "$argument" in
+    --help|--print)
+      has_flag_breaking=true
+      debug "${LINENO}" "has flag: breaking."
+    ;;
+    --safari|--stdin|--save)
+      has_flag_runtime=true
+      debug "${LINENO}" "has flag: runtime."
+    ;;
+    --markdown|--html|--csv)
+      has_flag_processing=true
+      debug "${LINENO}" "has flag: processing."
+    ;;
+    --copy|--instapaper|--pdf|--pinboard)
+      debug "${LINENO}" "old option selected: '$argument'."
+      _util.color blue "Option '$argument' has been removed from 'lnks'."
+    ;;
+    *)
+      _util.color red "Unknown argument: '$argument'"
+      echo "Usage: lnks [query] <options...>"
+      echo "Use 'lnks --help' to view the full help document"
+    ;;
+  esac
+done
 # 3. Breaking flags - Stop execution and output
 # ------------------------------------
 # In order to limit actions to combinations that make the most sense
@@ -310,24 +321,26 @@ debug "${LINENO}" "has flag: processing? $(
 # addtional options from being parsed. This avoids (subjectively)
 # random combination of options like `lnks --print --copy --html --stdin`
 #
-for breaking_opt in "${args[@]}"; do
-  # lnks --help
-  if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
-    help
-    exit
-  # lnks <query> with no other arguments acts as an alias for --print
-  # the --print option is kept to mitigate surprise behavior and
-  # provide an explicit way to handle this task.
-  #
-  # lnks <query>
-  # lnks <query> --print
-  elif [[ $breaking_opt == "--print" ]]; then
-    #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
-    if [[ -z ${flag_stdin+x} ]]; then
-      pull_and_query_urls
+if [[ $has_flag_breaking == true ]]; then
+  for breaking_opt in "${args[@]}"; do
+    # lnks --help
+    if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
+      help
+      exit
+    # lnks <query> with no other arguments acts as an alias for --print
+    # the --print option is kept to mitigate surprise behavior and
+    # provide an explicit way to handle this task.
+    #
+    # lnks <query>
+    # lnks <query> --print
+    elif [[ $breaking_opt == "--print" ]]; then
+      #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
+      if [[ -z ${flag_stdin+x} ]]; then
+        pull_and_query_urls
+      fi
     fi
-  fi
-done
+  done
+fi
 # ------------------------------------
 # 4. Runtime flags - options that affect processing.
 # --safari, --stdin, and --save are higher-prescedence
@@ -400,7 +413,7 @@ for processing_opt in "${args[@]}"; do
     fi
   elif [[ $processing_opt == "--save" ]]; then
     plain_urls="$(pull_and_query_urls)"
-    if [[ "$flag_save" == true ]] && [[ ! $has_flag_processing ]]; then
+    if [[ "$flag_save" == true ]] && [[ ! $has_flag_processing == true ]]; then
        echo "$plain_urls" > "$output_filename"
        _util.color green "Url saved to $output_filename."
     else
@@ -415,3 +428,5 @@ done
 #
 # Option parsing ends here --------------------------
 # ---------------------------------------------------
+#
+# ::~ EndFile

@@ -14,5 +14,13 @@ function initialize_lnks_configuration() {
     echo "lnks config file created at $configuration_rc_path"
   }
 }
+# TODO: use $XDG_CONFIG_HOME if set, otherwise create a folder in
+# $HOME/.config, fall back to creating a folder in the $HOME directory
+lnks_configuration="$configuration_rc_path"
+if [[ ! -f "$lnks_configuration" ]]; then
+  echo "No configuration file found at '$configuration_base_path'. Creating..."
+  # create configuration files
+  initialize_lnks_configuration
+fi
 #
 # ::~ EndFile

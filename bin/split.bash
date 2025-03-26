@@ -5,10 +5,13 @@
 # sed -n '/\# \:\:\~ File: \"src\/util\.zsh\"/,/\# \:\:\~ EndFile/p' src/main.sh
 
 declare -a source=(
+  "debug.zsh"
+  "help.zsh"
   "util.zsh"
   "initialize.zsh"
+  "configuration.zsh"
   "lib.zsh"
-  "help.zsh"
+  "options.zsh"
 )
 for sourcefile in "${source[@]}"; do
   section_content="$(
