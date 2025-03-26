@@ -4,8 +4,8 @@
   "description": "List / Save / Instapaper your Google Chrome links from the terminal - on MacOS",
   "main": "lnks",
   "scripts": {
-    "build": "bash bin/build.bash",
-    "split": "bash bin/split.bash"
+    "build": "bash bin/build.sh",
+    "split": "bash bin/split.sh"
   },
   "repository": {
     "type": "git",
