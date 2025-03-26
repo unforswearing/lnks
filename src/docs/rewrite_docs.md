@@ -59,3 +59,9 @@ Consider adding output format options for various markup languages
 #     - plugins should perform some external action.
 #     - plugins can store their credentials with the plugin or in `lnks.conf`
 #     - more TBD
+
+This tool is MacOS only, but there are other ways to get chrome tabs on other systems:
+
+- [google chrome - How to get all opened chromium tabs list for Linux in CLI? - Stack Overflow](https://stackoverflow.com/questions/49660403/how-to-get-all-opened-chromium-tabs-list-for-linux-in-cli)
+- [Get Chrome tab URL in Python - Stack Overflow](https://stackoverflow.com/questions/52675506/get-chrome-tab-url-in-python/63703030#63703030)
+- [javascript - How can i get all URL&#39;s of a google chrome window - Stack Overflow](https://stackoverflow.com/questions/19485740/how-can-i-get-all-urls-of-a-google-chrome-window)

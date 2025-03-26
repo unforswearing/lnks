@@ -89,11 +89,11 @@ $ src/main.sh example --markdown
 
 # 5. Test that the --html option can print html formatted urls
 
-# $ src/main.sh example --html
-# <ul>
-#  <li><a href="https://www.example.com/">Example Domain</a></li>
-# </ul>
-# >=0
+$ src/main.sh example --html
+> /.ul.
+  .li..a href="https...www.example.com.".Example Domain..a...li.
+..ul./
+>=0
 
 # 6. Test that the --csv option can print csv formatted urls
 
@@ -114,15 +114,21 @@ $ echo "https://www.example.com" | src/main.sh example --stdin --markdown
 
 # 9. Test that the --html option works with --stdin
 
-# $ echo "https://www.example.com" | src/main.sh example --stdin --html
-# <ul>
-#  <li><a href="https://www.example.com/">Example Domain</a></li>
-# </ul>
-# >=0
+$ echo "https://www.example.com" | src/main.sh example --stdin --html
+> /.ul.
+  .li..a href="https...www.example.com".Example Domain..a...li.
+..ul./
+>=0
 
 # 10. Test that the --csv option works with --stdin
 
 $ echo "https://www.example.com" | src/main.sh example --stdin --csv
 > /date,title,url
 ^.*,"Example Domain",https\:\/\/www.example.com/
+>=0
+
+# 11. Test that the --safari option works to use Safari instead of Chrome
+
+$ open -a Safari "https://www.example.com"; src/main.sh example --safari --print
+https://www.example.com/
 >=0

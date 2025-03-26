@@ -6,9 +6,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 ## To Do
 
-- [ ] Add a touch of *class* (colorized output, robust error checking, maybe logging).
-- [ ] Set up some sort of tests.
-  - [ ] Start by testing "Runtime" options: `--safari`, `--save`, `--stdin`, and `--read`
+- [x] Set up some sort of tests.
+  - [ ] Start by testing "Runtime" options: `--safari`, `--save`, and `--stdin`
 - [ ] Revise / update the project `readme.md`
 
 ## Future (version 3?)
@@ -41,6 +40,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 ## Complete
 
+- [x] Add a touch of *class* (colorized output, robust error checking, maybe logging).
+  - Added debugging and error checking (both with colorized output)
 - [x] Add runtime option `--stdin` to read urls from the output of another program in a pipe.
   - Process urls from `stdin` using another lnks option.
 - [x] REMOVED: `--read` is redundant with `--stdin`, but more complicated to implement
