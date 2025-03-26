@@ -116,6 +116,7 @@ function initialize_lnks_configuration() {
 # $HOME/.config, fall back to creating a folder in the $HOME directory
 lnks_configuration="$configuration_rc_path"
 if [[ ! -f "$lnks_configuration" ]]; then
+  debug "${LINENO}" "No configuration file found. Creating config in ~/.config/lnks"
   echo "No configuration file found at '$configuration_base_path'. Creating..."
   # create configuration files
   initialize_lnks_configuration
@@ -153,12 +154,14 @@ function _util.get_config_item() {
 
 # ::~ File: "src/configuration.sh"
 #
+debug "${LINENO}" "Attempting to create variables from lnks configuration file"
 # After config is initialized, set some variables:
 # config_default_action="$(_util.get_config_item default_action)"
 # config_save_format="$(_util.get_config_item save_format)"
 config_browser="$(_util.get_config_item default_browser)"
 browser_application="$config_browser"
 test -z "${browser_application+x}" && browser_application="Google Chrome"
+debug "${LINENO}" "Browser application for lnks: $browser_application."
 #
 # ::~ EndFile
 
@@ -250,6 +253,8 @@ EOT
 
 # ::~ File: "src/options.sh"
 #
+user_query="${1}"
+
 debug "${LINENO}" "args: ${args[*]}"
 debug "${LINENO}" "user query: ${user_query}"
 debug "${LINENO}" "found urls: $(countof_urls)"
@@ -258,11 +263,11 @@ debug "${LINENO}" "found urls: $(countof_urls)"
 #
 # TODO: can i move this section to "argument parsing", lower in the script?
 # the first argument to lnks will always be the user query.
-user_query="${1}"
 if [[ "$user_query" == "--help" ]]; then
   help
   exit 0
 elif [[ "$user_query" =~ -- ]]; then
+  debug "${LINENO}" "User passed option instead of query to script."
   >&2 _util.color red "Please specify a query before passing any options."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
@@ -290,6 +295,7 @@ fi
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
 if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
+  debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
   pull_and_query_urls
   exit
 fi
@@ -319,6 +325,7 @@ for argument in "${args[@]}"; do
   --copy | --instapaper | --pdf | --pinboard)
     debug "${LINENO}" "old option selected: '$argument'."
     _util.color blue "Option '$argument' has been removed from 'lnks'."
+    exit
     ;;
   *)
     >&2 _util.color red "Unknown argument: '$argument'"
@@ -331,22 +338,18 @@ done
 # 3. Breaking flags - Stop execution and output
 # ------------------------------------
 # In order to limit actions to combinations that make the most sense
-# --help and --print will break the loop, preventing any
+# --help (above) and --print (below) will break the loop, preventing any
 # addtional options from being parsed. This avoids (subjectively)
 # random combination of options like `lnks --print --copy --html --stdin`
 #
 for breaking_opt in "${args[@]}"; do
-  # lnks --help
-  if [[ $breaking_opt == "--help" ]] || [[ $breaking_opt == "-h" ]]; then
-    help
-    exit
   # lnks <query> with no other arguments acts as an alias for --print
   # the --print option is kept to mitigate surprise behavior and
   # provide an explicit way to handle this task.
   #
   # lnks <query>
   # lnks <query> --print
-  elif [[ $breaking_opt == "--print" ]]; then
+  if [[ $breaking_opt == "--print" ]]; then
     #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
     if [[ -z ${flag_stdin+x} ]]; then
       pull_and_query_urls

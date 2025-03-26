@@ -1,5 +1,7 @@
 # using shelltestrunner
 # https://github.com/simonmichael/shelltestrunner
+#
+# A fun consequence of using tests -- if debug=true in main.sh, tests will fail.
 
 # 1. Test that the --help option properly prints the full help text.
 
