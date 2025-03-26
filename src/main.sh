@@ -349,7 +349,7 @@ for breaking_opt in "${args[@]}"; do
   #
   # lnks <query>
   # lnks <query> --print
-  if [[ $breaking_opt == "--print" ]]; then
+  if [[ "$breaking_opt" == "--print" ]]; then
     #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
     if [[ -z ${flag_stdin+x} ]]; then
       pull_and_query_urls
@@ -366,10 +366,10 @@ done
 #
 for runtime_opt in "${args[@]}"; do
   # lnks <query> --safari --html
-  if [[ $runtime_opt == "--safari" ]]; then
+  if [[ "$runtime_opt" == "--safari" ]]; then
     browser_application="Safari"
   # cat "bookmarks.txt" | lnks <query> --stdin --markdown
-  elif [[ $runtime_opt == "--stdin" ]]; then
+  elif [[ "$runtime_opt" == "--stdin" ]]; then
     stdin=$(cat -)
 
     if [[ -z "${stdin}" ]]; then
@@ -384,7 +384,7 @@ for runtime_opt in "${args[@]}"; do
     }
     flag_stdin=true
   # lnks <query> --save filename.txt
-  elif [[ $runtime_opt == "--save" ]]; then
+  elif [[ "$runtime_opt" == "--save" ]]; then
     # --save must always be the second to last argument
     # followed by output_file as the last argument
     # TODO: would prefer to explicitly step through the array
@@ -399,7 +399,7 @@ for processing_opt in "${args[@]}"; do
   # ------------------------------------
   # lnks <query> --markdown
   # lnks <query> --markdown --save filename.md
-  if [[ $processing_opt == "--markdown" ]]; then
+  if [[ "$processing_opt" == "--markdown" ]]; then
     md_urls="$(
       pull_and_query_urls | create_markdown_urls
     )"
@@ -410,7 +410,7 @@ for processing_opt in "${args[@]}"; do
     fi
   # lnks <query> --html
   # lnks <query> --html --save filename.html
-  elif [[ $processing_opt == "--html" ]]; then
+  elif [[ "$processing_opt" == "--html" ]]; then
     html_urls="$(
       pull_and_query_urls | create_html_urls
     )"
@@ -422,7 +422,7 @@ for processing_opt in "${args[@]}"; do
     fi
   # lnks <query> --csv
   # lnks <query> --csv --save filename.csv
-  elif [[ $processing_opt == "--csv" ]]; then
+  elif [[ "$processing_opt" == "--csv" ]]; then
     csv_urls="$(
       pull_and_query_urls | create_csv_urls
     )"
@@ -432,15 +432,15 @@ for processing_opt in "${args[@]}"; do
     else
       echo "$csv_urls"
     fi
-  elif [[ $processing_opt == "--save" ]]; then
+  elif [[ "$processing_opt" == "--save" ]]; then
     plain_urls="$(pull_and_query_urls)"
-    if [[ "$flag_save" == true ]] && [[ $has_flag_processing == false ]]; then
+    if [[ "$flag_save" == true ]] && [[ "$has_flag_processing" == false ]]; then
       echo "$plain_urls" >"$output_filename"
       _util.color green "Url saved to $output_filename."
     else
       echo "$md_urls"
     fi
-  elif [[ $processing_opt == "--print" ]]; then
+  elif [[ "$processing_opt" == "--print" ]]; then
     # if [[ ${has_flag_breaking} ]]; then
     pull_and_query_urls
     # fi
