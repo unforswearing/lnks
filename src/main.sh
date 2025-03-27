@@ -6,6 +6,15 @@
 # Tested interactively in zsh and bash shells. See bin/build.sh for unit tests,
 # \shellcheck, and formatting.
 #
+
+# Enable some optional \shellcheck checks:
+
+# shellcheck enable=add-default-case
+# shellcheck enable=avoid-nullary-conditions
+# shellcheck enable=quote-safe-variables
+# shellcheck enable=require-double-brackets
+# shellcheck enable=require-variable-braces
+
 args=("${@}")
 
 # ::~ File: "src/debug.sh"
@@ -13,14 +22,14 @@ args=("${@}")
 debug_flag=
 # debug "${LINENO}" "we debuggin"
 debug() {
-  test "$debug_flag" == true && {
+  test "${debug_flag}" == true && {
     local lineno="$1"
     shift
     local blue="\033[34m"
     local reset="\033[39m"
     local ts
     ts="$(date +'%Y-%m-%d %H:%M:%S')"
-    echo "DEBUG: ${ts} [line $lineno]"
+    echo "DEBUG: ${ts} [line ${lineno}]"
     echo -en ":: ${blue}$*${reset} "
     echo
     echo
@@ -89,24 +98,24 @@ EOT
 
 # ::~ File: "src/initialize.sh"
 #
-configuration_base_path="$HOME/.config/lnks"
-configuration_rc_path="$HOME/.config/lnks/lnks.rc"
+configuration_base_path="${HOME}/.config/lnks"
+configuration_rc_path="${HOME}/.config/lnks/lnks.rc"
 function initialize_lnks_configuration() {
-  test -d "$configuration_base_path" || {
-    mkdir "$configuration_base_path"
+  test -d "${configuration_base_path}" || {
+    mkdir "${configuration_base_path}"
     {
       echo "default_browser=chrome"
       echo "default_action="
-    } >"$configuration_rc_path"
-    echo "lnks config file created at $configuration_rc_path"
+    } >"${configuration_rc_path}"
+    echo "lnks config file created at ${configuration_rc_path}"
   }
 }
 # TODO: use $XDG_CONFIG_HOME if set, otherwise create a folder in
 # $HOME/.config, fall back to creating a folder in the $HOME directory
-lnks_configuration="$configuration_rc_path"
-if [[ ! -f "$lnks_configuration" ]]; then
+lnks_configuration="${configuration_rc_path}"
+if [[ ! -f "${lnks_configuration}" ]]; then
   debug "${LINENO}" "No configuration file found. Creating config in ~/.config/lnks"
-  echo "No configuration file found at '$configuration_base_path'. Creating..."
+  echo "No configuration file found at '${configuration_base_path}'. Creating..."
   # create configuration files
   initialize_lnks_configuration
 fi
@@ -122,10 +131,11 @@ function _util.color() {
   local reset="\033[39m"
   local opt="$1"
   shift
-  case "$opt" in
+  case "${opt}" in
   red) echo -en "${red}$*${reset}\n" ;;
   green) echo -en "${green}$*${reset}\n" ;;
   blue) echo -en "${blue}$*${reset}\n" ;;
+  *) echo "choose color: red, green, blue" ;;
   esac
 }
 function _util.null() {
@@ -136,7 +146,7 @@ function _util.timestamp() {
 }
 function _util.get_config_item() {
   local keyname="${1}"
-  grep "$keyname" "$lnks_configuration" | awk -F= '{ print $2 }'
+  grep "${keyname}" "${lnks_configuration}" | awk -F= '{ print $2 }'
 }
 #
 # ::~ EndFile
@@ -147,10 +157,10 @@ debug "${LINENO}" "Attempting to create variables from lnks configuration file"
 # After config is initialized, set some variables:
 # config_default_action="$(_util.get_config_item default_action)"
 config_browser="$(_util.get_config_item default_browser)"
-browser_application="$config_browser"
+browser_application="${config_browser}"
 
 test -z "${browser_application+x}" && browser_application="Google Chrome"
-debug "${LINENO}" "Browser application for lnks: $browser_application."
+debug "${LINENO}" "Browser application for lnks: ${browser_application}."
 #
 # ::~ EndFile
 
@@ -159,7 +169,7 @@ debug "${LINENO}" "Browser application for lnks: $browser_application."
 function pull_browser_application_urls() {
   local browser="${1}"
   osascript <<EOT
-    tell application "$browser"
+    tell application "${browser}"
     	get URL of tabs of windows
     end tell
 EOT
@@ -171,7 +181,7 @@ function query_urls() {
   awk "/${user_query}/"
 }
 function pull_and_query_urls() {
-  pull_browser_application_urls "$browser_application" |
+  pull_browser_application_urls "${browser_application}" |
     format_urls |
     query_urls
 }
@@ -211,12 +221,12 @@ function create_html_urls() {
     local title
     local tmpl
     title="$(query_url_title "${this_url}")"
-    tmpl="<li><a href=\"$this_url\">$title</a></li>"
-    list_html+=("$tmpl")
+    tmpl="<li><a href=\"${this_url}\">${title}</a></li>"
+    list_html+=("${tmpl}")
   done
   cat <<EOT
 <ul>
-$(for item in "${list_html[@]}"; do echo "  $item"; done)
+$(for item in "${list_html[@]}"; do echo "  ${item}"; done)
 </ul>
 EOT
 }
@@ -231,11 +241,11 @@ function create_csv_urls() {
       query_url_title "${this_url}"
     )"
     tmpl="$(_util.timestamp),\"${title}\",${this_url}"
-    urls_csv+=("$tmpl")
+    urls_csv+=("${tmpl}")
   done
   cat <<EOT
 ${csv_header_row}
-$(for item in "${urls_csv[@]}"; do echo "$item"; done)
+$(for item in "${urls_csv[@]}"; do echo "${item}"; done)
 EOT
 }
 #
@@ -261,7 +271,7 @@ has_flag_runtime=false
 has_flag_processing=false
 
 # 1. Check for --help flag as the first argument.
-if [[ "$user_query" == "--help" ]]; then
+if [[ "${user_query}" == "--help" ]]; then
   help
   exit 0
 fi
@@ -277,7 +287,7 @@ if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
   # warn the user. TODO: what happens when a user legitimately
   # needs to search for the double hyphen "--"? Searching for a single
   # hyphen does not throw this error
-elif [[ "$user_query" =~ -- ]]; then
+elif [[ "${user_query}" =~ -- ]]; then
   debug "${LINENO}" "User passed option instead of query to script."
   >&2 _util.color red "Please specify a query before passing any options."
   echo "Usage: lnks [query] <options...>"
@@ -296,22 +306,22 @@ else
 fi
 # 6. Loop through the arguments array to set flags or warn about invalid options.
 for argument in "${args[@]}"; do
-  case "$argument" in
+  case "${argument}" in
   --print)
     has_flag_breaking=true
-    debug "${LINENO}" "has flag: breaking. $has_flag_breaking"
+    debug "${LINENO}" "has flag: breaking. ${has_flag_breaking}"
     ;;
   --safari | --stdin)
     has_flag_runtime=true
-    debug "${LINENO}" "has flag: runtime. $has_flag_runtime"
+    debug "${LINENO}" "has flag: runtime. ${has_flag_runtime}"
     ;;
   --markdown | --html | --csv)
     has_flag_processing=true
-    debug "${LINENO}" "has flag: processing. $has_flag_processing"
+    debug "${LINENO}" "has flag: processing. ${has_flag_processing}"
     ;;
   --copy | --save)
-    debug "${LINENO}" "redundant option selected: '$argument'."
-    echo "Option '$argument' has been removed from 'lnks'."
+    debug "${LINENO}" "redundant option selected: '${argument}'."
+    echo "Option '${argument}' has been removed from 'lnks'."
     echo "Use a redirect to perform --save actions, eg:"
     echo "  'lnks <query> --markdown > file.md'"
     echo
@@ -322,13 +332,13 @@ for argument in "${args[@]}"; do
     exit
     ;;
   --instapaper | --pdf | --pinboard)
-    debug "${LINENO}" "old option selected: '$argument'."
-    echo "Option '$argument' has been removed from 'lnks'."
+    debug "${LINENO}" "old option selected: '${argument}'."
+    echo "Option '${argument}' has been removed from 'lnks'."
     echo "Use 'lnks --help' to view the full help document"
     exit
     ;;
   *)
-    >&2 _util.color red "Unknown argument: '$argument'"
+    >&2 _util.color red "Unknown argument: '${argument}'"
     echo "Usage: lnks [query] <options...>"
     echo "Use 'lnks --help' to view the full help document"
     exit 1
@@ -349,7 +359,7 @@ for breaking_opt in "${args[@]}"; do
   #
   # lnks <query>
   # lnks <query> --print
-  if [[ "$breaking_opt" == "--print" ]]; then
+  if [[ "${breaking_opt}" == "--print" ]]; then
     #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
     if [[ -z ${flag_stdin+x} ]]; then
       pull_and_query_urls
@@ -365,10 +375,10 @@ done
 #
 for runtime_opt in "${args[@]}"; do
   # lnks <query> --safari --html
-  if [[ "$runtime_opt" == "--safari" ]]; then
+  if [[ "${runtime_opt}" == "--safari" ]]; then
     browser_application="Safari"
   # cat "bookmarks.txt" | lnks <query> --stdin --markdown
-  elif [[ "$runtime_opt" == "--stdin" ]]; then
+  elif [[ "${runtime_opt}" == "--stdin" ]]; then
     stdin=$(cat -)
 
     if [[ -z "${stdin}" ]]; then
@@ -389,8 +399,8 @@ done
 # any urls match $user_query and exit if no urls are found.
 # if ((countof_urls < 1)); then
 if [[ $(countof_urls) -lt 1 ]]; then
-  debug "${LINENO}" "No match for user query: '$user_query'"
-  echo "No match for '$user_query' in $browser_application Urls."
+  debug "${LINENO}" "No match for user query: '${user_query}'"
+  echo "No match for '${user_query}' in ${browser_application} Urls."
   exit
 fi
 # 9. Processing flags - options that convert links to various
@@ -398,24 +408,24 @@ fi
 for processing_opt in "${args[@]}"; do
   # ------------------------------------
   # lnks <query> --markdown
-  if [[ "$processing_opt" == "--markdown" ]]; then
+  if [[ "${processing_opt}" == "--markdown" ]]; then
     md_urls="$(
       pull_and_query_urls | create_markdown_urls
     )"
-    echo "$md_urls"
+    echo "${md_urls}"
   # lnks <query> --html
-  elif [[ "$processing_opt" == "--html" ]]; then
+  elif [[ "${processing_opt}" == "--html" ]]; then
     html_urls="$(
       pull_and_query_urls | create_html_urls
     )"
-    echo "$html_urls"
+    echo "${html_urls}"
   # lnks <query> --csv
-  elif [[ "$processing_opt" == "--csv" ]]; then
+  elif [[ "${processing_opt}" == "--csv" ]]; then
     csv_urls="$(
       pull_and_query_urls | create_csv_urls
     )"
-    echo "$csv_urls"
-  elif [[ "$processing_opt" == "--print" ]]; then
+    echo "${csv_urls}"
+  elif [[ "${processing_opt}" == "--print" ]]; then
     # if [[ ${has_flag_breaking} ]]; then
     pull_and_query_urls
     # fi
