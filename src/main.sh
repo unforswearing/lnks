@@ -257,27 +257,40 @@ has_flag_breaking=false
 has_flag_runtime=false
 has_flag_processing=false
 
+# 1. Check for --help flag as the first argument.
 if [[ "$user_query" == "--help" ]]; then
   help
   exit 0
-elif [[ "$user_query" =~ -- ]]; then
-  debug "${LINENO}" "User passed option instead of query to script."
-  >&2 _util.color red "Please specify a query before passing any options."
-  echo "Usage: lnks [query] <options...>"
-  echo "Use 'lnks --help' to view the full help document"
-  exit 1
 fi
-
+# 2. user_query should always be the first argument. If no query was passed
+# to the script, and there are no other args, error and exit.
 if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
   debug "${LINENO}" "No query passed to script."
   >&2 _util.color red "No query was passed to lnks."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
   exit 1
+  # 3. If there was a user_query, but it appears to match a flag,
+  # warn the user. (TODO: what happens when a user legitimately
+  # needs to search for the double hyphen "--"?)
+elif [[ "$user_query" =~ -- ]]; then
+  debug "${LINENO}" "User passed option instead of query to script."
+  >&2 _util.color red "Please specify a query before passing any options."
+  echo "Usage: lnks [query] <options...>"
+  echo "Use 'lnks --help' to view the full help document"
+  exit 1
+  # 4. If lnks was called with only a query, print urls
+  # matching that query and exit the script. A non-alias
+  # for the --print option (retained below).
+elif [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
+  debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
+  pull_and_query_urls
+  exit 0
 else
-  # shift the args array to remove user_query item
+  # 5. Otherwise, if the script hasn't exited, shift the args array to remove user_query item
   args=("${args[@]:1}")
 fi
+# 6. Loop through the arguments array to set flags or warn about invalid options.
 for argument in "${args[@]}"; do
   case "$argument" in
   --print)
@@ -318,20 +331,12 @@ for argument in "${args[@]}"; do
     ;;
   esac
 done
-# 2. If lnks was called with only a query, print urls
-# matching that query and exit the script. A non-alias
-# for the --print option (retained below).
-if [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
-  debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
-  pull_and_query_urls
-  exit
-fi
-# 3. Breaking flags - Stop execution and output
+# 7. Breaking flags - Stop execution and output
 # ------------------------------------
 # In order to limit actions to combinations that make the most sense
 # --help (above) and --print (below) will break the loop, preventing any
 # addtional options from being parsed. This avoids (subjectively)
-# random combination of options like `lnks --print --copy --html --stdin`
+# random combination of options like `lnks --print --html --stdin`
 #
 for breaking_opt in "${args[@]}"; do
   # lnks <query> with no other arguments acts as an alias for --print
@@ -348,7 +353,7 @@ for breaking_opt in "${args[@]}"; do
   fi
 done
 # ------------------------------------
-# 4. Runtime flags - options that affect processing.
+# 8. Runtime flags - options that affect processing.
 # --safari and --stdin are higher-prescedence
 # actions / options. they are also the only actions / options that
 # do not break the ${args[@]} loop.
@@ -375,14 +380,16 @@ for runtime_opt in "${args[@]}"; do
     flag_stdin=true
   fi
 done
-# 1. Exit if no urls matching user query are found
+# Now that all breaking and runtime flags have been parsed, the
+# script can now start pulling urls from the browser. First, check if
+# any urls match $user_query and exit if no urls are found.
 # if ((countof_urls < 1)); then
 if [[ $(countof_urls) -lt 1 ]]; then
   debug "${LINENO}" "No match for user query: '$user_query'"
   echo "No match for '$user_query' in $browser_application Urls."
   exit
 fi
-# 5. Processing flags - options that convert links to various
+# 9. Processing flags - options that convert links to various
 # markup and data fomats.
 for processing_opt in "${args[@]}"; do
   # ------------------------------------

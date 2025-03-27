@@ -1,9 +1,10 @@
 {
   "name": "lnks",
-  "version": "1.0.1",
-  "description": "List / Save / Instapaper your Google Chrome links from the terminal - on MacOS",
+  "version": "2.0.0",
+  "description": "Triage your Google Chrome / Safari links from the terminal on MacOS",
   "main": "lnks",
   "scripts": {
+    "test": "shelltest src/test/lnks.test",
     "build": "bash bin/build.sh",
     "split": "bash bin/split.sh"
   },
@@ -15,9 +16,8 @@
     "google",
     "chrome",
     "links",
-    "pinboard",
-    "instapaper",
-    "wkhtmltopdf",
+    "csv",
+    "html",
     "markdown",
     "bookmarking",
     "cli",
@@ -30,9 +30,5 @@
     "url": "https://github.com/unforswearing/lnks/issues"
   },
   "homepage": "https://github.com/unforswearing/lnks#readme",
-  "funding": {
-    "type" : "individual",
-    "url" : "https://www.unforswearing.com/#/"
-  },
-  "os": [ "darwin", "linux"]
+  "os": [ "darwin" ]
 }

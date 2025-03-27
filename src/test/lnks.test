@@ -123,7 +123,7 @@ $ echo "https://www.example.com" | src/main.sh example --stdin --csv
 
 # 11. Test that the --safari option works to use Safari instead of Chrome with the --print option
 
-$ open -a Safari "https://www.example.com"; src/main.sh example --safari --print
+$ open -a Safari "https://www.example.com" && sleep 0.5; src/main.sh example --safari --print
 https://www.example.com/
 >=0
 

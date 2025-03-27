@@ -11,7 +11,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Additional testing for all options, especially runtime options.
 - [ ] Attempt to create tests for internal functions
 - [ ] Revise / update the project `readme.md`
-  - Update header line to read "Triage your Google Chrome / Safari links on MacOS".
+  - Update header line to read "Triage your Google Chrome / Safari links from the terminal on MacOS".
   - Revise installation, usage description, options explanation, etc.
 - [ ] Publish a new `npm` version if possible.
 
