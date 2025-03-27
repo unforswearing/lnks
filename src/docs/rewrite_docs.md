@@ -19,25 +19,16 @@ REPO
 - test (DIR)
   - lnks.test
 
-## Permanent options for use with `~/.config/lnks/options.ext`
+## Permanent options for use with `~/.config/lnks/lnks.rc`
 
-default_browser' will skip the check in the script
+use `lnks.rc` for storing other runtime preferenes:
 
-default_browser = <safari | chrome>; default: chrome
-
-default_action' will allow you to run lnks with no flags
-
-ote: if your default_action is 'save', you must still supply
-
- filename. eg `lnks output.md`
-
-efault_action = <print|copy|save>; default: unset
-
-save_format' - automatically convert urls to this format
-
-hen using the `--save` flag. you must still supply an output filename.
-
-ave_format = <txt|markdown|csv|html>; default: text
+- default_browser = `< safari | chrome >`; default: chrome
+- default_process = `< print | markdown | html | csv >`
+- network_tool = `< curl | wget >` (curl by default)
+- progress = `< true | false >` (show curl/wget progress, true by default)
+- debug = `< true | false >` (print debugging messages, false by default)
+- store = `< true | false >` (use the store to save urls across runs, false by default)
 
 ## Command line options:
 

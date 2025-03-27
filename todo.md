@@ -9,7 +9,12 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 > The basic `lnks 2.0` will be published pending the following updates:
 
 - [ ] More storable options for `lnks.rc`
-  - Currently only using `default-browser`, what else can be added?
+  - default_browser = `< safari | chrome >`; default: chrome
+  - default_process = `< print | markdown | html | csv >`
+  - network_tool = `< curl | wget | other_option? >` (curl by default)
+  - progress = `< true | false >` (show curl/wget progress, true by default)
+  - debug = `< true | false >` (print debugging messages, false by default)
+  - store = `< true | false >` (use the store to save urls across runs, false by default)
 - [ ] Additional testing for all options, especially runtime options.
 - [ ] Attempt to create tests for internal functions
 - [ ] Revise / update the project `readme.md`
@@ -24,6 +29,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
 - [ ] Runtime options can be created to toggle tool options or swap tools
+  - NOTE: these should go into `lnks.rc` instead of script flags.
   - `--verbose` to show `curl` progress
   - `--wget` to use `wget` instead of `curl` (default)
   - etc...

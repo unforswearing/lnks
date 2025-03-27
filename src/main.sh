@@ -184,7 +184,8 @@ function query_url_title() {
   local url="${1}"
   local url_title
   url_title="$(
-    curl -skLZ "${url}" |
+    # curl -skLZ "${url}" |
+    curl -kLZ "${url}" |
       grep '<title>' |
       sed 's/^.*<title>//g;s/<\/title>.*$//g'
   )"
