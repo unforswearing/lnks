@@ -21,8 +21,6 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - https://www.ii.com/links-footnotes-markdown/
 - [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
-- [ ] Add option (runtime): `--merge` to combine urls from `--stdin` and the browser into single stream.
-  - `--merge` should work with all? options: `lnks <query> --merge --select --markdown`
 - [ ] Runtime options can be created to toggle tool options or swap tools
   - `--verbose` to show `curl` progress
   - `--wget` to use `wget` instead of `curl` (default)
@@ -33,15 +31,20 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 ## Version 3 (Non-shell based)
 
-> Updating for version 2 made me realize why bash is not usable for larger scripts. Version 3 of this script will use a different programming language to accommodate more complex features. Completion date: TBD.
+> Updating for version 2 made me realize why bash is not usable for larger scripts (and I love bash). Version 3 of this script will use a different programming language to accommodate more complex features. Completion date: TBD.
 
 - [ ] Update all processing options to use language-native tooling, removing shell tools.
 - [ ] Rewrite script option parsing logic.
 - [ ] Preserve all Version 2 options and features (color output, logging, tests).
 - [ ] Add option (processing): `--json` to output a `json` object / file.
-- [ ] Add option (runtime): `--md-image` and `--html-image` to detect image file extensions and generate markdown or html formatted image src blocks using the image urls.
-- [ ] Interact with Chrome and Safari bookmarks (via the bookmarks `json` file)
+- [ ] Add option (processing?): `--store` to save matching urls across runs.
+- [ ] Add option (runtime?): `--get` to retrieve urls matching <query> that were saved via `--store`
+- [ ] Add option (runtime): `--merge` to combine urls from `--stdin`, browser, and store into single stream for querying.
+  - `cat urls.txt | lnks <query> --merge --markdown`
+- [ ] Consider adding an option (runtime) to interact with Chrome and Safari bookmarks (via the bookmarks `json` file)
   - `/Users/$USER/Library/Application Support/Google/Chrome/Default/Bookmarks`
+- [ ] Consider adding an option (runtime): `--md-image` and `--html-image` to detect image file extensions and generate markdown or html formatted image src blocks using the image urls.
+- [ ] Consider adding an option (processing) that will search page content instead of the url, and save urls that match "query" (`--search`)
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
   - Could implement `--input-plugin` and `--output-plugin` to connect to services that provide urls for `lnks` input, or accept urls from `lnks` output.
@@ -60,6 +63,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - Do `cat urls.txt | lnks <query> --stdin` instead.
   - Note: too complex for a `bash` script: Add runtime option `--read <urls.txt>` to process a file containing a list urls in <format>
     - Process urls from `<urls.txt>` using another lnks option.
+  - Note: `--read` could be added to V3 of this script (possibly replacing `--stdin`)
 - [x] Change default config location to use `~/.config/lnks`.
   - Filename `lnks.rc`, format will be plain `shell`.
 - [x] Develop prescedence for options.
@@ -72,7 +76,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - Using an rc file - `lnks.rc`
 - [x] Revise available options.
 - [x] Choose to switch base language (keep `bash`, use `python` / `ruby`)?
-  - Keeping `bash`
+  - Keeping `bash` for V2, V3 will use a different language.
 - [x] Specify which window to pull links from, or all windows
   - Pull from all windows, ignoring individual windows
 - [x] Find methods other than `osascript` to retrieve links?
@@ -91,21 +95,20 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [x] Remove Pinboard action (`--pinboard`)
   - I no longer use this service
 - [x] Remove WkhtmltoPdf action (`--pdf`)
+  - `wkhtmltopdf` currently seems unmaintained
   - There are better ways to save / archive web pages.
-  - Eventually `lnks` will hand off urls / webpages to `--pandoc` (via `curl`)
-    - Possibly also tools like ArchiveBox and `nb` (see "Future" section above)
 - [x] Consider adding Raindrop.io action (default posture: no).
   - No, do not add an external (Web/API-based) service to `lnks`.
   - Also add as option in `lnks.rc` config file.
 - [x] Option (breaking): use flag `--nb` to add urls to [nb](https://xwmx.github.io/nb)
-  - No.
+  - No, loop output of `lnks <query> --print` to add to `nb`
 - [x] Option (breaking): use flag `--archivebox` to add urls to [archivebox](https://github.com/ArchiveBox/ArchiveBox)
-  - No.
+  - No, loop output of `lnks <query> --print` to add to ArchiveBox.
 - [x] Option (breaking): use flag `--monolith` to add urls to [monolith](https://github.com/Y2Z/monolith)
-  - No.
+  - No, loop output of `lnks <query> --print` to add to `monolith`
 - [x] Option (processing): Consider adding an experimental `--pandoc` flag that converts `curl` output
       html to some other format.
-  - No.
+  - No, `lnks` will not handle document conversion.
 - [x] Consider creating output formats that can be piped to `jc`
   - Nothing to add to `lnks` at this time.
   - https://github.com/kellyjonbrazil/jc

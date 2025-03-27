@@ -3,7 +3,8 @@
 #   - zsh 5.9 (x86_64-apple-darwin24.0)
 #   - GNU bash, version 3.2.57(1)-release (x86_64-apple-darwin24)
 #
-# Tested using interactive zsh and bash, and this script has no shellcheck errors.
+# Tested interactively in zsh and bash shells. See bin/build.sh for unit tests,
+# \shellcheck, and formatting.
 #
 args=("${@}")
 
@@ -271,8 +272,9 @@ if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
   echo "Use 'lnks --help' to view the full help document"
   exit 1
   # 3. If there was a user_query, but it appears to match a flag,
-  # warn the user. (TODO: what happens when a user legitimately
-  # needs to search for the double hyphen "--"?)
+  # warn the user. TODO: what happens when a user legitimately
+  # needs to search for the double hyphen "--"? Searching for a single
+  # hyphen does not throw this error
 elif [[ "$user_query" =~ -- ]]; then
   debug "${LINENO}" "User passed option instead of query to script."
   >&2 _util.color red "Please specify a query before passing any options."
