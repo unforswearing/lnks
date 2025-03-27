@@ -1,6 +1,6 @@
 # Lnks Update
 
-The first version of `lnks` was created in 2016. Last checked and this command no longer works (MacOS 15), so its time to update.
+The first version of `lnks` was created in 2015. Last checked and this command no longer works (MacOS 15), so its time to update.
 
 This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.0.0` of this script (according to the old [package.json](package.json) file).
 
@@ -8,6 +8,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 > The basic `lnks 2.0` will be published pending the following updates:
 
+- [ ] More storable options for `lnks.rc`
+  - Currently only using `default-browser`, what else can be added?
 - [ ] Additional testing for all options, especially runtime options.
 - [ ] Attempt to create tests for internal functions
 - [ ] Revise / update the project `readme.md`
@@ -45,6 +47,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - `/Users/$USER/Library/Application Support/Google/Chrome/Default/Bookmarks`
 - [ ] Consider adding an option (runtime): `--md-image` and `--html-image` to detect image file extensions and generate markdown or html formatted image src blocks using the image urls.
 - [ ] Consider adding an option (processing) that will search page content instead of the url, and save urls that match "query" (`--search`)
+  - `curl url  -> strip tags (converting to text) -> search for 'user_query'`
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
   - Could implement `--input-plugin` and `--output-plugin` to connect to services that provide urls for `lnks` input, or accept urls from `lnks` output.

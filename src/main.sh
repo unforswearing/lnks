@@ -148,6 +148,7 @@ debug "${LINENO}" "Attempting to create variables from lnks configuration file"
 # config_default_action="$(_util.get_config_item default_action)"
 config_browser="$(_util.get_config_item default_browser)"
 browser_application="$config_browser"
+
 test -z "${browser_application+x}" && browser_application="Google Chrome"
 debug "${LINENO}" "Browser application for lnks: $browser_application."
 #

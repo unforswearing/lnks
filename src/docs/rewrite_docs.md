@@ -1,3 +1,24 @@
+Folder structure for lnks v2:
+
+REPO
+
+- .lnks.rc
+- lnks (binary)
+- package.json
+- README.md
+- todo.md (-> TODO.md)
+- applescript (DIR)
+  - lnks.applescript
+- bin (DIR)
+  - build.sh
+  - split.sh
+- plugins (DIR)
+  - empty
+- src (DIR)
+  - main.sh
+- test (DIR)
+  - lnks.test
+
 ## Permanent options for use with `~/.config/lnks/options.ext`
 
 default_browser' will skip the check in the script
