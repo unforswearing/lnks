@@ -199,7 +199,7 @@ function query_url_title() {
       grep '<title>' |
       sed 's/^.*<title>//g;s/<\/title>.*$//g'
   )"
-  if [[ -z ${url_title+x} ]]; then
+  if [[ -z "${url_title+x}" ]]; then
     >&2 _util.color red "Unable to retrieve url title."
     exit 1
   fi
@@ -361,7 +361,7 @@ for breaking_opt in "${args[@]}"; do
   # lnks <query> --print
   if [[ "${breaking_opt}" == "--print" ]]; then
     #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
-    if [[ -z ${flag_stdin+x} ]]; then
+    if [[ -z "${flag_stdin+x}" ]]; then
       pull_and_query_urls
     fi
   fi
@@ -398,7 +398,7 @@ done
 # script can now start pulling urls from the browser. First, check if
 # any urls match $user_query and exit if no urls are found.
 # if ((countof_urls < 1)); then
-if [[ $(countof_urls) -lt 1 ]]; then
+if [[ "$(countof_urls)" -lt 1 ]]; then
   debug "${LINENO}" "No match for user query: '${user_query}'"
   echo "No match for '${user_query}' in ${browser_application} Urls."
   exit
