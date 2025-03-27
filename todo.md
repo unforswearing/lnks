@@ -8,13 +8,6 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 > The basic `lnks 2.0` will be published pending the following updates:
 
-- [ ] More storable options for `lnks.rc`
-  - default_browser = `< safari | chrome >`; default: chrome
-  - default_process = `< print | markdown | html | csv >`
-  - network_tool = `< curl | wget | other_option? >` (curl by default)
-  - progress = `< true | false >` (show curl/wget progress, true by default)
-  - debug = `< true | false >` (print debugging messages, false by default)
-  - store = `< true | false >` (use the store to save urls across runs, false by default)
 - [ ] Additional testing for all options, especially runtime options.
 - [ ] Attempt to create tests for internal functions
 - [ ] Revise / update the project `readme.md`
@@ -28,35 +21,48 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - https://www.ii.com/links-footnotes-markdown/
 - [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
-- [ ] Runtime options can be created to toggle tool options or swap tools
-  - NOTE: these should go into `lnks.rc` instead of script flags.
-  - `--verbose` to show `curl` progress
-  - `--wget` to use `wget` instead of `curl` (default)
-  - etc...
+- [ ] More storable options for `lnks.rc` (not all need to be implemented in the script)
+  - default_browser = `< safari | chrome >`; default: chrome
+  - default_process = `< print | markdown | html | csv >`
+  - network_tool = `< curl | wget | other_option? >` (curl by default)
+  - progress = `< true | false >` (show curl/wget progress, true by default)
+  - debug = `< true | false >` (print debugging messages, false by default)
+  - store = `< true | false >` (use the store to save urls across runs, false by default)
 - [ ] Test all new options.
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
 
 ## Version 3 (Non-shell based)
 
-> Updating for version 2 made me realize why bash is not usable for larger scripts (and I love bash). Version 3 of this script will use a different programming language to accommodate more complex features. Completion date: TBD.
+> Updating for version 2 made me realize why bash is not usable for larger scripts (and I actually love bash). Version 3 of this script will use a different programming language to accommodate more complex features and generally make development a bit easier. Completion date: TBD.
 
-- [ ] Update all processing options to use language-native tooling, removing shell tools.
-- [ ] Rewrite script option parsing logic.
+- [ ] Use language-native tooling.
+  - Remove all code that relies on `bash` tools (`sed`, `awk`, `curl`, et al).
+- [ ] Rewrite option parsing logic.
 - [ ] Preserve all Version 2 options and features (color output, logging, tests).
+- [ ] Add a cache for curl / networking tasks
+- [ ] Review all settings to improve process or document format.
 - [ ] Add option (processing): `--json` to output a `json` object / file.
 - [ ] Add option (processing?): `--store` to save matching urls across runs.
+  - The `store` itself will likely be a `json` file (of TBD structure) saved to `~/.config/lnks/store.json`
 - [ ] Add option (runtime?): `--get` to retrieve urls matching <query> that were saved via `--store`
 - [ ] Add option (runtime): `--merge` to combine urls from `--stdin`, browser, and store into single stream for querying.
   - `cat urls.txt | lnks <query> --merge --markdown`
+- [ ] Consider adding an option (processing) that will search page content instead of the url, and save urls that match "query" (`--search`)
+  - Default posture: Yes, urls are still the main focus.
+- [ ] Consider adding an option (runtime): `--md-image` and `--html-image` to detect image file extensions and generate markdown or html formatted image src blocks using the image urls.
+  - Default posture: Maybe.
+    - Depends on implementation details. Will the flag tell the script to pull urls with image extensions, or mix images with regular urls and format based on the extension? Add options to create img src blocks and linked images (and others)? How to detect images served via JavaScript that may not have an extension? Etc?
+  - `curl url  -> strip tags (converting to text) -> search for 'user_query'`
 - [ ] Consider adding an option (runtime) to interact with Chrome and Safari bookmarks (via the bookmarks `json` file)
   - `/Users/$USER/Library/Application Support/Google/Chrome/Default/Bookmarks`
-- [ ] Consider adding an option (runtime): `--md-image` and `--html-image` to detect image file extensions and generate markdown or html formatted image src blocks using the image urls.
-- [ ] Consider adding an option (processing) that will search page content instead of the url, and save urls that match "query" (`--search`)
-  - `curl url  -> strip tags (converting to text) -> search for 'user_query'`
+  - Default posture: No.
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
   - Could implement `--input-plugin` and `--output-plugin` to connect to services that provide urls for `lnks` input, or accept urls from `lnks` output.
+    - Default posture: No. I can't (yet) think of a good use for plugins.
+      - They were originally going to be used to handle external tool functions (like saving to Pinboard), but I no longer use any of the original tools.
+      - Perhaps revist the idea of saving to Raindrop.io as an extension.
 
 ## Complete
 
