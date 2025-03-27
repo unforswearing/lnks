@@ -186,6 +186,6 @@ No match for 'yyy-example-zzz' in chrome Urls.
 
 # 21. Test that lnks prints a message when no urls matching query are found in Safari.
 
-# $ src/main.sh yyy-example-zzz --safari --print
-# No match for 'yyy-example-zzz' in safari Urls.
-# >=0
+$ src/main.sh yyy-example-zzz --safari --print
+No match for 'yyy-example-zzz' in Safari Urls.
+>=0

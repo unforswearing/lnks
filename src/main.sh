@@ -318,13 +318,6 @@ for argument in "${args[@]}"; do
     ;;
   esac
 done
-# 1. Exit if no urls matching user query are found
-# if ((countof_urls < 1)); then
-if [[ $(countof_urls) -lt 1 ]] && [[ $has_flag_runtime == false ]]; then
-  debug "${LINENO}" "No match for user query: '$user_query'"
-  echo "No match for '$user_query' in $browser_application Urls."
-  exit
-fi
 # 2. If lnks was called with only a query, print urls
 # matching that query and exit the script. A non-alias
 # for the --print option (retained below).
@@ -382,6 +375,13 @@ for runtime_opt in "${args[@]}"; do
     flag_stdin=true
   fi
 done
+# 1. Exit if no urls matching user query are found
+# if ((countof_urls < 1)); then
+if [[ $(countof_urls) -lt 1 ]]; then
+  debug "${LINENO}" "No match for user query: '$user_query'"
+  echo "No match for '$user_query' in $browser_application Urls."
+  exit
+fi
 # 5. Processing flags - options that convert links to various
 # markup and data fomats.
 for processing_opt in "${args[@]}"; do
