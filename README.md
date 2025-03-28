@@ -48,23 +48,22 @@ Options
 
 ## Examples
 
-Print urls matching <query> from Google Chrome:
+### Print urls matching <query> from Google Chrome
 
 ```
 lnks [query]
 lnks [query] --print
 ```
 
-Use Safari instead of Google Chrome:
+### Use Safari instead of Google Chrome:
 
-If the '--safari' flag follows query, search Safari URLs instead of Chrome.
-This option can be set permanently in settings.
+If the '--safari' flag follows query, search Safari URLs instead of Chrome. This option can be set permanently in settings.
 
 ```
 lnks [query] --safari --csv
 ```
 
-Read urls from files or other commands:
+### Read urls from files or other commands
 
 Use the '--stdin' flag to read urls from standard input.
 
@@ -72,7 +71,7 @@ Use the '--stdin' flag to read urls from standard input.
 cat urls.txt | lnks --stdin --csv
 ```
 
-Processing options:
+### Processing options
 
 ```
 lnks [query] --markdown
@@ -82,7 +81,7 @@ lnks [query] --csv
 lnks [query] --stdin [ --markdown | --html | --csv ]
 ```
 
-### Configuration File
+## Configuration File
 
 `lnks` stores default values for some options and other behind-the-scenes details in the `lnksrc` configuration file located at `"$HOME"/.config/lnks/lnks.rc`.
 
