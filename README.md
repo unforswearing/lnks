@@ -25,7 +25,7 @@ Instead of using the `lnks` binary, you may create an alias or function that cal
 alias lnks='bash /path/to/lnks/src/main.sh'
 
 function lnks() {
-    "/path/to/lnks/src/main.sh" "${@}"
+    bash "/path/to/lnks/src/main.sh" "${@}"
 }
 ```
 
