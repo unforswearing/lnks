@@ -29,8 +29,6 @@ Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 > [!NOTE]
 > These are the default BSD-based tools installed with MacOS, and **not** the equivalent Linux / GNU tools.
 
-<br/><br/>
-
 ## Usage
 
 ```txt
