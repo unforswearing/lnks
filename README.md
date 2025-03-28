@@ -102,7 +102,7 @@ lnks [query] --stdin [ --markdown | --html | --csv ]
 
 ## Configuration File
 
-`lnks` stores default values for some options and other behind-the-scenes details in the `lnks.rc` configuration file located at `"$HOME"/.config/lnks/lnks.rc`.
+`lnks` stores default values for some options and other behind-the-scenes details in the [`lnks.rc`](lnks.rc) configuration file located at `"$HOME"/.config/lnks/lnks.rc`.
 
 Current options:
 
