@@ -12,6 +12,16 @@ $ cd lnks
 $ sudo cp lnks /usr/local/bin
 ```
 
+If you run into [code signing issues](https://support.apple.com/en-us/102445), create an alias or function that calls `src/main.sh`.
+
+```bash
+alias lnks='bash /path/to/lnks/src/main.sh'
+
+function lnks() {
+    "/path/to/lnks/src/main.sh" "${@}"
+}
+```
+
 <!--
 Or with `npm`
 
