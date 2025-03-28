@@ -46,6 +46,9 @@ Options
 
 ## Examples
 
+> [!IMPORTANT]
+> Queries are currently **case-sensitive**. This will be removed in future versions of `lnks`.
+
 ### Print urls matching <query> from Google Chrome
 
 ```
