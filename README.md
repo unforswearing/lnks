@@ -14,7 +14,7 @@ $ sudo cp lnks /usr/local/bin
 > [!IMPORTANT]
 > If you run into [code signing issues](https://support.apple.com/en-us/102445) when running `lnks` for the first time, please [follow these steps to open an app from an unidentified developer](https://support.apple.com/en-us/102445#:~:text=If%20you%20want%20to%20open%20an%20app%20that%20hasn%E2%80%99t%20been%20notarized%20or%20is%20from%20an%20unidentified%20developer).
 
-Alternatively, you may also create an alias or function that calls `src/main.sh`.
+Alternatively, you may also create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
 
 ```bash
 alias lnks='bash /path/to/lnks/src/main.sh'
