@@ -30,6 +30,8 @@ $ npm install -g lnks
 ```
 -->
 
+`lnks` source code can be found in [`src/main.sh`](src/main.sh).
+
 ## Dependencies
 
 Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
