@@ -4,6 +4,9 @@ Triage your Google Chrome / Safari links from the terminal on MacOS.
 
 ## Installation
 
+> [!NOTE]
+> `lnks` source code can be found in [`src/main.sh`](src/main.sh).
+
 ```command
 $ git clone https://github.com/unforswearing/lnks.git lnks
 $ cd lnks
@@ -11,13 +14,7 @@ $ chmod +x lnks
 $ sudo cp lnks /usr/local/bin
 ```
 
-> [!IMPORTANT]
-> If you run into [code signing issues](https://support.apple.com/en-us/102445) when running `lnks` for the first time, please [follow these steps to open an app from an unidentified developer](https://support.apple.com/en-us/102445#:~:text=If%20you%20want%20to%20open%20an%20app%20that%20hasn%E2%80%99t%20been%20notarized%20or%20is%20from%20an%20unidentified%20developer).
-
-> [!NOTE]
-> `lnks` source code can be found in [`src/main.sh`](src/main.sh).
-
-Alternatively, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
+Instead of using the `lnks` binary, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
 
 ```bash
 alias lnks='bash /path/to/lnks/src/main.sh'
@@ -27,6 +24,9 @@ function lnks() {
 }
 ```
 
+> [!IMPORTANT]
+> If you run into [code signing issues](https://support.apple.com/en-us/102445) when running the `lnks` binary for the first time, please [follow these steps to open an app from an unidentified developer](https://support.apple.com/en-us/102445#:~:text=If%20you%20want%20to%20open%20an%20app%20that%20hasn%E2%80%99t%20been%20notarized%20or%20is%20from%20an%20unidentified%20developer).
+
 <!--
 Or with `npm`
 
@@ -34,7 +34,6 @@ Or with `npm`
 $ npm install -g lnks
 ```
 -->
-
 
 ## Dependencies
 
