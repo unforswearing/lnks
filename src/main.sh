@@ -275,7 +275,7 @@ has_flag_runtime=false
 has_flag_processing=false
 
 # 1. Check for --help flag as the first argument.
-if [[ "${user_query}" == "--help" ]] || [[ "${user_query}" == "-h" ]]; then
+if [[ "${user_query}" == "--help" ]] || [[ "${user_query}" =~ -h ]]; then
   help
   exit 0
 fi
