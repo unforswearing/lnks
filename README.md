@@ -47,7 +47,7 @@ Options
   --safari    search for urls in Safari instead of Google Chrome
   --print     print urls to stdout
   --stdin     read new-line-separated urls from stdin for use with other options
-  --markdown  print markdown formattined urls to stdout
+  --markdown  print markdown formatted urls to stdout
   --html      print html formatted list of urls to stdout
   --csv       print csv formatted urls to stdout
 ```
