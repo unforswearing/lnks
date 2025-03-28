@@ -275,7 +275,7 @@ has_flag_runtime=false
 has_flag_processing=false
 
 # 1. Check for --help flag as the first argument.
-if [[ "${user_query}" == "--help" ]]; then
+if [[ "${user_query}" == "--help" ]] || [[ "${user_query}" == "-h" ]]; then
   help
   exit 0
 fi
@@ -305,7 +305,8 @@ elif [[ -z ${args+x} ]] && [[ -n "${user_query}" ]]; then
   pull_and_query_urls
   exit 0
 else
-  # 5. Otherwise, if the script hasn't exited, shift the args array to remove user_query item
+  # 5. Otherwise, if the script hasn't exited, shift the args array
+  # to remove user_query item
   args=("${args[@]:1}")
 fi
 # 6. Loop through the arguments array to set flags or warn about invalid options.
