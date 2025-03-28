@@ -9,6 +9,7 @@ Clone the `lnks` repository and move the binary to your preferred location.
 ```command
 $ git clone https://github.com/unforswearing/lnks.git lnks
 $ cd lnks
+# chmod +x lnks
 $ sudo cp lnks /usr/local/bin
 ```
 > [!IMPORTANT]
