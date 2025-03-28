@@ -8,12 +8,18 @@
 #
 
 # Enable some optional \shellcheck checks:
-
 # shellcheck enable=add-default-case
 # shellcheck enable=avoid-nullary-conditions
 # shellcheck enable=quote-safe-variables
 # shellcheck enable=require-double-brackets
 # shellcheck enable=require-variable-braces
+
+# Bash options for safety:
+# restricted shell
+# https://www.gnu.org/software/bash/manual/html_node/The-Restricted-Shell.html
+set -r
+# NOTE: strict posix compat breaks the script
+# set -o posix
 
 args=("${@}")
 
@@ -124,7 +130,7 @@ fi
 
 # ::~ File: "src/util.sh"
 #
-function _util.color() {
+function _util_color() {
   local red="\033[31m"
   local green="\033[32m"
   local blue="\033[34m"
@@ -138,13 +144,10 @@ function _util.color() {
   *) echo "choose color: red, green, blue" ;;
   esac
 }
-function _util.null() {
-  cat /dev/null
-}
-function _util.timestamp() {
+function _util_timestamp() {
   date +'%Y-%m-%d %H:%M:%S'
 }
-function _util.get_config_item() {
+function _util_get_config_item() {
   local keyname="${1}"
   grep "${keyname}" "${lnks_configuration}" | awk -F= '{ print $2 }'
 }
@@ -155,8 +158,8 @@ function _util.get_config_item() {
 #
 debug "${LINENO}" "Attempting to create variables from lnks configuration file"
 # After config is initialized, set some variables:
-# config_default_action="$(_util.get_config_item default_action)"
-config_browser="$(_util.get_config_item default_browser)"
+# config_default_action="$(_util_get_config_item default_action)"
+config_browser="$(_util_get_config_item default_browser)"
 browser_application="${config_browser}"
 
 test -z "${browser_application+x}" && browser_application="Google Chrome"
@@ -194,13 +197,14 @@ function query_url_title() {
   local url="${1}"
   local url_title
   url_title="$(
-    # curl -skLZ "${url}" |
-    curl --progress-bar -kLZ "${url}" |
+    # TODO: enabling the progress bar causes tests to fail
+    # curl -kLZ "${url}" |
+    curl -skLZ "${url}" |
       grep '<title>' |
       sed 's/^.*<title>//g;s/<\/title>.*$//g'
   )"
   if [[ -z "${url_title+x}" ]]; then
-    >&2 _util.color red "Unable to retrieve url title."
+    >&2 _util_color red "Unable to retrieve url title."
     exit 1
   fi
   echo "${url_title}"
@@ -240,7 +244,7 @@ function create_csv_urls() {
     title="$(
       query_url_title "${this_url}"
     )"
-    tmpl="$(_util.timestamp),\"${title}\",${this_url}"
+    tmpl="$(_util_timestamp),\"${title}\",${this_url}"
     urls_csv+=("${tmpl}")
   done
   cat <<EOT
@@ -279,7 +283,7 @@ fi
 # to the script, and there are no other args, error and exit.
 if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
   debug "${LINENO}" "No query passed to script."
-  >&2 _util.color red "No query was passed to lnks."
+  >&2 _util_color red "No query was passed to lnks."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
   exit 1
@@ -289,7 +293,7 @@ if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
   # hyphen does not throw this error
 elif [[ "${user_query}" =~ -- ]]; then
   debug "${LINENO}" "User passed option instead of query to script."
-  >&2 _util.color red "Please specify a query before passing any options."
+  >&2 _util_color red "Please specify a query before passing any options."
   echo "Usage: lnks [query] <options...>"
   echo "Use 'lnks --help' to view the full help document"
   exit 1
@@ -338,7 +342,7 @@ for argument in "${args[@]}"; do
     exit
     ;;
   *)
-    >&2 _util.color red "Unknown argument: '${argument}'"
+    >&2 _util_color red "Unknown argument: '${argument}'"
     echo "Usage: lnks [query] <options...>"
     echo "Use 'lnks --help' to view the full help document"
     exit 1
@@ -382,7 +386,7 @@ for runtime_opt in "${args[@]}"; do
     stdin=$(cat -)
 
     if [[ -z "${stdin}" ]]; then
-      >&2 _util.color red "No processing options passed for --stdin"
+      >&2 _util_color red "No processing options passed for --stdin"
       echo "Usage: lnks [query] <options...>"
       echo "Use 'lnks --help' to view the full help document"
     fi
