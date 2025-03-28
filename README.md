@@ -58,8 +58,11 @@ Options
 
 ## Examples
 
+> [!NOTE]
+> Queries use `awk` and will accept keywords and regular expressions as input.
+
 > [!IMPORTANT]
-> Queries are currently **case-sensitive**. This will be removed in future versions of `lnks`.
+> Queries are currently **case-sensitive**. Case sensitivity will be removed in future versions of `lnks`.
 
 ### Print urls matching <query> from Google Chrome
 

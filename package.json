@@ -1,6 +1,6 @@
 {
   "name": "lnks",
-  "version": "2.0.1a",
+  "version": "2.0.1-a",
   "description": "Triage your Google Chrome / Safari links from the terminal on MacOS",
   "main": "src/main.sh",
   "scripts": {
@@ -29,5 +29,10 @@
     "url": "https://github.com/unforswearing/lnks/issues"
   },
   "homepage": "https://github.com/unforswearing/lnks#readme",
-  "os": [ "darwin" ]
+  "os": [
+    "darwin"
+  ],
+  "dependencies": {
+    "lnks": "^2.0.1-a"
+  }
 }
