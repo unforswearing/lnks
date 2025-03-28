@@ -1,6 +1,6 @@
 {
   "name": "lnks",
-  "version": "2.0.1",
+  "version": "2.0.1a",
   "description": "Triage your Google Chrome / Safari links from the terminal on MacOS",
   "main": "src/main.sh",
   "scripts": {
