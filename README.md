@@ -2,8 +2,6 @@
 
 Triage your Google Chrome / Safari links from the terminal on MacOS.
 
-<br/><br/>
-
 ## Installation
 
 Clone the `lnks` repository and move the binary to your preferred location.
@@ -14,13 +12,13 @@ $ cd lnks
 $ sudo cp lnks /usr/local/bin
 ```
 
+<!--
 Or with `npm`
 
 ```command
 $ npm install -g lnks
 ```
-
-<br/><br/>
+-->
 
 ## Dependencies
 
@@ -93,8 +91,6 @@ Current options:
   - **Default**: Chrome
 
 More options to come in the future.
-
-<br/><br/>
 
 ## To Do / Roadmap
 
