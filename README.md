@@ -24,8 +24,6 @@ $ npm install -g lnks
 
 Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
-<br/>
-
 > [!NOTE]
 > These are the default BSD-based tools installed with MacOS, and **not** the equivalent Linux / GNU tools.
 
