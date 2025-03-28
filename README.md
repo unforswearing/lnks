@@ -106,6 +106,6 @@ More options to come in the future.
 
 ## To Do / Roadmap
 
-After some years of neglect, `lnks` has been rewritten for version 2. This version is a stripped-down iteration of the script that removes redundant options (`--copy`, `--save`) and external (web/API-based) services (`--instapaper`, `--pinboard`). The `--pdf` option was also removed as `wkhtmltopdf` is currently unmaintained, and `lnks` is best at reformatting urls not pdf generation.
+After some years of neglect, `lnks` has been rewritten for version 2. This version is a stripped-down iteration of the script that removes redundant options (`--copy`, `--save`) and external (web/API-based) services (`--instapaper`, `--pinboard`). The `--pdf` option was also removed as `wkhtmltopdf` is currently unmaintained, and `lnks` is best at reformatting urls not pdf generation. You may find an older (possibly non-functional) version of `lnks` with these features in the [v1 directory](https://github.com/unforswearing/lnks/tree/main/v1).
 
 Please see [todo.md](todo.md) for a full list of changes for version 2, and a list of features for version 3.
