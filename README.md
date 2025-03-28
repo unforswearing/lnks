@@ -24,6 +24,8 @@ $ npm install -g lnks
 
 Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
+<br/>
+
 > [!NOTE]
 > These are the default BSD-based tools installed with MacOS, and **not** the equivalent Linux / GNU tools.
 
@@ -35,13 +37,13 @@ Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 Usage: lnks [query] <options>
 
 Options
-  -h, --help      prints this help message
-  --safari        search for urls in Safari instead of Google Chrome
-  --print         print urls to stdout
-  --stdin         read new-line-separated urls from stdin for use with other options
-  --markdown      print markdown formattined urls to stdout
-  --html          print html formatted list of urls to stdout
-  --csv           print csv formatted urls to stdout
+  -h, --help  prints this help message
+  --safari    search for urls in Safari instead of Google Chrome
+  --print     print urls to stdout
+  --stdin     read new-line-separated urls from stdin for use with other options
+  --markdown  print markdown formattined urls to stdout
+  --html      print html formatted list of urls to stdout
+  --csv       print csv formatted urls to stdout
 ```
 
 ## Examples
