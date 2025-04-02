@@ -4,29 +4,19 @@ The first version of `lnks` was created in 2015. Last checked and this command n
 
 This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.0.0` of this script (according to the old [package.json](package.json) file).
 
-## To Do (Version 2 - Rewrite)
-
-> The basic `lnks 2.0` will be published pending the following updates:
-
-- [ ] Publish a new `npm` version if possible.
-- [ ] Revise / update the project `readme.md`
-  - Update header line to read "Triage your Google Chrome / Safari links from the terminal on MacOS".
-  - Revise installation, usage description, options explanation, etc.
 
 ### Future Version 2 Updates
 
+- [ ] More settings / storable options for `lnks.rc` (not all need to be implemented in the script)
+  - [ ] default_process = `< print | markdown | html | csv >`
+  - [ ] network_tool = `< curl | wget | other_option? >` (curl by default)
+  - [ ] progress = `< true | false >` (show curl/wget progress, true by default)
+  - [ ] debug = `< true | false >` (print debugging messages, false by default)
 - [ ] Add option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
   - https://www.ii.com/links-footnotes-markdown/
 - [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
-- [ ] More storable options for `lnks.rc` (not all need to be implemented in the script)
-  - default_browser = `< safari | chrome >`; default: chrome
-  - default_process = `< print | markdown | html | csv >`
-  - network_tool = `< curl | wget | other_option? >` (curl by default)
-  - progress = `< true | false >` (show curl/wget progress, true by default)
-  - debug = `< true | false >` (print debugging messages, false by default)
-  - store = `< true | false >` (use the store to save urls across runs, false by default)
-- [ ] Test all new options.
+- [ ] Test all new options and settings.
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
 
@@ -43,6 +33,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Add option (processing): `--json` to output a `json` object / file.
 - [ ] Add option (processing?): `--store` to save matching urls across runs.
   - The `store` itself will likely be a `json` file (of TBD structure) saved to `~/.config/lnks/store.json`
+  - [ ] Add `store` as a setting in `lnks.rc`
+    - store = `< true | false >` (use the store to save urls across runs, false by default)
 - [ ] Add option (runtime?): `--get` to retrieve urls matching <query> that were saved via `--store`
 - [ ] Add option (runtime): `--merge` to combine urls from `--stdin`, browser, and store into single stream for querying.
   - `cat urls.txt | lnks <query> --merge --markdown`
@@ -64,6 +56,15 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 ## Complete
 
+### To Do (Version 2 - Rewrite)
+
+> The basic `lnks 2.0` will be published pending the following updates:
+
+- [x] Publish a new `npm` version if possible.
+    - Available on `npm`, will add to `readme.md` at some point?
+- [x] Revise / update the project `readme.md`
+  - Update header line to read "Triage your Google Chrome / Safari links from the terminal on MacOS".
+  - Revise installation, usage description, options explanation, etc.
 - [x] Additional testing for all options, especially runtime options.
 - [x] Attempt to create tests for internal functions
   - Created a script that sources main.sh to use internal functions with tests.
