@@ -19,6 +19,9 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 - [ ] Test all new options and settings.
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
+- [ ] External helper tool:
+  - [ ] Create a standalone script to output urls to `.webloc` and `.url` files.
+    - eg. `lnks <query> --print | lnks2file --webloc # -> "match_title_1.webloc match_title_2.webloc"`
 
 ## Version 3 (Non-shell based)
 
@@ -44,9 +47,6 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - Default posture: Maybe.
     - Depends on implementation details. Will the flag tell the script to pull urls with image extensions, or mix images with regular urls and format based on the extension? Add options to create img src blocks and linked images (and others)? How to detect images served via JavaScript that may not have an extension? Etc?
   - `curl url  -> strip tags (converting to text) -> search for 'user_query'`
-- [ ] Consider adding an option (runtime) to interact with Chrome and Safari bookmarks (via the bookmarks `json` file)
-  - `/Users/$USER/Library/Application Support/Google/Chrome/Default/Bookmarks`
-  - Default posture: No.
 - [ ] Consider adding an extension system, via `--plugin` flag.
   - The extension would accept a serialized list of links for procesing using any language.
   - Could implement `--input-plugin` and `--output-plugin` to connect to services that provide urls for `lnks` input, or accept urls from `lnks` output.
