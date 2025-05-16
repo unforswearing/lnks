@@ -16,6 +16,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
   - https://www.ii.com/links-footnotes-markdown/
 - [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
+- [ ] Add option (runtime): `--exclude <pattern>`
+- [ ] Add option (runtime): `--dedupe`
 - [ ] Test all new options and settings.
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
