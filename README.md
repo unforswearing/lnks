@@ -22,10 +22,10 @@ $ sudo cp lnks /usr/local/bin
 Instead of using the `lnks` binary, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
 
 ```bash
-alias lnks='bash /path/to/lnks/src/main.sh'
+alias lnks='bash $filepath/lnks/src/main.sh'
 
 function lnks() {
-    bash "/path/to/lnks/src/main.sh" "${@}"
+    bash "$filepath/lnks/src/main.sh" "${@}"
 }
 ```
 
