@@ -10,5 +10,6 @@ shellcheck src/main.sh || exit 1
 # shelltest test/lnks.test
 #
 # https://github.com/neurobin/shc
-shc -f src/main.sh -o lnks && \
-  rm src/main.sh.x.c
+# shc -f src/main.sh -o lnks && \
+#  rm src/main.sh.x.c
+cp src/main.sh lnks
