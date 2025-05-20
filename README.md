@@ -7,6 +7,8 @@ Triage your Google Chrome / Safari links from the terminal on MacOS.
 > [!NOTE]
 > `lnks` source code can be found in [`src/main.sh`](src/main.sh).
 
+### Git Clone
+
 Clone this repository, cd into the cloned directory, make the `lnks` binary file executable, and move it to your preferred location.
 
 ```command
@@ -16,8 +18,28 @@ $ chmod +x lnks
 $ sudo cp lnks /usr/local/bin
 ```
 
-> [!IMPORTANT]
-> If you run into [code signing issues](https://support.apple.com/en-us/102445) when running the `lnks` binary for the first time, please [follow these steps to open an app from an unidentified developer](https://support.apple.com/en-us/102445#:~:text=If%20you%20want%20to%20open%20an%20app%20that%20hasn%E2%80%99t%20been%20notarized%20or%20is%20from%20an%20unidentified%20developer).
+### Eget
+
+You can also install the `v2` release using [eget](https://github.com/zyedidia/eget):
+
+```command
+$ eget unforswearing/lnks
+$ sudo cp lnks /usr/local/bin
+```
+
+<!--
+
+### NPM
+
+5/19/2025: Despite this option being hidden, you can also install `lnks`  via `npm`:
+
+```command
+$ npm install -g lnks
+```
+
+-->
+
+### Dotfiles
 
 Instead of using the `lnks` binary, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
 
@@ -28,14 +50,6 @@ function lnks() {
     bash "$filepath/lnks/src/main.sh" "${@}"
 }
 ```
-
-<!--
-Or with `npm`
-
-```command
-$ npm install -g lnks
-```
--->
 
 ## Dependencies
 
