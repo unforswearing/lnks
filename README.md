@@ -18,6 +18,19 @@ $ chmod +x lnks
 $ sudo cp lnks /usr/local/bin
 ```
 
+
+#### Adding `lnks` to Your Dotfiles
+
+Instead of using the `lnks` binary, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
+
+```bash
+alias lnks='bash $filepath/lnks/src/main.sh'
+
+function lnks() {
+    bash "$filepath/lnks/src/main.sh" "${@}"
+}
+```
+
 ### Eget
 
 You can also install the `v2` release using [eget](https://github.com/zyedidia/eget):
@@ -38,18 +51,6 @@ $ npm install -g lnks
 ```
 
 -->
-
-### Dotfiles
-
-Instead of using the `lnks` binary, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
-
-```bash
-alias lnks='bash $filepath/lnks/src/main.sh'
-
-function lnks() {
-    bash "$filepath/lnks/src/main.sh" "${@}"
-}
-```
 
 ## Dependencies
 
