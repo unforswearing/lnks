@@ -29,6 +29,14 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 > Updating for version 2 made me realize why bash is not usable for larger scripts (and I actually love bash). Version 3 of this script will use a different programming language to accommodate more complex features and generally make development a bit easier. Completion date: TBD.
 
+Rewriting `lnks` in a different language:
+
+- [ ] Choose a language
+  - JavaScript (already using `npm`)
+  - Python (large ecosystem)
+  - Ruby (most fun)
+  - Swift (Apple-native language, unlikely)
+  - Other?
 - [ ] Use language-native tooling.
   - Remove all code that relies on `bash` tools (`sed`, `awk`, `curl`, et al).
 - [ ] Rewrite option parsing logic.
