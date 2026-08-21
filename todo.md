@@ -8,7 +8,8 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 
 - [ ] Add option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
   - https://www.ii.com/links-footnotes-markdown/
-- [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).- [ ] Add option (processing): `--open-in <safari | chrome>` open chrome links in safari and vice versa.
+- [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
+- [ ] Add option (processing): `--open-in <safari | chrome>` open chrome links in safari and vice versa.
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
 - [ ] Add option (runtime): `--exclude <pattern>`
 - [ ] Add option (runtime): `--dedupe`
