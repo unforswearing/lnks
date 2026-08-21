@@ -27,7 +27,7 @@ This todo file tracks progress on `src/main.sh`. These changes will constitute `
 Rewriting `lnks` in a different language:
 
 - [ ] Choose a language
-  - JavaScript (already using `npm`)
+  - JavaScript (already using `npm`, but I don't have to if i use [`qjs`](https://bellard.org/quickjs/))
   - Python (large ecosystem)
   - Ruby (most fun)
   - Swift (Apple-native language, unlikely)
