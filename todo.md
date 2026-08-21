@@ -2,8 +2,7 @@
 
 The first version of `lnks` was created in 2015. Last checked and this command no longer works (MacOS 15), so its time to update.
 
-This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.0.0` of this script (according to the old [package.json](package.json) file).
-
+This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.2.0` of this script (current version is `2.0.1-a` according to the old [package.json](package.json) file).
 
 ### Future Version 2 Updates
 
