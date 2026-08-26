@@ -283,7 +283,7 @@ fi
 # to the script, and there are no other args, error and exit.
 # if [[ -z "${user_query}" ]]; then
 # if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
-if  [[ -z "${user_query}" ]] && [[ -z "${args[*]:1}" ]]; then
+if [[ -z "${user_query}" ]] && [[ -z "${args[*]:1}" ]]; then
   debug "${LINENO}" "No query passed to script."
   >&2 _util_color red "No query was passed to lnks."
   echo "Usage: lnks [query] <options...>"
@@ -303,7 +303,7 @@ elif [[ "${user_query}" =~ -- ]]; then
   # matching that query and exit the script. A non-alias
   # for the --print option (retained below).
 elif [[ -n "${user_query}" ]] && [[ -z "${args[*]:1}" ]]; then
-# elif [[ -n "${user_query}" ]]; then
+  # elif [[ -n "${user_query}" ]]; then
   debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
   pull_and_query_urls
   exit 0
@@ -315,11 +315,11 @@ fi
 # 6. Loop through the arguments array to set flags or warn about invalid options.
 for argument in "${args[@]}"; do
   case "${argument}" in
-#  "")
-#    debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
-#    pull_and_query_urls
-#    exit 0
-#  ;;
+  #  "")
+  #    debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
+  #    pull_and_query_urls
+  #    exit 0
+  #  ;;
   --print)
     has_flag_breaking=true
     debug "${LINENO}" "has flag: breaking. ${has_flag_breaking}"
@@ -420,9 +420,9 @@ fi
 # markup and data fomats.
 for processing_opt in "${args[@]}"; do
   # ------------------------------------
-#  lnks <query>
-#  if [[ -z "${processing_opt}" ]]; then
-#    pull_and_query_urls
+  #  lnks <query>
+  #  if [[ -z "${processing_opt}" ]]; then
+  #    pull_and_query_urls
   # lnks <query> --markdown
   if [[ "${processing_opt}" == "--markdown" ]]; then
     md_urls="$(
