@@ -7,6 +7,7 @@ shfmt --indent 2 --write src/main.sh
 shellcheck src/main.sh || exit 1
 #
 # https://github.com/simonmichael/shelltestrunner
+# NOTE: (8/26/2026) this works. remember to close browser tabs between runs
 # shelltest test/lnks.test
 #
 # https://github.com/neurobin/shc
