@@ -112,6 +112,9 @@ lnks [query] --csv
 lnks [query] --stdin [ --markdown | --html | --csv ]
 ```
 
+> [!IMPORTANT]
+> The "--stdin" option must be followed with a processing flag (markdown, html, or csv).
+
 ## Configuration File
 
 `lnks` stores default values for some options and other behind-the-scenes details in the [`lnks.rc`](lnks.rc) configuration file located at `"$HOME"/.config/lnks/lnks.rc`.
