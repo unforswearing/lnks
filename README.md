@@ -129,7 +129,7 @@ More options to come in the future.
 
 ## To Do / Roadmap
 
-`lnks` is currently at version `2.0.0`, though I am only loosely tracking this. Please see [todo.md](todo.md) for a full list of changes for version 2, and a list of features for version 3.
+`lnks` is currently at version `2.2.0`, though I am only loosely tracking this. Please see [todo.md](todo.md) for a full list of changes for version 2, and a list of features for version 3.
 
 You may find an older (possibly non-functional) version of `lnks` with these features in the [v1 directory](https://github.com/unforswearing/lnks/tree/main/v1).
 
