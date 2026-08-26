@@ -4,9 +4,6 @@ Triage your Google Chrome / Safari links from the terminal on MacOS.
 
 ## Installation
 
-> [!NOTE]
-> `lnks` source code can be found in [`src/main.sh`](src/main.sh).
-
 ### Git Clone
 
 Clone this repository, cd into the cloned directory, make the `lnks` binary file executable, and move it to your preferred location.
