@@ -16,5 +16,6 @@ git push origin "v${version}"
 
 # NOTE: The lnks binary created with shc must be manually uploaded
 #       until I figure out a way to use the gh command below to do this
+#       possibly: `gh release upload "v${version}" "../lnks"`
 gh release create "v${version}" --notes "${message}"
 

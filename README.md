@@ -30,24 +30,11 @@ function lnks() {
 
 ### Eget
 
-You can also install the `v2` release using [eget](https://github.com/zyedidia/eget):
+You can also install the latest release binary using [eget](https://github.com/zyedidia/eget):
 
 ```command
-$ eget unforswearing/lnks
-$ sudo cp lnks /usr/local/bin
+$ eget unforswearing/lnks --to /usr/local/bin
 ```
-
-<!--
-
-### NPM
-
-5/19/2025: Despite this option being hidden, you can also install `lnks`  via `npm`:
-
-```command
-$ npm install -g lnks
-```
-
--->
 
 ## Dependencies
 
