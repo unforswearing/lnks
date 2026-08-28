@@ -1,4 +1,6 @@
 #!/bin/bash
+# usage: bash bin/build.bash
+# NOTE: always run from the root directory!
 
 # https://github.com/mvdan/sh
 shfmt --indent 2 --write src/main.sh

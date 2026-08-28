@@ -1,5 +1,9 @@
 #!/bin/bash
-# usage: bash release.bash "version" "release message"
+# use this file to create a new tag and release for eget installation.
+# usage: bash bin/release.bash "version" "release message"
+
+# NOTE: always run from the root directory!
+
 version="$1"
 message="$2"
 
@@ -14,8 +18,6 @@ fi
 git tag -a "v${version}" -m "${message}"
 git push origin "v${version}"
 
-# NOTE: The lnks binary created with shc must be manually uploaded
-#       until I figure out a way to use the gh command below to do this
-#       possibly: `gh release upload "v${version}" "../lnks"`
+# NOTE: make sure the `gh release upload` command works!
 gh release create "v${version}" --notes "${message}"
-
+gh release upload "v${version}" lnks
