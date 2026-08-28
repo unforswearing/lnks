@@ -92,15 +92,36 @@ cat urls.txt | lnks --stdin --csv
 ### Processing options
 
 ```
+# format urls as markdown links
 lnks [query] --markdown
+
+# format urls as an html list of links
 lnks [query] --html
+
+# format urls as a csv table (timestamp, title, url)
 lnks [query] --csv
 
+# use lnks to format newline separated urls from stdin (file or other command)
 lnks [query] --stdin [ --markdown | --html | --csv ]
 ```
 
 > [!IMPORTANT]
 > The "--stdin" option must be followed with a processing flag (markdown, html, or csv).
+
+### Using `lnks` with `pandoc`
+
+`lnks` intentionally has a limited set of output options, but you may use [`pandoc`](https://pandoc.org/) to convert the markdown or html formatted urls to another format.
+
+```
+# convert markdown to mediawiki style links
+lnks [query] --markdown | pandoc -f markdown -t mediawiki
+
+# convert csv to an html table
+lnks [query] --csv | pandoc -f csv -t html
+
+# convert standard markdown links to reference-style links
+lnks [query] --markdown | pandoc -f markdown -t markdown --reference-links
+```
 
 ## Configuration File
 
@@ -114,7 +135,12 @@ Current options:
 
 More options to come in the future.
 
-## To Do / Roadmap
+## Bugs
+
+- On first run, `lnks` may fail when creating the `lnks.rc` file.
+- The `lnks` binary file installed via `eget` may not work correctly on some versions of MacOS.
+
+## To Do
 
 `lnks` is currently at version `2.2.0`, though I am only loosely tracking this. Please see [todo.md](todo.md) for a full list of changes for version 2, and a list of features for version 3.
 
