@@ -41,7 +41,7 @@ $ eget unforswearing/lnks --to /usr/local/bin
 Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
 > [!NOTE]
-> These are the default BSD-based tools installed with MacOS, and **not** the equivalent Linux / GNU tools.
+> These are the default BSD-based tools installed with MacOS.
 
 ## Usage
 
@@ -66,30 +66,14 @@ Options
 > [!IMPORTANT]
 > Queries are currently **case-sensitive**. Case sensitivity will be removed in future versions of `lnks`.
 
-### Print urls matching <query> from Google Chrome
+### Print a simple list of urls matching <query> from Google Chrome
 
 ```
 lnks [query]
 lnks [query] --print
 ```
 
-### Use Safari instead of Google Chrome:
-
-If the `--safari` flag follows query, search Safari URLs instead of Chrome. This option can be set permanently in settings.
-
-```
-lnks [query] --safari --csv
-```
-
-### Read urls from files or other commands
-
-Use the `--stdin` flag to read urls from standard input.
-
-```
-cat urls.txt | lnks --stdin --csv
-```
-
-### Processing options
+### Convert the queried urls to various formats
 
 ```
 # format urls as markdown links
@@ -100,9 +84,23 @@ lnks [query] --html
 
 # format urls as a csv table (timestamp, title, url)
 lnks [query] --csv
+```
 
-# use lnks to format newline separated urls from stdin (file or other command)
+### Use Safari instead of Google Chrome
+
+If the `--safari` flag follows query, search Safari URLs instead of Chrome. This option can be set permanently in settings.
+
+```
+lnks [query] --safari --csv
+```
+
+### Use the `--stdin` flag to read urls from standard input
+
+```
 lnks [query] --stdin [ --markdown | --html | --csv ]
+
+# For example:
+cat urls.txt | lnks --stdin --csv
 ```
 
 > [!IMPORTANT]
