@@ -2,18 +2,16 @@
 
 The first version of `lnks` was created in 2015. Last checked and this command no longer works (MacOS 15), so its time to update.
 
-This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.2.0` of this script (current version is `2.0.1-a` according to the old [package.json](package.json) file).
+This todo file tracks progress on `src/main.sh`. These changes will constitute `version 2.3.0` of this script (current version is `2.2.0`).
+
+Proposed changes for v3 are also included below, however review is needed before anything is implemented. 
 
 ### Future Version 2 Updates
 
-- [ ] Add option (processing): `--reference` to output `markdown` refrence-style links (footnotes).
-  - https://www.ii.com/links-footnotes-markdown/
-- [ ] Add option (processing): `--wiki` to output wiki-style links (`[[link]]` or `[[link|title]]`).
 - [ ] Add option (processing): `--open-in <safari | chrome>` open chrome links in safari and vice versa.
 - [ ] Add option (runtime): `--no-title` don't retreive the page title via `curl`.
 - [ ] Add option (runtime): `--exclude <pattern>`
 - [ ] Add option (runtime): `--dedupe`
-- [ ] Test all new options and settings.
 - [ ] Discard all non-url content when using options `--stdin`.
   - Match and output urls only, discard any other sort of formatting.
 
