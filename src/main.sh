@@ -303,7 +303,6 @@ elif [[ "${user_query}" =~ -- ]]; then
   # matching that query and exit the script. A non-alias
   # for the --print option (retained below).
 elif [[ -n "${user_query}" ]] && [[ -z "${args[*]:1}" ]]; then
-  # elif [[ -n "${user_query}" ]]; then
   debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
   pull_and_query_urls
   exit 0
