@@ -315,11 +315,6 @@ fi
 # 6. Loop through the arguments array to set flags or warn about invalid options.
 for argument in "${args[@]}"; do
   case "${argument}" in
-  #  "")
-  #    debug "${LINENO}" "User supplied a query with no arguments. Pull urls"
-  #    pull_and_query_urls
-  #    exit 0
-  #  ;;
   --print)
     has_flag_breaking=true
     debug "${LINENO}" "has flag: breaking. ${has_flag_breaking}"
@@ -351,9 +346,6 @@ for breaking_opt in "${args[@]}"; do
   # lnks <query> with no other arguments acts as an alias for --print
   # the --print option is kept to mitigate surprise behavior and
   # provide an explicit way to handle this task.
-  #
-  # lnks <query>
-  # lnks <query> --print
   if [[ "${breaking_opt}" == "--print" ]]; then
     #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
     if [[ -z "${flag_stdin+x}" ]]; then
@@ -392,7 +384,6 @@ done
 # Now that all breaking and runtime flags have been parsed, the
 # script can now start pulling urls from the browser. First, check if
 # any urls match $user_query and exit if no urls are found.
-# if ((countof_urls < 1)); then
 if [[ "$(countof_urls)" -lt 1 ]]; then
   debug "${LINENO}" "No match for user query: '${user_query}'"
   echo "No match for '${user_query}' in ${browser_application} Urls."
@@ -401,10 +392,6 @@ fi
 # 9. Processing flags - options that convert links to various
 # markup and data fomats.
 for processing_opt in "${args[@]}"; do
-  # ------------------------------------
-  #  lnks <query>
-  #  if [[ -z "${processing_opt}" ]]; then
-  #    pull_and_query_urls
   # lnks <query> --markdown
   if [[ "${processing_opt}" == "--markdown" ]]; then
     md_urls="$(
@@ -424,9 +411,7 @@ for processing_opt in "${args[@]}"; do
     )"
     echo "${csv_urls}"
   elif [[ "${processing_opt}" == "--print" ]]; then
-    # if [[ ${has_flag_breaking} ]]; then
     pull_and_query_urls
-    # fi
   fi
 done
 #
