@@ -14,8 +14,7 @@
 # shellcheck enable=require-double-brackets
 # shellcheck enable=require-variable-braces
 
-# Bash options for safety:
-# restricted shell
+# restricted shell, more as a safety guarantee than a limiting factor
 # https://www.gnu.org/software/bash/manual/html_node/The-Restricted-Shell.html
 set -r
 # NOTE: strict posix compat breaks the script
