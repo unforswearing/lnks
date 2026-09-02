@@ -347,7 +347,6 @@ for breaking_opt in "${args[@]}"; do
   # the --print option is kept to mitigate surprise behavior and
   # provide an explicit way to handle this task.
   if [[ "${breaking_opt}" == "--print" ]]; then
-    #if [[ -z ${has_flag_runtime+x} ]] || [[ -z ${has_flag_processing+x} ]]; then
     if [[ -z "${flag_stdin+x}" ]]; then
       pull_and_query_urls
     fi
