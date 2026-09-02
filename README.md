@@ -15,7 +15,6 @@ $ chmod +x lnks
 $ sudo cp lnks /usr/local/bin
 ```
 
-
 #### Adding `lnks` to Your Dotfiles
 
 Instead of using the `lnks` binary, you may create an alias or function that calls `src/main.sh` and add it to your shell startup files (like `.zshrc`).
@@ -40,8 +39,10 @@ $ eget unforswearing/lnks --to /usr/local/bin
 
 Standard command line utilities: `awk`, `curl`, `grep`, `sed`, etc.
 
+`lnks` also uses [AppleScript](src/applescript/links.applescript) to pull urls from Google Chrome / Safari.
+
 > [!NOTE]
-> These are the default BSD-based tools installed with MacOS.
+> To use `lnks` with other browsers (Brave, Chromium, Vivaldi, etc), consider modifying this script to replace the AppleScript snippet with [`chrome-cli`](https://github.com/prasmussen/chrome-cli).
 
 ## Usage
 
