@@ -121,6 +121,19 @@ lnks [query] --csv | pandoc -f csv -t html
 lnks [query] --markdown | pandoc -f markdown -t markdown --reference-links
 ```
 
+### Other Examples
+
+```
+# save a list of links to your clipboard
+lnks [query] | pbcopy
+
+# save a list of links to a file
+lnks [query] --markdown > urls.md
+
+# use html-tidy to create a webpage containing the list of matching links
+lnks [query] --html | tidy -o urls.html
+```
+
 ## Configuration File
 
 `lnks` stores default values for some options and other behind-the-scenes details in the [`lnks.rc`](lnks.rc) configuration file located at `"$HOME"/.config/lnks/lnks.rc`.
