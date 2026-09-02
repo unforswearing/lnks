@@ -281,8 +281,6 @@ if [[ "${user_query}" == "--help" ]] || [[ "${user_query}" =~ -h ]]; then
 fi
 # 2. user_query should always be the first argument. If no query was passed
 # to the script, and there are no other args, error and exit.
-# if [[ -z "${user_query}" ]]; then
-# if [[ -z ${args+x} ]] && [[ -z "${user_query}" ]]; then
 if [[ -z "${user_query}" ]] && [[ -z "${args[*]:1}" ]]; then
   debug "${LINENO}" "No query passed to script."
   >&2 _util_color red "No query was passed to lnks."
